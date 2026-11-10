@@ -3,6 +3,13 @@
 Snapshot date: 2026-11-10. Git tag of this exact state: `handoff-2026-11-10`.
 Written for the pause while the art, animation and gameplay overhaul happens elsewhere.
 
+> **Update 2026-11-11:** ChatGPT's overhaul v1 has been merged on branch `overhaul-v1`
+> and passes every check below. What it changed is in `CHANGELOG.md` and
+> `PRODUCTION_OVERHAUL_README.md`. The art limits in sections 7 and 8 still largely
+> apply: Tato now has idle, jump, fall, land, attack, pickup and hurt animations, and
+> creatures and bosses have four motion frames each, but all of those frames are
+> re-posed copies of the earlier drawings.
+
 How to read this file:
 
 - **Works (tested)** — built, and an automated test or an on-screen check confirmed it.

@@ -45,10 +45,46 @@ func setup(theme_name: String, level_size: Vector2) -> void:
 	_add_layer("bg/%s_mid" % theme, Vector2(0.36, 0.75), level_size.y - 430.0, 1.3, Vector2.ZERO)
 
 
+static var _seamless_cache: Dictionary = {}
+
+
+## A layer whose left and right edges do not match shows a hard seam (a tree
+## cut in half, a step in the hills) every time it repeats. Such a layer is
+## doubled with a mirrored copy of itself, so each edge always meets itself.
+static func seamless(short: String, tex: Texture2D) -> Texture2D:
+	if _seamless_cache.has(short):
+		return _seamless_cache[short]
+	var out := tex
+	var img := tex.get_image()
+	if img != null and not img.is_empty():
+		if img.is_compressed():
+			img.decompress()
+		img.convert(Image.FORMAT_RGBA8)
+		var w := img.get_width()
+		var h := img.get_height()
+		var diff := 0.0
+		var rows := 0
+		for y in range(0, h, 4):
+			var a := img.get_pixel(0, y)
+			var b := img.get_pixel(w - 1, y)
+			diff += absf(a.r - b.r) + absf(a.g - b.g) + absf(a.b - b.b) + absf(a.a - b.a)
+			rows += 1
+		if rows > 0 and diff / rows > 0.06:
+			var wide := Image.create(w * 2, h, false, Image.FORMAT_RGBA8)
+			wide.blit_rect(img, Rect2i(0, 0, w, h), Vector2i.ZERO)
+			var flipped: Image = img.duplicate()
+			flipped.flip_x()
+			wide.blit_rect(flipped, Rect2i(0, 0, w, h), Vector2i(w, 0))
+			out = ImageTexture.create_from_image(wide)
+	_seamless_cache[short] = out
+	return out
+
+
 func _add_layer(short: String, scroll: Vector2, top_y: float, scale_by: float, autoscroll: Vector2) -> void:
 	var tex := Art.tex(short)
 	if tex == null:
 		return
+	tex = seamless(short, tex)
 	var px := Parallax2D.new()
 	px.scroll_scale = scroll
 	px.repeat_size = Vector2(tex.get_width() * scale_by, 0)

@@ -4,6 +4,16 @@ extends Node
 ##   --level=W1-L1     jump straight into a stage (throwaway profile)
 ##   --test            mark the run as an automated test (no fades, no prompts)
 
+var _shot_taker: ShotTaker
+
+
+func _shots() -> ShotTaker:
+	if _shot_taker == null:
+		_shot_taker = ShotTaker.new()
+		get_tree().root.add_child.call_deferred(_shot_taker)
+	return _shot_taker
+
+
 func _ready() -> void:
 	var level := ""
 	for arg in OS.get_cmdline_user_args():
@@ -15,6 +25,16 @@ func _ready() -> void:
 			Game.headless_test = true
 		elif arg == "--fps":
 			Game.show_stats = true
+		elif arg.begins_with("--shot="):
+			_shots().path = arg.substr(7)
+		elif arg.begins_with("--shot-after="):
+			_shots().after = arg.substr(13).to_int()
+		elif arg.begins_with("--shot-count="):
+			_shots().count = arg.substr(13).to_int()
+		elif arg.begins_with("--shot-every="):
+			_shots().every = arg.substr(13).to_int()
+		elif arg.begins_with("--press="):
+			_shots().press = arg.substr(8).split(",")
 	# web builds can use ?level=W1-L1 for quick checks
 	if OS.has_feature("web"):
 		var q: Variant = JavaScriptBridge.eval("new URLSearchParams(window.location.search).get('level') || ''", true)
