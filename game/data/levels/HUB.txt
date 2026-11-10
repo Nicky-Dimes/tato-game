@@ -1,0 +1,39 @@
+; The Home Nest: world gates, the notebook, the wardrobe and the trial room.
+[meta]
+id = HUB
+name = Home Nest
+kind = hub
+theme = nest
+music = hub
+hints = Each picture is a world: walk up and press up. | The notebook remembers what you have found. | Coins buy things to wear at the wardrobe.
+[legend]
+1 = sign text=hub_gate
+2 = sign text=hub_book
+3 = sign text=hub_trial
+4 = sign text=hub_wardrobe
+a = worldgate W1
+b = worldgate W2
+c = worldgate W3
+d = worldgate W4
+e = worldgate W5
+f = worldgate W6
+K = book
+W = wardrobe
+T = door to=TRIAL
+D = decor
+[map]
+
+
+
+
+
+
+
+
+
+
+
+  D  2 K   4 W    @   1   a     b     c     d     e     f    3  T   D
+########################################################################
+########################################################################
+########################################################################

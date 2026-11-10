@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="FoodDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/food/food_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"WATERMELON"
+display_name = "Watermelon"
+ability_name = "Multi Shot"
+description = "Three melon slices fan out at once. Great against a crowd."
+color = Color(0.2471, 0.6824, 0.2902, 1)
+accent = Color(0.9490, 0.3529, 0.4314, 1)
+icon_path = "res://assets/sprites/powers/watermelon.png"
+demo_path = "res://assets/sprites/cards/demo_watermelon.png"
+ability_script = "res://scripts/food/abilities/watermelon.gd"
+damage = 1
+cooldown = 0.50
+duration = 0.20
+element = &"melon"
+unlock_world = 2
+blend_adjective = "Juicy"
+blend_noun = "Rumble"
+honk_sound = "honk_melon"
+tags = PackedStringArray("melon")

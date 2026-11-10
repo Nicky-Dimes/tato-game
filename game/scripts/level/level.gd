@@ -2,18 +2,20 @@ class_name Level
 extends Node2D
 ## One playable stage, built at run time from a text file (see LevelData).
 ## Owns the terrain, Tato, the camera, the HUD and the stage rules:
-## checkpoints, falling out, snack-break respawns, links between switches
-## and the things they open, and finishing the stage.
+## hearts and respawning at checkpoints (no lives, nothing is ever lost),
+## coins and what spills out of crates and blocks, links between buttons and
+## the things they move, and finishing the stage.
 
 signal completed(stats: Dictionary)
 signal link_changed(id: String, active: int)
 signal player_respawned
+signal enemy_defeated(enemy: Node)
 
 const TILE := Layers.TILE
 
 var level_id := ""
 var data: LevelData
-var theme := "picnic"
+var theme := "grassland"
 var kind := "core"
 var terrain: Terrain
 var entities: Node2D
@@ -26,19 +28,22 @@ var boss: Node = null
 
 var elapsed := 0.0
 var finished := false
-var scraps_total := 0
-var scraps_found := 0
+var notes_total := 0
+var notes_found := 0
+var charms := 0
+var defeated_count := 0
+var enemy_time := 1.0                 # creatures' clock (a Time pickup slows it)
 var checkpoint_position := Vector2.ZERO
-var checkpoint_inventory: Dictionary = {}
+var checkpoint_power: Dictionary = {}
 var active_checkpoint: Node = null
 
 var _links: Dictionary = {}          # id -> Array[Node] targets
 var _link_sources: Dictionary = {}   # id -> Dictionary(source instance id -> true)
 var _pause_menu: PauseMenu
-var _replace_prompt: ReplacePrompt
 var _dialogue: DialogueBox
 var _respawning := false
 var _started := false
+var _slow_left := 0.0
 
 
 func _ready() -> void:
@@ -50,7 +55,7 @@ func _ready() -> void:
 	for e in data.errors:
 		push_warning("%s: %s" % [level_id, e])
 	var w := LevelDB.world_of(level_id)
-	theme = data.meta_str("theme", str(w.get("theme", "nest")))
+	theme = data.meta_str("theme", str(w.get("theme", "grassland")))
 	kind = data.meta_str("kind", LevelDB.stage_kind(level_id))
 	process_mode = Node.PROCESS_MODE_PAUSABLE
 
@@ -87,21 +92,22 @@ func _ready() -> void:
 	hud.setup(self)
 	touch = TouchControls.new()
 	add_child(touch)
+	touch.setup(self)
 	_dialogue = DialogueBox.new()
 	add_child(_dialogue)
-	_replace_prompt = ReplacePrompt.new()
-	add_child(_replace_prompt)
 	_pause_menu = PauseMenu.new()
 	add_child(_pause_menu)
 	_pause_menu.setup(self)
 
 	player.fell_out.connect(_on_fell_out)
 	player.got_hurt.connect(_on_player_hurt)
-	player.replace_needed.connect(_on_replace_needed)
 	GameState.recipe_discovered.connect(_on_recipe_discovered)
 	GameState.reset_session()
 	if Game.start_checkpoint != "":
 		_start_at_checkpoint(Game.start_checkpoint)
+	var start_power := data.meta_str("power")
+	if start_power != "":
+		player.power.pick_up(StringName(start_power))
 
 	var music := data.meta_str("music", str(w.get("music", "hub")))
 	AudioService.music(music)
@@ -116,20 +122,20 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	if not finished:
 		elapsed += delta
+	if _slow_left > 0.0:
+		_slow_left -= delta
+		if _slow_left <= 0.0:
+			enemy_time = 1.0
 
 
 func _unhandled_input(event: InputEvent) -> void:
 	if finished or Game.is_transitioning:
 		return
 	if event.is_action_pressed("pause"):
-		if _dialogue.is_open() or _replace_prompt.is_open():
+		if _dialogue.is_open():
 			return
 		_pause_menu.open()
 		get_viewport().set_input_as_handled()
-	elif event.is_action_pressed("hint"):
-		show_hint_nest()
-	elif event.is_action_pressed("map"):
-		_pause_menu.open("journal")
 
 
 # ------------------------------------------------------------------ build --
@@ -151,15 +157,16 @@ func _build_bounds() -> void:
 
 
 func _build_entities() -> void:
-	var counters := {"scrap": 0, "pin": 0, "dish": 0}
+	var notes := 0
 	for e in data.entities:
 		var type: String = e["type"]
 		if type == "spawn":
 			continue
-		if counters.has(type):
-			counters[type] = int(counters[type]) + 1
-			var letter := type.substr(0, 1).to_upper()
-			e["params"]["collect_id"] = "%s-%s%02d" % [level_id, letter, int(counters[type])]
+		if type == "note":
+			notes += 1
+			e["params"]["collect_id"] = "%s-N%02d" % [level_id, notes]
+		elif type == "star":
+			e["params"]["collect_id"] = "%s-star" % level_id
 		var node := EntityFactory.create(self, e)
 		if node == null:
 			continue
@@ -167,9 +174,8 @@ func _build_entities() -> void:
 		var link_id := str(e["params"].get("id", ""))
 		if link_id != "":
 			register_link(link_id, node)
-	scraps_total = int(counters["scrap"])
-	scraps_found = GameState.count_in_level("scrap", level_id)
-	# let targets learn their starting state once everything exists
+	notes_total = notes
+	notes_found = GameState.count_in_level("note", level_id)
 	for id: String in _links.keys():
 		_notify_link(id)
 
@@ -205,6 +211,12 @@ func is_solid_at(point: Vector2) -> bool:
 	return data.is_block(c.x, c.y)
 
 
+## A Time pickup: creatures move in slow motion for a while.
+func slow_time(seconds: float) -> void:
+	enemy_time = 0.35
+	_slow_left = seconds
+
+
 # ------------------------------------------------------------------ links --
 
 func register_link(id: String, node: Node) -> void:
@@ -213,8 +225,8 @@ func register_link(id: String, node: Node) -> void:
 	(_links[id] as Array).append(node)
 
 
-## A switch, chime, plate ... reports that it is on or off. Everything that
-## shares the id hears how many sources are currently on.
+## A button, lever ... reports that it is on or off. Everything that shares
+## the id hears how many sources are currently on.
 func trigger(id: String, on: bool, source: Node) -> void:
 	if id == "":
 		return
@@ -241,19 +253,58 @@ func _notify_link(id: String) -> void:
 			node.call("on_link", count)
 
 
-func nodes_with_id(id: String) -> Array:
-	return _links.get(id, [])
-
-
-# ------------------------------------------------------------- collectibles --
+# ------------------------------------------------------------ coins & loot --
 
 func collect(collect_kind: String, id: String, at: Vector2) -> void:
 	var fresh := GameState.collect(collect_kind, id)
-	if collect_kind == "scrap" and fresh:
-		scraps_found += 1
-	hud.on_collect(collect_kind, fresh)
+	if collect_kind == "note" and fresh:
+		notes_found += 1
+	hud.refresh_counts()
 	if fresh:
 		Fx.sparkle(self, at, Color(1, 0.92, 0.45), 8)
+
+
+## Coins hop out (of a defeated creature, a crate, a block).
+func drop_coins(at: Vector2, count: int) -> void:
+	for i in count:
+		var coin := EntityFactory.create(self, {"type": "coin", "cell": cell_at(at), "args": [], "params": {}})
+		if coin == null:
+			continue
+		entities.add_child(coin)
+		(coin as Node2D).global_position = at
+		coin.call("toss", Vector2(randf_range(-110.0, 110.0), randf_range(-420.0, -280.0)))
+
+
+## What was inside a crate or a Question Block: "coins:3", "heart", "key",
+## "pickup:wings", "power:FROSTBERRY".
+func spill(holds: String, at: Vector2) -> void:
+	if holds == "":
+		return
+	var parts := holds.split(":")
+	var what := parts[0]
+	var extra := parts[1] if parts.size() > 1 else ""
+	if what == "coins":
+		drop_coins(at, maxi(int(extra), 1))
+		return
+	var entry := {"type": what, "cell": cell_at(at), "args": [], "params": {}}
+	if what == "pickup" or what == "power":
+		entry["args"] = [extra]
+		entry["params"][extra] = true
+	var node := EntityFactory.create(self, entry)
+	if node == null:
+		return
+	entities.add_child(node)
+	if what == "power":
+		(node as Node2D).global_position = Vector2(at.x, (cell_at(at).y + 1) * TILE)
+	else:
+		(node as Node2D).global_position = at + Vector2(0, 30)
+		node.create_tween().tween_property(node, "global_position", at, 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	AudioService.play("appear", -4.0)
+
+
+func on_enemy_defeated(enemy: Node) -> void:
+	defeated_count += 1
+	enemy_defeated.emit(enemy)
 
 
 # -------------------------------------------------------------- checkpoints --
@@ -265,12 +316,12 @@ func activate_checkpoint(cp: Node2D) -> void:
 		active_checkpoint.call("set_lit", false)
 	active_checkpoint = cp
 	checkpoint_position = cp.global_position
-	checkpoint_inventory = player.inventory.snapshot()
-	GameState.restore_feathers()
+	checkpoint_power = player.power.snapshot()
+	GameState.restore_hearts()
 	GameState.profile["checkpoint"] = str(cp.get("checkpoint_id"))
 	GameState.profile["current_level"] = level_id if level_id != LevelDB.HUB_ID else str(GameState.profile.get("current_level", ""))
 	GameState.save()
-	Captions.caption("Snack station reached")
+	hud.show_message("Checkpoint!", 1.0)
 
 
 func _start_at_checkpoint(cp_id: String) -> void:
@@ -286,7 +337,7 @@ func _start_at_checkpoint(cp_id: String) -> void:
 
 
 func _on_player_hurt() -> void:
-	if GameState.lose_feather():
+	if GameState.lose_heart():
 		call_deferred("respawn_at_checkpoint")
 
 
@@ -294,7 +345,7 @@ func _on_fell_out() -> void:
 	if _respawning or finished:
 		return
 	_respawning = true
-	var out := GameState.lose_feather()
+	var out := GameState.lose_heart()
 	AudioService.voice("honk_hurt")
 	if out:
 		respawn_at_checkpoint()
@@ -303,41 +354,42 @@ func _on_fell_out() -> void:
 		camera.snap()
 		Fx.puff(self, player.global_position, Color(1, 1, 1, 0.8), 5)
 		player_respawned.emit()
-	_respawning = false
+		_respawning = false
 
 
-## Out of Comfort Feathers: a little "snack break" back at the last station.
-## Nothing is lost; puzzle pieces reset so the room can always be solved.
+## Out of hearts: Tato flops, then pops back at the last checkpoint with
+## full hearts. Coins, notes and everything found are kept.
 func respawn_at_checkpoint() -> void:
 	if finished:
 		return
 	_respawning = true
 	player.set_disabled(true)
-	hud.show_message("Snack break!")
+	hud.show_defeat()
 	if not Game.headless_test:
-		await get_tree().create_timer(0.7).timeout
+		await get_tree().create_timer(1.1).timeout
 	if not is_inside_tree():
 		return
 	reset_puzzles()
-	GameState.restore_feathers()
-	if not checkpoint_inventory.is_empty():
-		player.inventory.restore(checkpoint_inventory)
+	GameState.restore_hearts()
+	if not checkpoint_power.is_empty():
+		player.power.restore(checkpoint_power)
 	player.teleport_to(checkpoint_position)
 	player.last_safe_position = checkpoint_position
 	player.set_disabled(false)
 	camera.snap()
 	_respawning = false
 	player_respawned.emit()
+	if boss != null and is_instance_valid(boss) and boss.has_method("on_player_respawn"):
+		boss.call("on_player_respawn")
 
 
-## Puts loose puzzle pieces back (crates, melted blocks, switches ...).
+## Puts loose things back (creatures still about, buttons, platforms).
 func reset_puzzles() -> void:
 	for node in get_tree().get_nodes_in_group("resettable"):
 		if node.has_method("reset_puzzle") and is_ancestor_of(node):
 			node.call("reset_puzzle")
-	for t in get_tree().get_nodes_in_group("temporary"):
-		if is_ancestor_of(t):
-			t.queue_free()
+	for shot in get_tree().get_nodes_in_group("enemy_shot"):
+		shot.queue_free()
 
 
 # ------------------------------------------------------------------ finish --
@@ -352,8 +404,10 @@ func complete_level() -> void:
 	var stats := {
 		"time": elapsed,
 		"hurt": player.hurt_count,
-		"scraps_found": scraps_found,
-		"scraps_total": scraps_total,
+		"notes_found": notes_found,
+		"notes_total": notes_total,
+		"coins": GameState.stage_coins,
+		"defeated": defeated_count,
 	}
 	var result := Game.finish_level(stats)
 	completed.emit(stats)
@@ -377,14 +431,6 @@ func say(dialogue_id: String, on_done: Callable = Callable()) -> void:
 	_dialogue.play(dialogue_id, player, on_done)
 
 
-func say_lines(lines: Array, on_done: Callable = Callable()) -> void:
-	if Game.headless_test:
-		if on_done.is_valid():
-			on_done.call()
-		return
-	_dialogue.play_lines(lines, player, on_done)
-
-
 func dialogue_open() -> bool:
 	return _dialogue != null and _dialogue.is_open()
 
@@ -392,31 +438,21 @@ func dialogue_open() -> bool:
 func show_hint_nest() -> void:
 	var hints: Array = HintNest.hints_for(self)
 	if hints.is_empty():
-		hud.show_message("Honk at things. Eat snacks. Try both together!")
-		return
+		hints = ["Jump on creatures or bop them with your attack.", "Food bowls give Tato a new attack.", "Look for three Treasure Notes hidden off the main path."]
 	hud.show_hint(hints)
 
 
 func open_wardrobe() -> void:
-	var panel := WardrobePanel.new()
 	var layer := CanvasLayer.new()
 	layer.layer = 45
 	add_child(layer)
+	var panel := WardrobePanel.new()
 	layer.add_child(panel)
 	player.set_disabled(true)
 	panel.closed.connect(func() -> void:
 		layer.queue_free()
 		player.set_disabled(false)
 		player.visual.refresh_cosmetics())
-
-
-# ------------------------------------------------------------------ prompts --
-
-func _on_replace_needed(food: StringName) -> void:
-	if Game.headless_test:
-		player.resolve_replace(FoodInventory.SLOT_A)
-		return
-	_replace_prompt.ask(player, food)
 
 
 func _on_recipe_discovered(rec: RecipeDefinition) -> void:

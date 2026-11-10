@@ -4,12 +4,12 @@ extends Area2D
 ## freezes the surface into temporary ice that can be walked on.
 
 const THEME_COLORS := {
-	"picnic": Color(0.36, 0.72, 0.96, 0.62),
-	"farm": Color(0.98, 0.72, 0.25, 0.7),      # syrup river
-	"fair": Color(0.55, 0.82, 0.98, 0.62),
-	"market": Color(0.33, 0.78, 0.8, 0.62),
-	"marsh": Color(0.25, 0.5, 0.75, 0.66),
-	"kitchen": Color(0.6, 0.75, 0.95, 0.6),
+	"grassland": Color(0.36, 0.72, 0.96, 0.62),
+	"orchard": Color(0.36, 0.72, 0.96, 0.62),
+	"candy": Color(1.0, 0.6, 0.82, 0.66),      # strawberry syrup
+	"icy": Color(0.42, 0.74, 0.98, 0.66),
+	"windy": Color(0.36, 0.76, 0.92, 0.62),
+	"castle": Color(0.5, 0.62, 0.95, 0.62),
 	"nest": Color(0.36, 0.72, 0.96, 0.62),
 }
 

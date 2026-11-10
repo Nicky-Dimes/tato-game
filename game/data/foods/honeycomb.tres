@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="FoodDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/food/food_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"HONEYCOMB"
+display_name = "Honeycomb"
+ability_name = "Honey Shot"
+description = "A gooey glob of honey. Sticks creatures in place so they cannot move."
+color = Color(0.9608, 0.6510, 0.1373, 1)
+accent = Color(1.0000, 0.8784, 0.5412, 1)
+icon_path = "res://assets/sprites/powers/honeycomb.png"
+demo_path = "res://assets/sprites/cards/demo_honeycomb.png"
+ability_script = "res://scripts/food/abilities/honeycomb.gd"
+damage = 1
+cooldown = 0.45
+duration = 0.20
+element = &"honey"
+unlock_world = 2
+blend_adjective = "Sticky"
+blend_noun = "Goo"
+honk_sound = "honk_sticky"
+tags = PackedStringArray("honey")

@@ -1,12 +1,12 @@
 class_name JournalPanel
 extends Control
-## Mimi's Recipe Notebook: snacks met so far, the twelve signature recipes
-## (names stay "? ? ?" until first cooked), kitchen experiments, and the
-## collection (pages, scraps, pins, dishes, medals).
+## The Snack Notebook: the twelve power-ups (with the action pictures from
+## the item board), the Flavor Bursts found so far, the creatures met, and
+## the collection (pages, stars, Treasure Notes, coins).
 
 signal closed
 
-const TABS := ["Snacks", "Recipes", "Collection"]
+const TABS := ["Powers", "Bursts", "Creatures", "Collection"]
 
 var _body: VBoxContainer
 var _tab_buttons: Array[Button] = []
@@ -17,22 +17,22 @@ func _ready() -> void:
 	theme = UITheme.theme()
 	var panel := UITheme.panel()
 	panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	panel.offset_left = 70.0
-	panel.offset_right = -70.0
-	panel.offset_top = 34.0
-	panel.offset_bottom = -34.0
+	panel.offset_left = 60.0
+	panel.offset_right = -60.0
+	panel.offset_top = 30.0
+	panel.offset_bottom = -30.0
 	add_child(panel)
 	var outer := VBoxContainer.new()
 	outer.add_theme_constant_override("separation", 8)
 	panel.add_child(outer)
-	outer.add_child(UITheme.title_label("Recipe Notebook", 40))
+	outer.add_child(UITheme.title_label("Snack Notebook", 40))
 	var tabs := HBoxContainer.new()
 	tabs.alignment = BoxContainer.ALIGNMENT_CENTER
 	tabs.add_theme_constant_override("separation", 8)
 	outer.add_child(tabs)
 	for t: String in TABS:
 		var b := UITheme.small_button(t)
-		b.custom_minimum_size = Vector2(190, 52)
+		b.custom_minimum_size = Vector2(170, 52)
 		b.pressed.connect(_show_tab.bind(t))
 		tabs.add_child(b)
 		_tab_buttons.append(b)
@@ -48,7 +48,7 @@ func _ready() -> void:
 	back.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	back.pressed.connect(func() -> void: closed.emit())
 	outer.add_child(back)
-	_show_tab("Snacks")
+	_show_tab("Powers")
 	_tab_buttons[0].grab_focus()
 
 
@@ -58,18 +58,20 @@ func _show_tab(tab: String) -> void:
 	for i in TABS.size():
 		_tab_buttons[i].modulate = Color.WHITE if TABS[i] == tab else Color(1, 1, 1, 0.7)
 	match tab:
-		"Snacks":
-			_build_snacks()
-		"Recipes":
-			_build_recipes()
+		"Powers":
+			_build_powers()
+		"Bursts":
+			_build_bursts()
+		"Creatures":
+			_build_creatures()
 		"Collection":
 			_build_collection()
 
 
-func _icon(tex: Texture2D, size: float, known: bool) -> TextureRect:
+func _pic(tex: Texture2D, size: Vector2, known: bool = true) -> TextureRect:
 	var tr := TextureRect.new()
 	tr.texture = tex
-	tr.custom_minimum_size = Vector2(size, size)
+	tr.custom_minimum_size = size
 	tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	if not known:
@@ -84,19 +86,15 @@ func _card() -> PanelContainer:
 	return p
 
 
-func _build_snacks() -> void:
-	var grid := GridContainer.new()
-	grid.columns = 2
-	grid.add_theme_constant_override("h_separation", 10)
-	grid.add_theme_constant_override("v_separation", 10)
-	_body.add_child(grid)
+func _build_powers() -> void:
+	_body.add_child(UITheme.label("One power at a time: the newest food bowl replaces the old power.", 20, UITheme.PLUM_SOFT, true))
 	for def in FoodDB.all_foods():
 		var known := GameState.knows_food(def.id)
 		var card := _card()
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 12)
 		card.add_child(row)
-		row.add_child(_icon(FoodDB.icon(def.icon_path), 72, known))
+		row.add_child(_pic(FoodDB.icon(def.icon_path), Vector2(70, 70), known))
 		var col := VBoxContainer.new()
 		col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		row.add_child(col)
@@ -105,96 +103,87 @@ func _build_snacks() -> void:
 			var d := UITheme.label(def.description, 18)
 			d.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			col.add_child(d)
-			var r := UITheme.label("Watch out: " + def.risk, 16, UITheme.PLUM_SOFT)
-			r.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-			col.add_child(r)
+			row.add_child(_pic(FoodDB.icon(def.demo_path), Vector2(330, 70)))
 		else:
 			col.add_child(UITheme.label("? ? ?", 22, UITheme.PLUM_SOFT, true))
-			col.add_child(UITheme.label("A snack from world %d." % def.unlock_world, 18, UITheme.PLUM_SOFT))
+			var w := LevelDB.world("W%d" % def.unlock_world)
+			col.add_child(UITheme.label("Waiting in a food bowl in %s." % str(w.get("name", "a later world")), 18, UITheme.PLUM_SOFT))
+		_body.add_child(card)
+
+
+func _build_bursts() -> void:
+	_body.add_child(UITheme.label("Flavor Bursts found: %d of %d" % [GameState.bursts_found(), FoodDB.burst_total()], 22, UITheme.PLUM, true))
+	var tip := UITheme.label("Pick up a new power while holding a different one: the two flavours burst together and bop everything nearby.", 18, UITheme.PLUM_SOFT)
+	tip.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_body.add_child(tip)
+	var grid := GridContainer.new()
+	grid.columns = 3
+	grid.add_theme_constant_override("h_separation", 8)
+	grid.add_theme_constant_override("v_separation", 8)
+	_body.add_child(grid)
+	for key: String in GameState.profile["recipe_discoveries"]:
+		var rec := FoodDB.resolve_key(key)
+		if rec == null:
+			continue
+		var card := _card()
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 4)
+		card.add_child(row)
+		row.add_child(_pic(FoodDB.food_icon(rec.food_a), Vector2(40, 40)))
+		row.add_child(UITheme.label("+", 22, UITheme.PLUM, true))
+		row.add_child(_pic(FoodDB.food_icon(rec.food_b), Vector2(40, 40)))
+		row.add_child(UITheme.label(rec.display_name, 20, UITheme.PLUM, true))
 		grid.add_child(card)
 
 
-func _build_recipes() -> void:
-	var found := GameState.named_recipes_found()
-	_body.add_child(UITheme.label("Signature recipes: %d of %d      Kitchen experiments: %d" % [found, FoodDB.RECIPE_IDS.size(), GameState.experiments_found()], 22, UITheme.PLUM, true))
+func _build_creatures() -> void:
+	var met: Array = GameState.profile["enemies_met"]
+	_body.add_child(UITheme.label("Creatures met: %d of %d" % [met.size(), EnemyData.kinds().size()], 22, UITheme.PLUM, true))
 	var grid := GridContainer.new()
-	grid.columns = 2
-	grid.add_theme_constant_override("h_separation", 10)
-	grid.add_theme_constant_override("v_separation", 10)
+	grid.columns = 4
+	grid.add_theme_constant_override("h_separation", 8)
+	grid.add_theme_constant_override("v_separation", 8)
 	_body.add_child(grid)
-	for rec in FoodDB.named_recipes():
-		grid.add_child(_recipe_card(rec, GameState.knows_recipe(rec)))
-	var extra: Array = []
-	for key: String in GameState.profile["recipe_discoveries"]:
-		var rec2 := FoodDB.resolve_key(key)
-		if rec2 != null and not rec2.named:
-			extra.append(rec2)
-	if extra.size() > 0:
-		_body.add_child(UITheme.label("Kitchen experiments", 24, UITheme.ORANGE_DARK, true))
-		var grid2 := GridContainer.new()
-		grid2.columns = 2
-		grid2.add_theme_constant_override("h_separation", 10)
-		grid2.add_theme_constant_override("v_separation", 10)
-		_body.add_child(grid2)
-		for rec3: RecipeDefinition in extra:
-			grid2.add_child(_recipe_card(rec3, true))
-
-
-func _recipe_card(rec: RecipeDefinition, known: bool) -> PanelContainer:
-	var card := _card()
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 6)
-	card.add_child(row)
-	# ingredients are shown once the player has met both snacks
-	var a_known := GameState.knows_food(rec.food_a)
-	var b_known := GameState.knows_food(rec.food_b)
-	row.add_child(_icon(FoodDB.food_icon(rec.food_a), 52, known or a_known))
-	row.add_child(UITheme.label("+", 26, UITheme.PLUM, true))
-	row.add_child(_icon(FoodDB.food_icon(rec.food_b), 52, known or b_known))
-	var col := VBoxContainer.new()
-	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	row.add_child(col)
-	if known:
-		col.add_child(UITheme.label(rec.display_name, 22, UITheme.PLUM, true))
-		var d := UITheme.label(rec.description, 18)
-		d.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		col.add_child(d)
-	else:
-		col.add_child(UITheme.label("? ? ?", 22, UITheme.PLUM_SOFT, true))
-		col.add_child(UITheme.label("Carry both snacks and fuse them to find out.", 18, UITheme.PLUM_SOFT))
-	return card
+	for kind: String in EnemyData.kinds():
+		var known := met.has(kind)
+		var card := _card()
+		var col := VBoxContainer.new()
+		col.alignment = BoxContainer.ALIGNMENT_CENTER
+		card.add_child(col)
+		col.add_child(_pic(Art.tex("enemies/" + kind), Vector2(84, 84), known))
+		var name_l := UITheme.label(str(EnemyData.stat(kind, "name", kind)) if known else "? ? ?", 18, UITheme.PLUM, true)
+		name_l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		col.add_child(name_l)
+		if known:
+			var role := UITheme.label(str(EnemyData.stat(kind, "role", "")), 15, UITheme.PLUM_SOFT)
+			role.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			col.add_child(role)
+		grid.add_child(card)
 
 
 func _build_collection() -> void:
-	var top := UITheme.label("Flavor Pages %d/%d     Recipe Scraps %d/%d     Goose Pins %d/%d     Secret Dishes %d/%d     Feather Medals %d" % [
+	var top := UITheme.label("Flavor Pages %d/%d     Stars %d/%d     Treasure Notes %d/%d     Coins %d" % [
 		GameState.count("page"), LevelDB.WORLDS.size(),
-		GameState.count("scrap"), LevelDB.scrap_total(),
-		GameState.count("pin"), LevelDB.pin_total(),
-		GameState.count("dish"), LevelDB.dish_total(),
-		GameState.medal_count()], 20, UITheme.PLUM, true)
+		GameState.count("star"), LevelDB.star_total(),
+		GameState.count("note"), LevelDB.note_total(),
+		GameState.wallet()], 20, UITheme.PLUM, true)
 	top.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_body.add_child(top)
 	for w in LevelDB.WORLDS:
 		var wid: String = w["id"]
 		var open := GameState.world_unlocked(wid)
 		var card := _card()
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 12)
+		card.add_child(row)
+		row.add_child(_pic(Art.tex("cards/world_%s" % str(w["theme"])), Vector2(150, 66), open))
 		var col := VBoxContainer.new()
-		card.add_child(col)
+		row.add_child(col)
 		var title := "%d. %s" % [int(w["index"]), str(w["name"]) if open else "? ? ?"]
 		if GameState.has_collected("page", wid):
 			title += "   -   " + str(w["page"])
 		col.add_child(UITheme.label(title, 24, UITheme.PLUM, true))
 		if open:
-			col.add_child(UITheme.label("Scraps %d/%d    Pins %d/%d    Dishes %d/%d" % [
-				GameState.count_in_world("scrap", wid), LevelDB.SCRAPS_PER_WORLD,
-				GameState.count_in_world("pin", wid), LevelDB.PINS_PER_WORLD,
-				GameState.count_in_world("dish", wid), LevelDB.DISHES_PER_WORLD], 20))
-			var names: Array[String] = []
-			for id: String in GameState.profile["secret_dishes"]:
-				if id.begins_with(wid):
-					names.append(Story.dish_name(id))
-			if names.size() > 0:
-				var dl := UITheme.label("Dishes: " + ", ".join(names), 18, UITheme.PLUM_SOFT)
-				dl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-				col.add_child(dl)
+			col.add_child(UITheme.label("Stars %d/15    Treasure Notes %d/15" % [
+				GameState.count_in_world("star", wid), GameState.count_in_world("note", wid)], 20))
 		_body.add_child(card)

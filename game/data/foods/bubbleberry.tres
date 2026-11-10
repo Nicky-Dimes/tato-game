@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="FoodDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/food/food_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"BUBBLEBERRY"
+display_name = "Bubbleberry"
+ability_name = "Bubble Trap"
+description = "Blows bubbles that catch creatures and float them away."
+color = Color(0.7098, 0.5490, 0.9608, 1)
+accent = Color(0.9137, 0.8588, 1.0000, 1)
+icon_path = "res://assets/sprites/powers/bubbleberry.png"
+demo_path = "res://assets/sprites/cards/demo_bubbleberry.png"
+ability_script = "res://scripts/food/abilities/bubbleberry.gd"
+damage = 1
+cooldown = 0.45
+duration = 0.20
+element = &"bubble"
+unlock_world = 1
+blend_adjective = "Bubbly"
+blend_noun = "Fizz"
+honk_sound = "honk_bubble"
+tags = PackedStringArray("bubble")

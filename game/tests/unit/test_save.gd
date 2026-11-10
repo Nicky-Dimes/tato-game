@@ -7,7 +7,6 @@ var _backup_bak := ""
 
 
 func before_each() -> void:
-	# keep whatever a real player has in this slot
 	_backup_main = _read(SaveService.slot_path(SLOT))
 	_backup_bak = _read(SaveService.backup_path(SLOT))
 	SaveService.delete_slot(SLOT)
@@ -34,16 +33,16 @@ func _write(path: String, text: String) -> void:
 
 func test_round_trip() -> void:
 	var p := SaveService.new_profile(SLOT)
-	(p["recipe_scraps"] as Array).append("W1-L1-S01")
-	(p["recipe_discoveries"] as Array).append("BUBBLE|PEPPER")
-	p["honk_charge"] = 55
+	(p["treasure_notes"] as Array).append("W1-L1-N01")
+	(p["recipe_discoveries"] as Array).append("FIRE_PEPPER|FROSTBERRY")
+	p["coins"] = 55
 	check(SaveService.save_slot(SLOT, p), "save succeeds")
 	var q := SaveService.load_slot(SLOT)
-	check_eq(q["recipe_scraps"], ["W1-L1-S01"], "scraps survive")
-	check_eq(q["recipe_discoveries"], ["BUBBLE|PEPPER"], "recipes survive")
-	check_eq(int(q["honk_charge"]), 55, "charge survives")
+	check_eq(q["treasure_notes"], ["W1-L1-N01"], "notes survive")
+	check_eq(q["recipe_discoveries"], ["FIRE_PEPPER|FROSTBERRY"], "bursts survive")
+	check_eq(int(q["coins"]), 55, "coins survive")
 	check_eq(int(q["schema_version"]), SaveService.SCHEMA_VERSION, "schema version written")
-	check_eq(str(q["profile_id"]), "slot_3", "profile id is local slot name")
+	check_eq(str(q["profile_id"]), "slot_3", "profile id is a local slot name")
 
 
 func test_backup_recovers_a_damaged_save() -> void:
@@ -51,7 +50,7 @@ func test_backup_recovers_a_damaged_save() -> void:
 	(p["flavor_pages"] as Array).append("W1")
 	SaveService.save_slot(SLOT, p)
 	(p["flavor_pages"] as Array).append("W2")
-	SaveService.save_slot(SLOT, p)      # first save is now the backup
+	SaveService.save_slot(SLOT, p)
 	_write(SaveService.slot_path(SLOT), "{ this is not json")
 	var q := SaveService.load_slot(SLOT)
 	check(not q.is_empty(), "damaged save falls back to the backup")
@@ -64,49 +63,77 @@ func test_empty_slot() -> void:
 	check(not SaveService.slot_exists(SLOT), "slot_exists is false")
 
 
-func test_migration_from_old_and_partial_saves() -> void:
-	var old := {"cleared": ["W1-L1"], "scraps": ["W1-L1-S01"], "comfort_feathers": 99, "honk_charge": -5}
-	var m := SaveService.migrate(old)
+func test_migration_from_old_designs() -> void:
+	var v0 := {"cleared": ["W1-L1"], "scraps": ["W1-L1-S01"]}
+	var m := SaveService.migrate(v0)
 	check_eq(m["level_clear_ids"], ["W1-L1"], "v0 'cleared' becomes level_clear_ids")
-	check_eq(m["recipe_scraps"], ["W1-L1-S01"], "v0 'scraps' becomes recipe_scraps")
-	check_eq(int(m["comfort_feathers"]), 3, "feathers clamped")
-	check_eq(int(m["honk_charge"]), 0, "charge clamped")
-	check((m["world_unlocks"] as Array).has("W1"), "world 1 always unlocked")
-	check_eq(int(m["schema_version"]), SaveService.SCHEMA_VERSION, "version brought up to date")
+	check_eq(m["treasure_notes"], ["W1-L1-S01"], "v0 scraps become Treasure Notes")
+	var v1 := {"schema_version": 1, "recipe_scraps": ["W2-L1-S02"], "goose_pins": ["x"], "comfort_feathers": 2,
+		"recipe_discoveries": ["BUBBLE|PEPPER"], "food_unlocks": ["PEPPER"]}
+	var m1 := SaveService.migrate(v1)
+	check_eq(m1["treasure_notes"], ["W2-L1-S02"], "v1 recipe_scraps become Treasure Notes")
+	check(not m1.has("goose_pins") and not m1.has("comfort_feathers"), "v1 fields that no longer exist are dropped")
+	check_eq(m1["recipe_discoveries"], [], "old two-pocket recipes are cleared (those foods are gone)")
+	check((m1["world_unlocks"] as Array).has("W1"), "world 1 always unlocked")
+	check_eq(int(m1["schema_version"]), SaveService.SCHEMA_VERSION, "version brought up to date")
 	for key: String in SaveService.PROFILE_DEFAULTS.keys():
-		check(m.has(key), "migrated save has '%s'" % key)
+		check(m1.has(key), "migrated save has '%s'" % key)
 
 
 func test_migration_rejects_wrong_types_and_keeps_unknown_fields() -> void:
 	var weird := {
-		"schema_version": 1,
+		"schema_version": 2,
 		"level_clear_ids": "not a list",
-		"recipe_scraps": ["ok", 7, {"x": 1}, "ok", "x".repeat(200)],
+		"treasure_notes": ["ok", 7, {"x": 1}, "ok", "x".repeat(200)],
 		"medals": [],
+		"coins": -50,
 		"future_field": {"hello": "world"},
 	}
 	var m := SaveService.migrate(weird)
 	check_eq(m["level_clear_ids"], [], "wrong-typed list replaced by default")
-	check_eq(m["recipe_scraps"], ["ok"], "non-strings, repeats and oversized ids dropped")
+	check_eq(m["treasure_notes"], ["ok"], "non-strings, repeats and oversized ids dropped")
 	check(m["medals"] is Dictionary, "wrong-typed dictionary replaced")
+	check_eq(int(m["coins"]), 0, "negative coins clamped")
 	check(m.has("future_field"), "unknown fields are kept for newer versions")
 
 
 func test_game_state_saves_and_loads() -> void:
 	GameState.start_new(SLOT)
-	GameState.collect("scrap", "W1-L1-S01")
-	GameState.unlock_food(&"PEPPER")
-	GameState.discover_recipe(FoodDB.resolve(&"PEPPER", &"BUBBLE"))
-	GameState.mark_cleared("W1-L1", {"time": 61.0, "hurt": 0, "scraps_found": 3, "scraps_total": 3})
+	GameState.collect("note", "W1-L1-N01")
+	GameState.unlock_food(&"FIRE_PEPPER")
+	GameState.discover_recipe(FoodDB.resolve(&"FIRE_PEPPER", &"BUBBLEBERRY"))
+	GameState.add_coins(30)
+	GameState.mark_cleared("W1-L1", {"time": 61.0, "hurt": 0, "notes_found": 3, "notes_total": 3})
 	check(GameState.save(), "GameState.save succeeds")
 	GameState.use_temp_profile()
 	check(not GameState.is_cleared("W1-L1"), "temp profile is blank")
 	check(GameState.load_profile(SLOT), "profile loads")
 	check(GameState.is_cleared("W1-L1"), "cleared stage restored")
-	check(GameState.has_collected("scrap", "W1-L1-S01"), "scrap restored")
-	check(GameState.knows_food(&"PEPPER"), "food restored")
-	check(GameState.knows_recipe(FoodDB.resolve(&"BUBBLE", &"PEPPER")), "recipe restored")
+	check(GameState.has_collected("note", "W1-L1-N01"), "note restored")
+	check(GameState.knows_food(&"FIRE_PEPPER"), "power restored")
+	check(GameState.knows_recipe(FoodDB.resolve(&"BUBBLEBERRY", &"FIRE_PEPPER")), "burst restored")
+	check_eq(GameState.wallet(), 30, "coins restored")
 	check(GameState.is_unlocked("W1-L2"), "next stage unlocked after clearing W1-L1")
-	check(not GameState.is_unlocked("W1-B"), "finale still locked")
-	var medals: Dictionary = GameState.profile["medals"]
-	check(medals.has("W1-L1") and medals["W1-L1"].get("explorer", false) and medals["W1-L1"].get("gentle", false), "medals recorded")
+	check(not GameState.is_unlocked("W1-B"), "boss still locked")
+	check_eq(GameState.stars_in_level("W1-L1"), 2, "stars for finishing and for all notes")
+
+
+func test_hearts_and_coins() -> void:
+	GameState.use_temp_profile()
+	Settings.set_value("cozy_mode", false)
+	Settings.set_value("infinite_feathers", false)
+	check_eq(GameState.hearts, 5, "five hearts")
+	check(not GameState.lose_heart(), "losing one heart is not a defeat")
+	check_eq(GameState.hearts, 4, "four left")
+	check(GameState.add_heart(), "a heart pickup heals")
+	check(not GameState.add_heart(), "cannot go above five")
+	for i in 4:
+		GameState.lose_heart()
+	check(GameState.lose_heart(), "the last heart means back to the checkpoint")
+	GameState.restore_hearts()
+	GameState.lose_heart(2)
+	GameState.add_coins(100)
+	check_eq(GameState.hearts, 5, "100 coins refill the hearts")
+	check_eq(GameState.wallet(), 100, "coins are kept in the wallet")
+	check(GameState.spend_coins(40) and GameState.wallet() == 60, "spending works")
+	check(not GameState.spend_coins(999), "cannot overspend")

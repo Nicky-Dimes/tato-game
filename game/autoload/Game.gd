@@ -104,15 +104,18 @@ func leave_level(cleared: bool) -> void:
 	if id == LevelDB.HUB_ID:
 		goto_title()
 		return
+	if id == "TRIAL":
+		goto_hub()
+		return
 	var w := LevelDB.world_of(id)
 	if cleared and LevelDB.stage_kind(id) == "boss":
-		var story := "page_%s" % str(w.get("id", "")).to_lower()
 		if int(w.get("index", 0)) == LevelDB.WORLDS.size():
 			goto_story("ending", {"scene": CREDITS_SCENE})
 		else:
-			goto_story(story, {"hub": true})
+			goto_story("page_%s" % str(w.get("id", "")).to_lower(), {"hub": true})
 		return
 	if cleared and id == "W1-L1" and not GameState.has_flag("hub_intro"):
+		GameState.set_flag("hub_intro")
 		goto_hub()
 		return
 	goto_world_map(str(w.get("id", "W1")))

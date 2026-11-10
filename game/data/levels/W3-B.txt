@@ -1,0 +1,28 @@
+; Built by tools/build_levels.py from chunks: arena
+[meta]
+id = W3-B
+world = 3
+theme = candy
+kind = boss
+hints = Candy rains from above: keep moving. | Jump the sugar waves. | Attack while the King rests.
+[legend]
+P = power POPCORN
+1 = sign text=boss
+X = boss candy_king
+E = goal needs=boss
+[map]
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+     =n=      n         ==n
+ 
+ @  1   P           X    E
+##############################
+##############################
+##############################

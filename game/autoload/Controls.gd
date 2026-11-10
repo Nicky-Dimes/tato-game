@@ -11,25 +11,17 @@ const DEVICE_TOUCH := "touch"
 
 ## Gameplay actions in the order the remap screen lists them.
 const ACTIONS: Array[String] = [
-	"move_left", "move_right", "move_up", "move_down",
-	"jump", "flap", "eat_interact", "honk_primary", "fusion", "ability_swap",
-	"pause", "map", "hint",
+	"move_left", "move_right", "move_up", "move_down", "jump", "attack", "pause",
 ]
 
 const ACTION_LABELS := {
 	"move_left": "Move left",
 	"move_right": "Move right",
-	"move_up": "Look up / climb",
-	"move_down": "Crouch / drop",
-	"jump": "Jump",
-	"flap": "Flap (in the air)",
-	"eat_interact": "Eat / talk",
-	"honk_primary": "Honk / snack power",
-	"fusion": "Fuse both snacks",
-	"ability_swap": "Swap snack pocket",
+	"move_up": "Look up / talk / go in",
+	"move_down": "Crouch / drop / slide",
+	"jump": "Jump (again in the air to flap)",
+	"attack": "Attack (honk or power)",
 	"pause": "Pause",
-	"map": "Map",
-	"hint": "Hint",
 }
 
 ## Defaults: physical key codes and joypad buttons / axes.
@@ -39,14 +31,8 @@ const DEFAULT_KEYS := {
 	"move_up": [KEY_W, KEY_UP],
 	"move_down": [KEY_S, KEY_DOWN],
 	"jump": [KEY_SPACE, KEY_Z],
-	"flap": [KEY_SPACE, KEY_Z],
-	"eat_interact": [KEY_E, KEY_C],
-	"honk_primary": [KEY_J, KEY_X],
-	"fusion": [KEY_K, KEY_V],
-	"ability_swap": [KEY_Q, KEY_TAB],
+	"attack": [KEY_J, KEY_X],
 	"pause": [KEY_ESCAPE, KEY_P],
-	"map": [KEY_M],
-	"hint": [KEY_H],
 }
 
 const DEFAULT_PAD_BUTTONS := {
@@ -55,14 +41,8 @@ const DEFAULT_PAD_BUTTONS := {
 	"move_up": [JOY_BUTTON_DPAD_UP],
 	"move_down": [JOY_BUTTON_DPAD_DOWN],
 	"jump": [JOY_BUTTON_A],
-	"flap": [JOY_BUTTON_A],
-	"eat_interact": [JOY_BUTTON_X],
-	"honk_primary": [JOY_BUTTON_B],
-	"fusion": [JOY_BUTTON_Y],
-	"ability_swap": [JOY_BUTTON_LEFT_SHOULDER, JOY_BUTTON_RIGHT_SHOULDER],
+	"attack": [JOY_BUTTON_X, JOY_BUTTON_B],
 	"pause": [JOY_BUTTON_START],
-	"map": [JOY_BUTTON_BACK],
-	"hint": [JOY_BUTTON_RIGHT_STICK],
 }
 
 ## axis, sign
@@ -83,8 +63,7 @@ const PAD_BUTTON_NAMES := {
 }
 
 const TOUCH_LABELS := {
-	"jump": "JUMP", "flap": "JUMP", "eat_interact": "EAT", "honk_primary": "HONK",
-	"fusion": "FUSE", "ability_swap": "SWAP", "pause": "II", "map": "MAP", "hint": "?",
+	"jump": "JUMP", "attack": "ATTACK", "pause": "II",
 	"move_left": "◀", "move_right": "▶", "move_up": "▲", "move_down": "▼",
 }
 
@@ -209,8 +188,8 @@ func reset_bindings() -> void:
 	apply_bindings()
 
 
-func _may_share(a: String, b: String) -> bool:
-	return (a == "jump" and b == "flap") or (a == "flap" and b == "jump")
+func _may_share(_a: String, _b: String) -> bool:
+	return false
 
 
 func _store() -> void:

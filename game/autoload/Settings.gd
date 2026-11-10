@@ -11,9 +11,9 @@ const DEFAULTS := {
 	"music_volume": 0.7,
 	"sfx_volume": 1.0,
 	"voice_volume": 1.0,
-	"cozy_mode": false,          # no feather loss, longer timers, wider honk
-	"challenge_mode": false,     # shorter windows, never locks story rewards
-	"infinite_feathers": false,  # assist
+	"cozy_mode": false,          # hearts never run out, creatures are slower
+	"challenge_mode": false,     # creatures are quicker; never locks story rewards
+	"infinite_feathers": false,  # assist: endless hearts
 	"timer_scale": 1.0,          # 1.0 normal .. 2.0 relaxed
 	"captions": true,
 	"screen_shake": 1.0,         # 0..1
@@ -21,8 +21,7 @@ const DEFAULTS := {
 	"reduce_flashes": false,
 	"high_contrast": false,
 	"auto_run": true,
-	"hold_to_honk": false,
-	"auto_eat": false,
+	"hold_to_attack": false,     # hold the attack button to keep attacking
 	"ui_scale": 1.0,             # 0.75..1.5
 	"fullscreen": false,
 	"touch_controls": "auto",    # auto | on | off
@@ -90,8 +89,17 @@ func honk_range_factor() -> float:
 	return 1.3 if flag("cozy_mode") else 1.0
 
 
-func feathers_protected() -> bool:
+func hearts_protected() -> bool:
 	return flag("cozy_mode") or flag("infinite_feathers")
+
+
+## How fast creatures move and shoot: slower in Cozy Mode, quicker in Challenge.
+func enemy_speed() -> float:
+	if flag("cozy_mode"):
+		return 0.75
+	if flag("challenge_mode"):
+		return 1.2
+	return 1.0
 
 
 func shake_amount() -> float:

@@ -1,0 +1,28 @@
+; Built by tools/build_levels.py from chunks: arena
+[meta]
+id = W6-B
+world = 6
+theme = castle
+kind = boss
+hints = Food Bombs splat in a ring: step away. | Jump the cake waves. | Helpers march in halfway: bop them first.
+[legend]
+P = power LEMON_BEAM
+1 = sign text=boss
+X = boss chef_castle_golem
+E = goal needs=boss
+[map]
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+     =n=      n         ==n
+ 
+ @  1   P           X    E
+##############################
+##############################
+##############################

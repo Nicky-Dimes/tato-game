@@ -40,7 +40,7 @@ func _build_backdrop() -> void:
 	sky.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	sky.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(sky)
-	for short: String in ["bg/picnic_far", "bg/picnic_mid"]:
+	for short: String in ["bg/grassland_far", "bg/grassland_mid"]:
 		var tex := Art.tex(short)
 		if tex == null:
 			continue
@@ -52,7 +52,7 @@ func _build_backdrop() -> void:
 		hills.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(hills)
 	_hero = TextureRect.new()
-	_hero.texture = load("res://assets/ui/hero.png") if ResourceLoader.exists("res://assets/ui/hero.png") else null
+	_hero.texture = Art.tex("tato_big/front")
 	_hero.set_anchors_and_offsets_preset(Control.PRESET_CENTER_LEFT)
 	_hero.offset_left = 110.0
 	_hero.offset_top = -160.0

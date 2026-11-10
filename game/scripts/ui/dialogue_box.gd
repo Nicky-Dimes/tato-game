@@ -142,7 +142,7 @@ func _on_gui_input(event: InputEvent) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if not _open:
 		return
-	for action: String in ["jump", "eat_interact", "honk_primary", "ui_accept"]:
+	for action: String in ["jump", "attack", "ui_accept"]:
 		if event.is_action_pressed(action):
 			_advance()
 			get_viewport().set_input_as_handled()

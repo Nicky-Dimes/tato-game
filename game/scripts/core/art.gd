@@ -28,6 +28,24 @@ static func has(short: String) -> bool:
 	return tex(short) != null
 
 
+## A standing sprite scaled so it is `height` pixels tall on screen.
+static func sized(short: String, height: float) -> Sprite2D:
+	var s := standing(short, 1.0)
+	if s.texture != null:
+		var k := height / float(s.texture.get_height())
+		s.scale = Vector2(k, k)
+	return s
+
+
+## A centred sprite scaled so its larger side is `size` pixels on screen.
+static func icon(short: String, size: float) -> Sprite2D:
+	var s := centered(short, 1.0)
+	if s.texture != null:
+		var k := size / float(maxi(s.texture.get_width(), s.texture.get_height()))
+		s.scale = Vector2(k, k)
+	return s
+
+
 ## A Sprite2D whose bottom-centre sits on the node origin (things on the ground).
 static func standing(short: String, scale: float = ART_SCALE) -> Sprite2D:
 	var s := Sprite2D.new()

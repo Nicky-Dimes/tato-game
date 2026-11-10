@@ -5,16 +5,16 @@ extends Node2D
 ## cheap to draw on phones.
 
 const SKIES := {
-	"picnic": [Color("7cc7f5"), Color("d9f3ff")],
+	"grassland": [Color("6fc3f7"), Color("d9f3ff")],
 	"nest": [Color("8fd0f5"), Color("fff0d9")],
-	"farm": [Color("f7b267"), Color("ffe9b8")],
-	"fair": [Color("6f8fd9"), Color("e3ecff")],
-	"market": [Color("56b7c9"), Color("ffe6c7")],
-	"marsh": [Color("1d1f4a"), Color("3f4a8c")],
-	"kitchen": [Color("4a3566"), Color("c98f6a")],
+	"orchard": [Color("79c8f2"), Color("e6f7d9")],
+	"candy": [Color("b9a2f2"), Color("ffe1f0")],
+	"icy": [Color("6fa8e8"), Color("e6f3ff")],
+	"windy": [Color("59b9f0"), Color("d6f5e6")],
+	"castle": [Color("8f8fe0"), Color("ffe6d0")],
 }
 
-var theme := "picnic"
+var theme := "grassland"
 
 
 func setup(theme_name: String, level_size: Vector2) -> void:
@@ -23,7 +23,7 @@ func setup(theme_name: String, level_size: Vector2) -> void:
 	var sky_layer := CanvasLayer.new()
 	sky_layer.layer = -10
 	add_child(sky_layer)
-	var colors: Array = SKIES.get(theme, SKIES["picnic"])
+	var colors: Array = SKIES.get(theme, SKIES["grassland"])
 	var grad := Gradient.new()
 	grad.set_color(0, colors[0])
 	grad.set_color(1, colors[1])

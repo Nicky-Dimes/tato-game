@@ -18,12 +18,11 @@ const ROWS := {
 		["captions", "Captions for sounds", "toggle", null],
 	],
 	"Play": [
-		["cozy_mode", "Cozy Mode (no feather loss, longer timers, bigger honk)", "toggle", null],
-		["challenge_mode", "Challenge Mode (shorter timers)", "toggle", null],
-		["infinite_feathers", "Endless Comfort Feathers", "toggle", null],
-		["timer_scale", "Puzzle timer length", "range", [1.0, 2.0, 0.25]],
+		["cozy_mode", "Cozy Mode (hearts never run out, creatures are slower)", "toggle", null],
+		["challenge_mode", "Challenge Mode (creatures are quicker)", "toggle", null],
+		["infinite_feathers", "Endless hearts", "toggle", null],
+		["hold_to_attack", "Hold the attack button to keep attacking", "toggle", null],
 		["auto_run", "Run automatically after a moment", "toggle", null],
-		["auto_eat", "Eat snacks just by touching the bowl", "toggle", null],
 		["show_timer", "Show stage timer", "toggle", null],
 	],
 	"Comfort": [

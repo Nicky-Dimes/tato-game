@@ -1,40 +1,44 @@
 class_name TouchControls
 extends CanvasLayer
-## On-screen controls for phones and tablets. Left side: a floating stick
-## (put a thumb down anywhere and drag). Right side: Jump, Honk, Eat and
-## Fuse buttons. Tapping a Flavor Pocket in the HUD swaps pockets.
-## Shows itself when a touch is seen (or always, via Settings).
+## On-screen controls for phones and tablets, using the buttons drawn on the
+## Gameplay Redesign board: Move (left / right), Jump and Attack. That is all
+## the game needs. Sliding the moving thumb down crouches / drops / slides;
+## sliding it up looks up (and talks). Shown when a touch is seen (or always,
+## via Settings).
 
-const BUTTONS := [
-	# action, label, radius, offset from the bottom-right corner
-	["jump", "JUMP", 66.0, Vector2(-112, -112)],
-	["honk_primary", "HONK", 56.0, Vector2(-262, -92)],
-	["eat_interact", "EAT", 48.0, Vector2(-232, -232)],
-	["fusion", "FUSE", 48.0, Vector2(-96, -262)],
-]
-const STICK_RADIUS := 78.0
-const DEAD := 0.28
+const MOVE_SIZE := Vector2(250, 132)
+const JUMP_R := 68.0
+const ATTACK_R := 76.0
 
-var _pad: Control
-var _stick_touch := -1
-var _stick_origin := Vector2.ZERO
-var _stick_now := Vector2.ZERO
+var level: Level
+var _pad: Pad
+var _move_touch := -1
 var _held: Dictionary = {}       # touch index -> action
+var _move_rect := Rect2()
+var _jump_c := Vector2.ZERO
+var _attack_c := Vector2.ZERO
 var _pause_rect := Rect2()
-var _hint_rect := Rect2()
 
 
 func _ready() -> void:
 	layer = 20
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_pad = Pad.new()
-	(_pad as Pad).owner_controls = self
+	_pad.owner_controls = self
 	_pad.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_pad.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_pad)
 	Controls.device_changed.connect(func(_d: String) -> void: _refresh())
 	Settings.changed.connect(func(_k: String) -> void: _refresh())
+	_pad.resized.connect(_layout)
 	_refresh()
+
+
+func setup(lv: Level) -> void:
+	level = lv
+	if level != null and level.player != null:
+		level.player.power_changed.connect(func(_p: StringName) -> void: _pad.queue_redraw())
+		level.player.interact_target_changed.connect(func(_t: Node) -> void: _pad.queue_redraw())
 
 
 func _refresh() -> void:
@@ -42,37 +46,34 @@ func _refresh() -> void:
 	_pad.modulate.a = clampf(Settings.num("touch_opacity"), 0.2, 1.0)
 	if not _pad.visible:
 		_release_all()
-	_pad.queue_redraw()
+	_layout()
 
 
 func size_factor() -> float:
 	return clampf(Settings.num("touch_size"), 0.7, 1.5)
 
 
-func button_center(i: int) -> Vector2:
+func _layout() -> void:
 	var view := _pad.size
-	var off: Vector2 = BUTTONS[i][3]
-	return view + off * size_factor()
-
-
-func button_radius(i: int) -> float:
-	return float(BUTTONS[i][2]) * size_factor()
+	var k := size_factor()
+	_move_rect = Rect2(Vector2(34, view.y - 34 - MOVE_SIZE.y * k), MOVE_SIZE * k)
+	_jump_c = Vector2(view.x - 110 * k, view.y - 104 * k)
+	_attack_c = Vector2(view.x - 268 * k, view.y - 96 * k)
+	_pause_rect = Rect2(view.x - 84, 12, 72, 72)
+	_pad.queue_redraw()
 
 
 func _input(event: InputEvent) -> void:
 	if not _pad.visible:
 		return
 	if event is InputEventScreenTouch:
-		var pos: Vector2 = _to_pad(event.position)
+		var pos := _to_pad(event.position)
 		if event.pressed:
 			_press(event.index, pos)
 		else:
 			_release(event.index)
-	elif event is InputEventScreenDrag:
-		if event.index == _stick_touch:
-			_stick_now = _to_pad(event.position)
-			_apply_stick()
-			_pad.queue_redraw()
+	elif event is InputEventScreenDrag and event.index == _move_touch:
+		_apply_move(_to_pad(event.position))
 
 
 func _to_pad(screen_pos: Vector2) -> Vector2:
@@ -82,30 +83,32 @@ func _to_pad(screen_pos: Vector2) -> Vector2:
 func _press(index: int, pos: Vector2) -> void:
 	if get_tree().paused:
 		return
-	var view := _pad.size
-	_pause_rect = Rect2(view.x - 84, 12, 72, 72)
-	_hint_rect = Rect2(view.x - 84, 96, 72, 60)
 	if _pause_rect.has_point(pos):
 		_tap_action("pause")
 		return
-	for i in BUTTONS.size():
-		if pos.distance_to(button_center(i)) <= button_radius(i) * 1.18:
-			var action: String = BUTTONS[i][0]
-			_held[index] = action
-			Input.action_press(action)
-			_pad.queue_redraw()
-			return
-	if pos.x < view.x * 0.5 and pos.y > view.y * 0.22 and _stick_touch == -1:
-		_stick_touch = index
-		_stick_origin = pos
-		_stick_now = pos
-		_pad.queue_redraw()
+	var k := size_factor()
+	if pos.distance_to(_jump_c) <= JUMP_R * k * 1.2:
+		_hold(index, "jump")
+		return
+	if pos.distance_to(_attack_c) <= ATTACK_R * k * 1.2:
+		_hold(index, "attack")
+		return
+	# the whole left half is the move pad, so a thumb never misses it
+	if pos.x < _pad.size.x * 0.5 and pos.y > _pad.size.y * 0.3 and _move_touch == -1:
+		_move_touch = index
+		_apply_move(pos)
+
+
+func _hold(index: int, action: String) -> void:
+	_held[index] = action
+	Input.action_press(action)
+	_pad.queue_redraw()
 
 
 func _release(index: int) -> void:
-	if index == _stick_touch:
-		_stick_touch = -1
-		_clear_stick()
+	if index == _move_touch:
+		_move_touch = -1
+		_clear_move()
 	if _held.has(index):
 		Input.action_release(_held[index])
 		_held.erase(index)
@@ -116,8 +119,8 @@ func _release_all() -> void:
 	for index: int in _held.keys():
 		Input.action_release(_held[index])
 	_held.clear()
-	_stick_touch = -1
-	_clear_stick()
+	_move_touch = -1
+	_clear_move()
 
 
 func _tap_action(action: String) -> void:
@@ -131,30 +134,28 @@ func _tap_action(action: String) -> void:
 	Input.parse_input_event(up)
 
 
-func _apply_stick() -> void:
-	var d := (_stick_now - _stick_origin) / (STICK_RADIUS * size_factor())
-	if d.length() > 1.0:
-		# let the base follow a long drag so the thumb never runs out of room
-		_stick_origin = _stick_now - d.normalized() * STICK_RADIUS * size_factor()
-		d = d.normalized()
-	_set_axis("move_left", "move_right", d.x)
-	# up / down need a firmer push so walking does not crouch by accident
-	_set_axis("move_up", "move_down", d.y if absf(d.y) > 0.6 else 0.0)
-
-
-func _set_axis(neg: String, pos: String, v: float) -> void:
-	if v > DEAD:
-		Input.action_press(pos, minf(1.0, v))
-		Input.action_release(neg)
-	elif v < -DEAD:
-		Input.action_press(neg, minf(1.0, -v))
-		Input.action_release(pos)
+func _apply_move(pos: Vector2) -> void:
+	var mid := _move_rect.get_center()
+	var dx := pos.x - mid.x
+	if dx < -8.0:
+		Input.action_press("move_left")
+		Input.action_release("move_right")
+	elif dx > 8.0:
+		Input.action_press("move_right")
+		Input.action_release("move_left")
+	# thumb slid below / above the pad
+	if pos.y > _move_rect.end.y - 6.0:
+		Input.action_press("move_down")
 	else:
-		Input.action_release(neg)
-		Input.action_release(pos)
+		Input.action_release("move_down")
+	if pos.y < _move_rect.position.y - 34.0:
+		Input.action_press("move_up")
+	else:
+		Input.action_release("move_up")
+	_pad.queue_redraw()
 
 
-func _clear_stick() -> void:
+func _clear_move() -> void:
 	for a: String in ["move_left", "move_right", "move_up", "move_down"]:
 		Input.action_release(a)
 
@@ -172,41 +173,53 @@ class Pad:
 		var tc := owner_controls
 		if tc == null:
 			return
+		var k := tc.size_factor()
 		var plum := Color("301444")
-		var font := UITheme.font_bold()
-		for i in TouchControls.BUTTONS.size():
-			var c := tc.button_center(i)
-			var r := tc.button_radius(i)
-			var action: String = TouchControls.BUTTONS[i][0]
-			var down := tc._held.values().has(action)
-			draw_circle(c, r, Color(plum.r, plum.g, plum.b, 0.55))
-			var face := Color("ffcf3f") if i == 0 else Color("fff9ef")
-			if down:
-				face = Color("ff9a1f")
-			face.a = 0.9
-			draw_circle(c, r - 6.0, face)
+		# --- move pair
+		var move := Art.tex("ui/btn_move")
+		if move != null:
+			draw_texture_rect(move, tc._move_rect, false)
+		var left_down := Input.is_action_pressed("move_left") and tc._move_touch != -1
+		var right_down := Input.is_action_pressed("move_right") and tc._move_touch != -1
+		if left_down:
+			draw_rect(Rect2(tc._move_rect.position, Vector2(tc._move_rect.size.x * 0.5, tc._move_rect.size.y)), Color(1, 1, 1, 0.3))
+		if right_down:
+			draw_rect(Rect2(tc._move_rect.position + Vector2(tc._move_rect.size.x * 0.5, 0), Vector2(tc._move_rect.size.x * 0.5, tc._move_rect.size.y)), Color(1, 1, 1, 0.3))
+		# --- jump
+		var jump := Art.tex("ui/btn_jump")
+		var jr := TouchControls.JUMP_R * k * (0.92 if tc._held.values().has("jump") else 1.0)
+		if jump != null:
+			draw_texture_rect(jump, Rect2(tc._jump_c - Vector2(jr, jr), Vector2(jr, jr) * 2.0), false)
+		# --- attack: the red button, with the active power on it
+		var ar := TouchControls.ATTACK_R * k * (0.92 if tc._held.values().has("attack") else 1.0)
+		draw_circle(tc._attack_c, ar, Color("7a1830"))
+		draw_circle(tc._attack_c, ar - 6.0, Color("f0506a"))
+		draw_arc(tc._attack_c, ar - 12.0, -2.5, -1.2, 12, Color(1, 1, 1, 0.6), 6.0, true)
+		var icon: Texture2D = null
+		var label := ""
+		if tc.level != null and tc.level.player != null:
+			var p := tc.level.player
+			if p.interact_target != null and is_instance_valid(p.interact_target) and p.interact_target.has_method("uses_attack_button"):
+				label = "GO"
+			elif p.power.has_power():
+				icon = FoodDB.food_icon(p.power.power)
+			else:
+				label = "HONK"
+		if icon != null:
+			var s := ar * 1.25
+			var kk := s / float(maxi(icon.get_width(), icon.get_height()))
+			var sz := Vector2(icon.get_width(), icon.get_height()) * kk
+			draw_texture_rect(icon, Rect2(tc._attack_c - sz * 0.5, sz), false)
+		elif label != "":
+			var font := UITheme.font_title()
 			if font:
-				var label: String = TouchControls.BUTTONS[i][1]
-				var fs := int(r * 0.42)
+				var fs := int(ar * 0.42)
 				var w := font.get_string_size(label, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
-				draw_string(font, c + Vector2(-w * 0.5, fs * 0.36), label, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, plum)
-		# pause button
-		var pr := Rect2(size.x - 84, 12, 72, 72)
+				draw_string_outline(font, tc._attack_c + Vector2(-w * 0.5, fs * 0.36), label, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, 8, plum)
+				draw_string(font, tc._attack_c + Vector2(-w * 0.5, fs * 0.36), label, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color.WHITE)
+		# --- pause
+		var pr := tc._pause_rect
 		draw_circle(pr.get_center(), 34.0, Color(plum.r, plum.g, plum.b, 0.55))
 		draw_circle(pr.get_center(), 28.0, Color(1, 0.98, 0.94, 0.9))
 		draw_rect(Rect2(pr.get_center() + Vector2(-11, -12), Vector2(8, 24)), plum)
 		draw_rect(Rect2(pr.get_center() + Vector2(3, -12), Vector2(8, 24)), plum)
-		# stick
-		if tc._stick_touch != -1:
-			var sr := TouchControls.STICK_RADIUS * tc.size_factor()
-			draw_circle(tc._stick_origin, sr, Color(plum.r, plum.g, plum.b, 0.3))
-			draw_arc(tc._stick_origin, sr, 0.0, TAU, 40, Color(1, 1, 1, 0.7), 4.0, true)
-			var knob := tc._stick_origin + (tc._stick_now - tc._stick_origin).limit_length(sr)
-			draw_circle(knob, sr * 0.48, Color(1, 0.98, 0.94, 0.9))
-			draw_arc(knob, sr * 0.48, 0.0, TAU, 28, plum, 4.0, true)
-		else:
-			# resting hint for where the stick lives
-			var rest := Vector2(150, size.y - 150)
-			var sr2 := TouchControls.STICK_RADIUS * tc.size_factor()
-			draw_arc(rest, sr2, 0.0, TAU, 40, Color(1, 1, 1, 0.35), 4.0, true)
-			draw_circle(rest, sr2 * 0.42, Color(1, 0.98, 0.94, 0.35))

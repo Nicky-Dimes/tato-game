@@ -1,0 +1,36 @@
+; Built by tools/build_levels.py from chunks: start bowl_p w3_belts qblocks cp w3_saw pit_plat tower cp w3_drips steps high_road star_b flat_coins end
+[meta]
+id = W3-L1
+world = 3
+theme = candy
+kind = core
+hints = Candy belts carry you along. | Popcorn pops up and over: good for things above. | Watch the pink goo dripping from the ceiling.
+[legend]
+a = shock_slime
+b = candy_imp
+c = crab_snipper
+P = power POPCORN
+p = pickup candy
+D = decor
+1 = sign text=conveyor
+2 = sign text=power
+G = conveyor w=4 dir=1
+H = conveyor w=4 dir=-1
+y = saw dx=4 t=2.6
+z = drip every=2.2
+[map]
+ 
+ 
+ 
+ 
+                                                                                                                                                      n
+                                                                                                                                                    =====
+ 
+                                                                                                 o        o        o                            ====       ====           ####################
+                                                                    ?%?    o o                                                   o o                                        z     z     z                           ooo          oooooooo  n
+                          o o              o o        o o                                      y        y                                             ====                                                        ######        ==============    ########                   ooo
+                                                                                                                                =====                                                                         ##########                          #      #
+ @  1   2     D   P     a    a   B                                     a      p      C   h          a         b                                   a         b      C   h        a      c         n        ##############   a       a     b        #  *   B      a          D    a      D     D      E
+##########################################G       H       ####################################################################         ###################################################################################################################################################################
+##########################################                ####################################################################         ###################################################################################################################################################################
+##########################################                ####################################################################         ###################################################################################################################################################################

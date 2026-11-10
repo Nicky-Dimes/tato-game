@@ -15,6 +15,7 @@ func test_spawns_standing_on_the_ground() -> void:
 	check(p.is_on_floor(), "Tato is on the floor after spawning")
 	check_near(p.global_position.y, floor_y(level, 2), 2.0, "feet rest on top of the ground row")
 	check_eq(p.state, Tato.State.IDLE, "state is IDLE")
+	check_eq(GameState.hearts, GameState.MAX_HEARTS, "starts with five hearts")
 
 
 func test_walks_then_runs() -> void:

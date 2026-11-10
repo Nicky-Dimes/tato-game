@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="FoodDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/food/food_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"GARLIC_DASH"
+display_name = "Garlic Dash"
+ability_name = "Dash Attack"
+description = "Zoom! A speedy dash that bowls through creatures and crates."
+color = Color(0.9529, 0.9294, 0.9686, 1)
+accent = Color(0.7882, 0.7137, 1.0000, 1)
+icon_path = "res://assets/sprites/powers/garlic_dash.png"
+demo_path = "res://assets/sprites/cards/demo_garlic_dash.png"
+ability_script = "res://scripts/food/abilities/garlic_dash.gd"
+damage = 2
+cooldown = 0.75
+duration = 0.30
+element = &"dash"
+unlock_world = 5
+blend_adjective = "Zippy"
+blend_noun = "Zoom"
+honk_sound = "honk_zing"
+tags = PackedStringArray("dash")

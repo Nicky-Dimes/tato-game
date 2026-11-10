@@ -1,0 +1,42 @@
+; Snack Trial Room: every power in a row, with a few creatures to try them on.
+[meta]
+id = TRIAL
+name = Snack Trial Room
+kind = hub
+theme = nest
+music = hub
+hints = Touch a bowl to swap powers. | Each swap sets off a Flavor Burst. | Leave through the flag on the left.
+[legend]
+A = power FIRE_PEPPER
+B = power BUBBLEBERRY
+c = power WATERMELON
+d = power HONEYCOMB
+e = power POPCORN
+f = power NOODLE
+g = power FROSTBERRY
+i = power COCOA_SHIELD
+j = power GARLIC_DASH
+l = power THUNDER_CORN
+m = power LEMON_BEAM
+q = power TOMATO_BOMB
+s = slime_blob
+t = turtle_tank
+y = bee_buzzer up=2 range=3
+T = door to=HUB
+X = crate
+[map]
+
+
+
+
+
+
+
+
+
+                  ====              ====              ====
+
+ T  @    A  B  c  d   s   X  e  f  g  i   t   X  j  l  m  q   y   s   X
+##########################################################################
+##########################################################################
+##########################################################################

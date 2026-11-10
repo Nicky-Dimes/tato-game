@@ -67,15 +67,6 @@ func anim() -> String:
 	return ""
 
 
-## True for powers that keep Tato hush-quiet (listening creatures ignore him).
-func is_quiet() -> bool:
-	return false
-
-
-func is_stealthy() -> bool:
-	return false
-
-
 ## Lets a power shrug off thorns etc. (none do by default).
 func blocks_hurt() -> bool:
 	return false
@@ -96,17 +87,26 @@ func accent() -> Color:
 	return def.get("accent") if def else Color.WHITE
 
 
-func tags() -> PackedStringArray:
-	return def.get("tags") if def else PackedStringArray()
+func damage() -> int:
+	return int(def.get("damage")) if def else 1
+
+
+func element() -> StringName:
+	return def.get("element") if def else &"plain"
 
 
 func world() -> Node:
 	return player.get_parent() if player else null
 
 
-func pulse(at: Vector2, pulse_tags: PackedStringArray, radius: float, opts: Dictionary = {}) -> EffectPulse:
+## One shot from Tato's beak. `vel` is for facing right; it is mirrored for left.
+func shoot(vel: Vector2, opts: Dictionary = {}) -> Projectile:
 	var o := opts.duplicate()
 	o["source"] = player
+	if not o.has("damage"):
+		o["damage"] = damage()
+	if not o.has("element"):
+		o["element"] = element()
 	if not o.has("color"):
 		o["color"] = color()
-	return EffectPulse.emit(world(), at, pulse_tags, radius * Settings.honk_range_factor(), o)
+	return Projectile.fire(world(), player.muzzle(), Vector2(vel.x * player.facing, vel.y), o)

@@ -1,0 +1,28 @@
+; Built by tools/build_levels.py from chunks: arena
+[meta]
+id = W4-B
+world = 4
+theme = icy
+kind = boss
+hints = Jump over the Ice Beam. | A red mark shows where spikes will pop up. | Attack while the Puffin Lord rests.
+[legend]
+P = power FROSTBERRY
+1 = sign text=boss
+X = boss frost_puffin_lord
+E = goal needs=boss
+[map]
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+     =n=      n         ==n
+ 
+ @  1   P           X    E
+##############################
+##############################
+##############################

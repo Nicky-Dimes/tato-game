@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="FoodDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/food/food_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"THUNDER_CORN"
+display_name = "Thunder Corn"
+ability_name = "Lightning Shot"
+description = "A crackling bolt that jumps from creature to creature."
+color = Color(1.0000, 0.8902, 0.3020, 1)
+accent = Color(0.4784, 0.3098, 0.8118, 1)
+icon_path = "res://assets/sprites/powers/thunder_corn.png"
+demo_path = "res://assets/sprites/cards/demo_thunder_corn.png"
+ability_script = "res://scripts/food/abilities/thunder_corn.gd"
+damage = 1
+cooldown = 0.55
+duration = 0.20
+element = &"shock"
+unlock_world = 5
+blend_adjective = "Thundery"
+blend_noun = "Zap"
+honk_sound = "honk_boom"
+tags = PackedStringArray("shock")

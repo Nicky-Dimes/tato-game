@@ -1,0 +1,28 @@
+; Built by tools/build_levels.py from chunks: arena
+[meta]
+id = W1-B
+world = 1
+theme = grassland
+kind = boss
+hints = Wait for the warning flash, then dodge. | Jump over the little shock waves. | Attack while Mega Mushroot is resting.
+[legend]
+P = power FIRE_PEPPER
+1 = sign text=boss
+X = boss mega_mushroot
+E = goal needs=boss
+[map]
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+     =n=      n         ==n
+ 
+ @  1   P           X    E
+##############################
+##############################
+##############################

@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="FoodDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/food/food_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"FIRE_PEPPER"
+display_name = "Fire Pepper"
+ability_name = "Fire Shot"
+description = "Spits a fireball that flies straight ahead. Melts ice and lights torches."
+color = Color(0.9412, 0.2706, 0.1804, 1)
+accent = Color(1.0000, 0.7216, 0.1176, 1)
+icon_path = "res://assets/sprites/powers/fire_pepper.png"
+demo_path = "res://assets/sprites/cards/demo_fire_pepper.png"
+ability_script = "res://scripts/food/abilities/fire_pepper.gd"
+damage = 1
+cooldown = 0.34
+duration = 0.20
+element = &"fire"
+unlock_world = 1
+blend_adjective = "Spicy"
+blend_noun = "Sizzle"
+honk_sound = "honk_fire"
+tags = PackedStringArray("fire")

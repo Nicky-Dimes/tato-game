@@ -60,19 +60,10 @@ func try_activate(def: Resource) -> bool:
 	if not strat.can_start():
 		ability_denied.emit(def, "blocked")
 		return false
-	var cost := float(def.get("charge_cost"))
-	if not GameState.can_spend(cost):
-		ability_denied.emit(def, "charge")
-		return false
 	if current != null:
 		end_ability(current)
-	GameState.spend_charge(cost)
 	current = strat
 	var duration := float(def.get("duration"))
-	if strat.kind() == AbilityStrategy.KIND_TOGGLE:
-		duration *= Settings.timer_factor()
-		duration += float(bonus_time.get(id, 0.0))
-		bonus_time.erase(id)
 	strat.time_left = duration
 	cooldowns[id] = float(def.get("cooldown"))
 	ability_started.emit(def)

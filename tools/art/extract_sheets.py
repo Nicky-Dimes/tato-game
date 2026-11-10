@@ -96,13 +96,16 @@ WORLD_ORIGINS = {
     "candy": (0, 310), "icy": (723, 310),
     "windy": (0, 607), "castle": (723, 607),
 }
-# The asset blocks are three rows: a = tiles, b = hazards + props,
-# c = checkpoint, signpost, power bowl, collectibles. Every drawing in a row
-# is cut, left to right, and saved as <world>_<row><index>.png.
+# Each world kit has the same sub-panels. Every drawing inside a sub-panel is
+# cut, left to right, and saved as <world>_<part><index>.png.
 WORLD_ROWS = [
-    ("a", (358, 104, 558, 164)),
-    ("b", (358, 172, 716, 228)),
-    ("c", (358, 232, 716, 300)),
+    ("tile", (358, 114, 558, 161)),
+    ("hazard", (360, 184, 511, 227)),
+    ("prop", (513, 184, 716, 227)),
+    ("flag", (362, 246, 437, 299)),
+    ("sign", (438, 246, 517, 299)),
+    ("bowl", (518, 240, 619, 299)),
+    ("gem", (620, 248, 716, 297)),
 ]
 
 
@@ -172,26 +175,28 @@ def main():
 
     if want("world"):
         for world, (ox, oy) in WORLD_ORIGINS.items():
+            counts = []
             for row, rect in WORLD_ROWS:
                 r = (rect[0] + ox, rect[1] + oy, rect[2] + ox, rect[3] + oy)
-                cuts = cut_all(W, r, "flat", min_size=90, gap=4, thr=20, shadows=False)
+                cuts = cut_all(W, r, "flat", min_size=80, gap=1, thr=20, shadows=False)
                 for i, cut in enumerate(cuts):
                     cut = trim_thin(cut, 4)
                     save(cut, os.path.join(OUT, "world", "%s_%s%d.png" % (world, row, i)))
                     groups.setdefault("world", []).append(cut)
-                print("world     %-10s row %s: %d drawings" % (world, row, len(cuts)))
-                # keep each world's rows aligned on the review sheet
-                while len(groups["world"]) % 12 != 0:
-                    groups["world"].append(None)
+                counts.append("%s=%d" % (row, len(cuts)))
+            print("world     %-10s %s" % (world, " ".join(counts)))
+            # one review row per world
+            while len(groups["world"]) % 20 != 0:
+                groups["world"].append(None)
 
     if review:
         for g, cuts in groups.items():
             cell = 150 if g not in ("tato_big", "demos", "bosses") else 300
             if g == "world":
-                cell = 84
+                cell = 72
             if g == "demos":
                 continue
-            contact_sheet(cuts, os.path.join(ROOT, "docs", "art", "cut_%s.png" % g), cell=cell, cols=12 if g == "world" else (8 if cell == 150 else 4))
+            contact_sheet(cuts, os.path.join(ROOT, "docs", "art", "cut_%s.png" % g), cell=cell, cols=20 if g == "world" else (8 if cell == 150 else 4))
             print("review sheet: docs/art/cut_%s.png" % g)
 
 

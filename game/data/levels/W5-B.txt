@@ -1,0 +1,28 @@
+; Built by tools/build_levels.py from chunks: arena
+[meta]
+id = W5-B
+world = 5
+theme = windy
+kind = boss
+hints = The Turtle hovers: jump or shoot upward. | Its propeller pushes you: run against the wind. | Attack when it dips down to rest.
+[legend]
+P = power GARLIC_DASH
+1 = sign text=boss
+X = boss sky_airship_turtle
+E = goal needs=boss
+[map]
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+     =n=      n         ==n
+ 
+ @  1   P           X    E
+##############################
+##############################
+##############################

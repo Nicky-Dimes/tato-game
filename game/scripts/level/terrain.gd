@@ -11,7 +11,7 @@ const ATLAS_ROWS := 15
 const MATERIAL_BASE := {LevelData.SOLID: 0, LevelData.STRUCT: 5, LevelData.ICE: 10}
 
 var data: LevelData
-var theme := "picnic"
+var theme := "grassland"
 var tiles: TileMapLayer
 var solid_body: StaticBody2D
 var ice_body: StaticBody2D
@@ -192,7 +192,7 @@ func water_at(point: Vector2) -> bool:
 func _build_tiles() -> void:
 	var path := "res://assets/tiles/tiles_%s.svg" % theme
 	if not ResourceLoader.exists(path):
-		path = "res://assets/tiles/tiles_picnic.svg"
+		path = "res://assets/tiles/tiles_grassland.svg"
 	var tex := load(path) as Texture2D
 	if tex == null:
 		return

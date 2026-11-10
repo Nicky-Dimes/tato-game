@@ -3,31 +3,28 @@
 id = TEST
 name = Test Kitchen
 kind = test
-theme = picnic
-music = world1
-hints = Try every button. | Eat the pepper, then honk at the wax. | Fuse pepper and bubble under the tall shaft.
+theme = grassland
 [legend]
 1 = sign text=move
-2 = sign text=jump
-3 = sign text=honk
-4 = sign text=eat
-a = food PEPPER
-b = food BUBBLE
-K = chime opens=g1
-G = gate id=g1 h=3
-F = brazier up=6
-U = bush
-P = platform w=2 dx=3 dy=0 t=2.5
+P = power FIRE_PEPPER
+Q = power FROSTBERRY
+a = slime_blob
+b = mushroom_hopper
+f = bee_buzzer up=2 range=3
+M = platform w=2 dx=3 dy=0 t=2.5 thin
+u = pickup wings
 [map]
-                                                                                                    
-                                                                                                    
-                                                                                 ###                
-                                                             s                   # #        p       
-                                                           ====                  # #       ###      
-                        *  *                                                     # #                
-                      ##########            ==== *                               # #                
-            * *      /##########\                                   P            # #               E
- @  1  2   #####    /############\   3 U K  G   4 a   W   b C  ^^      ~~~~~~~~   F #  M     s    ####
-####################################################################    #~~~~~~~~####################
-####################################################################    ##########################  
-####################################################################    ##########################  
+
+
+
+
+
+
+
+                                                  n
+                       ?%?        o o o          ===
+                                             ====
+ @  1   P    a    B        b    Q    f    S          M        k   L   *   C    E
+####################################################     #######################
+####################################################     #######################
+####################################################     #######################

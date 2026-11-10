@@ -1,14 +1,7 @@
 class_name ResultsPanel
 extends CanvasLayer
-## The card at the end of a stage: what was found, Feather Medals earned,
-## and where to go next. No scores to chase, no ranks to fail.
-
-const MEDAL_NAMES := {
-	"clear": "Feast Finder (stage finished)",
-	"explorer": "Curious Beak (every Recipe Scrap)",
-	"gentle": "Gentle Goose (no bumps)",
-}
-
+## The card at the end of a stage: stars earned, Treasure Notes, coins.
+## No ranks to fail; everything found is kept.
 
 func _ready() -> void:
 	layer = 40
@@ -39,21 +32,35 @@ func show_results(level: Level, stats: Dictionary, result: Dictionary) -> void:
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(name_label)
 
+	var stars := HBoxContainer.new()
+	stars.alignment = BoxContainer.ALIGNMENT_CENTER
+	stars.add_theme_constant_override("separation", 6)
+	box.add_child(stars)
+	var have := GameState.stars_in_level(level.level_id)
+	for i in 3:
+		var tr := TextureRect.new()
+		tr.texture = Art.tex("items/star")
+		tr.custom_minimum_size = Vector2(64, 64)
+		tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		if i >= have:
+			tr.modulate = Color(0.2, 0.12, 0.3, 0.35)
+		stars.add_child(tr)
+	var how := UITheme.label("Stars: finish the stage, find all 3 Treasure Notes, find the hidden Star", 18, UITheme.PLUM_SOFT)
+	how.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	how.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	box.add_child(how)
+
 	var grid := GridContainer.new()
 	grid.columns = 2
 	grid.add_theme_constant_override("h_separation", 26)
 	grid.add_theme_constant_override("v_separation", 6)
 	grid.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	box.add_child(grid)
-	_row(grid, "Recipe Scraps", "%d / %d" % [int(stats.get("scraps_found", 0)), int(stats.get("scraps_total", 0))])
-	_row(grid, "Goose Pins here", "%d" % GameState.count_in_level("pin", level.level_id))
-	_row(grid, "Secret Dishes here", "%d" % GameState.count_in_level("dish", level.level_id))
+	_row(grid, "Treasure Notes", "%d / %d" % [int(stats.get("notes_found", 0)), int(stats.get("notes_total", 0))])
+	_row(grid, "Coins", "%d" % int(stats.get("coins", 0)))
+	_row(grid, "Creatures bopped", "%d" % int(stats.get("defeated", 0)))
 	_row(grid, "Time", HUD.format_time(float(stats.get("time", 0.0))) + ("  (best!)" if result.get("best_time", false) and not result.get("first_clear", false) else ""))
-
-	for m: String in result.get("new_medals", []):
-		var ml := UITheme.label("Feather Medal: " + str(MEDAL_NAMES.get(m, m)), 22, UITheme.ORANGE_DARK, true)
-		ml.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		box.add_child(ml)
 
 	var buttons := HBoxContainer.new()
 	buttons.alignment = BoxContainer.ALIGNMENT_CENTER

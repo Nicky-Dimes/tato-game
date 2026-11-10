@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="FoodDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/food/food_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"TOMATO_BOMB"
+display_name = "Tomato Bomb"
+ability_name = "Bomb Blast"
+description = "Lobs a tomato that goes SPLAT in a big blast. Breaks cracked walls."
+color = Color(0.8784, 0.2235, 0.1804, 1)
+accent = Color(1.0000, 0.6039, 0.1216, 1)
+icon_path = "res://assets/sprites/powers/tomato_bomb.png"
+demo_path = "res://assets/sprites/cards/demo_tomato_bomb.png"
+ability_script = "res://scripts/food/abilities/tomato_bomb.gd"
+damage = 3
+cooldown = 0.80
+duration = 0.20
+element = &"blast"
+unlock_world = 6
+blend_adjective = "Saucy"
+blend_noun = "Splat"
+honk_sound = "honk_boom"
+tags = PackedStringArray("blast")

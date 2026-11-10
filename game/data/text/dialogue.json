@@ -1,6 +1,1 @@
-{
-	"test_hello": [
-		{"who": "mimi", "text": "Oh! Tato! You're awake just in time for the First Feast."},
-		{"who": "tato", "text": "HONK!", "face": "excited"}
-	]
-}
+{}

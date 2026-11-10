@@ -26,20 +26,20 @@ const TERRAIN_CHARS := {
 ## letter -> "type arg key=value ..."
 const DEFAULT_LEGEND := {
 	"@": "spawn",
-	"E": "exit",
+	"E": "goal",
 	"C": "checkpoint",
-	"*": "crumb",
-	"s": "scrap",
-	"p": "pin",
-	"d": "dish",
-	"h": "feather",
-	"^": "thorns",
-	"v": "thorns flip",
+	"o": "coin",
+	"h": "heart",
+	"H": "extraheal",
+	"*": "star",
+	"n": "note",
+	"k": "key",
+	"L": "lock",
+	"?": "qblock",
 	"B": "crate",
-	"W": "wax",
-	"I": "iceblock",
-	"M": "crumb_mite",
-	"T": "bounce_pad",
+	"S": "spring",
+	"^": "spikes",
+	"v": "spikes flip",
 }
 
 var id := ""

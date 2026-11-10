@@ -4,86 +4,87 @@ extends Node
 
 const LEVEL_DIR := "res://data/levels/"
 const HUB_ID := "HUB"
-## Recipe Scraps needed to open the final door in the Silent Kitchen.
-const FINALE_SCRAPS := 36
-const FINALE_SCRAPS_COZY := 18
-
-const SCRAPS_PER_WORLD := 12
-const PINS_PER_WORLD := 6
-const DISHES_PER_WORLD := 4
+const NOTES_PER_STAGE := 3
 
 const WORLDS: Array[Dictionary] = [
 	{
-		"id": "W1", "index": 1, "name": "Picnic Patch", "theme": "picnic",
-		"tagline": "A sunny orchard of picnic cloths, windmills and honey flowers.",
-		"page": "Golden Crumb Page", "keeper": "Bun the Hedgehog", "music": "world1",
+		"id": "W1", "index": 1, "name": "Grassland", "theme": "grassland",
+		"tagline": "Rolling green hills, bouncy mushrooms and a windmill on the horizon.",
+		"page": "Golden Crumb Page", "boss": "Mega Mushroot", "boss_art": "mega_mushroot", "music": "world1",
+		"gimmick": "Bounce Mushroom", "powers": ["FIRE_PEPPER", "BUBBLEBERRY"],
 		"stages": ["W1-L1", "W1-L2", "W1-L3", "W1-X", "W1-B"],
 	},
 	{
-		"id": "W2", "index": 2, "name": "Syrupwood Farm", "theme": "farm",
-		"tagline": "Golden groves, syrup rivers and creaky wooden gears.",
-		"page": "Amber Glaze Page", "keeper": "Maple the Calf", "music": "world2",
+		"id": "W2", "index": 2, "name": "Orchard", "theme": "orchard",
+		"tagline": "Apple trees, ladders and baskets. Mind the falling apples!",
+		"page": "Amber Glaze Page", "boss": "Gigantapple", "boss_art": "gigantapple", "music": "world2",
+		"gimmick": "Falling Apples", "powers": ["WATERMELON", "HONEYCOMB"],
 		"stages": ["W2-L1", "W2-L2", "W2-L3", "W2-X", "W2-B"],
 	},
 	{
-		"id": "W3", "index": 3, "name": "Frostpop Fair", "theme": "fair",
-		"tagline": "A winter carnival of ice ponds and popcorn rides.",
-		"page": "Frosted Sugar Page", "keeper": "Pompom the Penguin", "music": "world3",
+		"id": "W3", "index": 3, "name": "Candy Carnival", "theme": "candy",
+		"tagline": "Frosted cake blocks, lollipops and candy conveyor belts.",
+		"page": "Frosted Sugar Page", "boss": "Candy King", "boss_art": "candy_king", "music": "world3",
+		"gimmick": "Candy Conveyor", "powers": ["POPCORN", "NOODLE"],
 		"stages": ["W3-L1", "W3-L2", "W3-L3", "W3-X", "W3-B"],
 	},
 	{
-		"id": "W4", "index": 4, "name": "Noodlebrook Market", "theme": "market",
-		"tagline": "Busy canals, paper lanterns and citrus mirrors.",
-		"page": "Tangy Spark Page", "keeper": "Udon the Otter", "music": "world4",
+		"id": "W4", "index": 4, "name": "Icy Pond", "theme": "icy",
+		"tagline": "Snowy blocks, igloos and very slippery ice.",
+		"page": "Tangy Spark Page", "boss": "Frost Puffin Lord", "boss_art": "frost_puffin_lord", "music": "world4",
+		"gimmick": "Slick Ice", "powers": ["FROSTBERRY", "COCOA_SHIELD"],
 		"stages": ["W4-L1", "W4-L2", "W4-L3", "W4-X", "W4-B"],
 	},
 	{
-		"id": "W5", "index": 5, "name": "Moonberry Marsh", "theme": "marsh",
-		"tagline": "Glowing night wetlands where everything is listening.",
-		"page": "Midnight Berry Page", "keeper": "Lumi the Firefly", "music": "world5",
+		"id": "W5", "index": 5, "name": "Windy Mill", "theme": "windy",
+		"tagline": "High bluffs, wooden bridges and gusts that carry a little goose far.",
+		"page": "Midnight Berry Page", "boss": "Sky Airship Turtle", "boss_art": "sky_airship_turtle", "music": "world5",
+		"gimmick": "Wind Gust", "powers": ["GARLIC_DASH", "THUNDER_CORN"],
 		"stages": ["W5-L1", "W5-L2", "W5-L3", "W5-X", "W5-B"],
 	},
 	{
-		"id": "W6", "index": 6, "name": "The Silent Kitchen", "theme": "kitchen",
-		"tagline": "A floating clockwork castle of brass ovens and silent chimes.",
-		"page": "Hearthsong Page", "keeper": "Ladle the Kettle-sprite", "music": "world6",
+		"id": "W6", "index": 6, "name": "Castle Feast", "theme": "castle",
+		"tagline": "Banners, banquet tables, drawbridges and the grandest kitchen of all.",
+		"page": "Hearthsong Page", "boss": "Chef Castle Golem", "boss_art": "chef_castle_golem", "music": "world6",
+		"gimmick": "Drawbridge", "powers": ["LEMON_BEAM", "TOMATO_BOMB"],
 		"stages": ["W6-L1", "W6-L2", "W6-L3", "W6-X", "W6-B"],
 	},
 ]
 
-## id -> {name, kind, technique}
+## id -> {name, kind}
 const STAGES := {
-	"HUB": {"name": "Home Nest", "kind": "hub", "technique": "Recipe book and world gates"},
-	"W1-L1": {"name": "The Missing Muffin", "kind": "core", "technique": "Waddle, jump, honk, eat"},
-	"W1-L2": {"name": "Berry Breeze", "kind": "core", "technique": "Bubble Float and breezes"},
-	"W1-L3": {"name": "The Warm Windmill", "kind": "core", "technique": "Fire Honk and Steam Lift"},
-	"W1-X": {"name": "Crumb Chase", "kind": "optional", "technique": "Shortcuts against the clock"},
-	"W1-B": {"name": "Puddle Puffer", "kind": "boss", "technique": "Redirect bubbles and steam"},
-	"W2-L1": {"name": "Sticky Situation", "kind": "core", "technique": "Sticky Waddle on walls"},
-	"W2-L2": {"name": "Rolling Harvest", "kind": "core", "technique": "Melon Roll and big buttons"},
-	"W2-L3": {"name": "The Barn That Turned Sideways", "kind": "core", "technique": "Caramel bridges"},
-	"W2-X": {"name": "The Great Rolling Race", "kind": "optional", "technique": "Sticky Bowling loops"},
-	"W2-B": {"name": "Barrelback", "kind": "boss", "technique": "Weight plates and gummed wheels"},
-	"W3-L1": {"name": "A Slippery Welcome", "kind": "core", "technique": "Freeze paths over water"},
-	"W3-L2": {"name": "Pop Goes the Platform", "kind": "core", "technique": "Bounce rhythm"},
-	"W3-L3": {"name": "The Carousel of Cold", "kind": "core", "technique": "Frost Pop and Snowball Express"},
-	"W3-X": {"name": "Endless Bounce", "kind": "optional", "technique": "A tall bouncing climb"},
-	"W3-B": {"name": "Whirligig", "kind": "boss", "technique": "Freeze the spinning ride"},
-	"W4-L1": {"name": "Market Detour", "kind": "core", "technique": "Noodle Neck reach and grab"},
-	"W4-L2": {"name": "Lantern Labyrinth", "kind": "core", "technique": "Flash Zing light beams"},
-	"W4-L3": {"name": "The Longest Noodle", "kind": "core", "technique": "Tether Noodle swings"},
-	"W4-X": {"name": "Chef's Secret Alley", "kind": "optional", "technique": "Prism Chill redirection"},
-	"W4-B": {"name": "The Twin Teapots", "kind": "boss", "technique": "Two linked puzzles"},
-	"W5-L1": {"name": "A Very Quiet Honk", "kind": "core", "technique": "Sneaking with Moonmint"},
-	"W5-L2": {"name": "Painted Paths", "kind": "core", "technique": "Jam Trail platforms"},
-	"W5-L3": {"name": "The Whispering Bog", "kind": "core", "technique": "Quiet Ink"},
-	"W5-X": {"name": "Glow Trail Hunt", "kind": "optional", "technique": "Stealth and route planning"},
-	"W5-B": {"name": "The Echo Owl", "kind": "boss", "technique": "Harmony, not a fight"},
-	"W6-L1": {"name": "The Quiet Gate", "kind": "core", "technique": "Drumbeat Honk resonance"},
-	"W6-L2": {"name": "Cloud Oven Climb", "kind": "core", "technique": "Feathercloud steps"},
-	"W6-L3": {"name": "The Missing Last Note", "kind": "core", "technique": "Thundercloud and Sunbeam Steps"},
-	"W6-X": {"name": "The Perfect Feast Trial", "kind": "optional", "technique": "Every power, one trial"},
-	"W6-B": {"name": "Cloche and the Silent Bell", "kind": "boss", "technique": "Three-part harmony"},
+	"HUB": {"name": "Home Nest", "kind": "hub"},
+	"TRIAL": {"name": "Snack Trial Room", "kind": "hub"},
+	"W1-L1": {"name": "Honk Hill", "kind": "core"},
+	"W1-L2": {"name": "Bouncy Meadow", "kind": "core"},
+	"W1-L3": {"name": "Hedgehog Hollow", "kind": "core"},
+	"W1-X": {"name": "Coin Dash", "kind": "optional"},
+	"W1-B": {"name": "Mega Mushroot", "kind": "boss"},
+	"W2-L1": {"name": "Apple Lane", "kind": "core"},
+	"W2-L2": {"name": "Mole Orchard", "kind": "core"},
+	"W2-L3": {"name": "Treetop Tumble", "kind": "core"},
+	"W2-X": {"name": "Bee Line", "kind": "optional"},
+	"W2-B": {"name": "Gigantapple", "kind": "boss"},
+	"W3-L1": {"name": "Sprinkle Street", "kind": "core"},
+	"W3-L2": {"name": "Conveyor Carnival", "kind": "core"},
+	"W3-L3": {"name": "Cotton Candy Climb", "kind": "core"},
+	"W3-X": {"name": "Balloon Bash", "kind": "optional"},
+	"W3-B": {"name": "Candy King", "kind": "boss"},
+	"W4-L1": {"name": "Slippy Shore", "kind": "core"},
+	"W4-L2": {"name": "Icicle Cavern", "kind": "core"},
+	"W4-L3": {"name": "Frozen Falls", "kind": "core"},
+	"W4-X": {"name": "Puffin Slide", "kind": "optional"},
+	"W4-B": {"name": "Frost Puffin Lord", "kind": "boss"},
+	"W5-L1": {"name": "Breezy Bluffs", "kind": "core"},
+	"W5-L2": {"name": "Gusty Gears", "kind": "core"},
+	"W5-L3": {"name": "Above the Clouds", "kind": "core"},
+	"W5-X": {"name": "Tailwind Trial", "kind": "optional"},
+	"W5-B": {"name": "Sky Airship Turtle", "kind": "boss"},
+	"W6-L1": {"name": "Banquet Bridge", "kind": "core"},
+	"W6-L2": {"name": "Kitchen Keep", "kind": "core"},
+	"W6-L3": {"name": "The Great Hall", "kind": "core"},
+	"W6-X": {"name": "Feast Gauntlet", "kind": "optional"},
+	"W6-B": {"name": "Chef Castle Golem", "kind": "boss"},
 }
 
 var _cache: Dictionary = {}
@@ -203,13 +204,9 @@ func next_story_stage(level_id: String) -> String:
 	return ""
 
 
-func scrap_total() -> int:
-	return SCRAPS_PER_WORLD * WORLDS.size()
+func note_total() -> int:
+	return NOTES_PER_STAGE * all_stage_ids().size()
 
 
-func pin_total() -> int:
-	return PINS_PER_WORLD * WORLDS.size()
-
-
-func dish_total() -> int:
-	return DISHES_PER_WORLD * WORLDS.size()
+func star_total() -> int:
+	return 3 * all_stage_ids().size()

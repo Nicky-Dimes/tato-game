@@ -1,1 +1,34 @@
-{}
+{
+	"intro": [
+		{"art": "cards/scene_grassland", "text": "In the valley of Crumboria, every feast begins with the Great Recipe Book."},
+		{"art": "tato_big/front", "text": "Tato, a little goose with a very big appetite, could hardly wait for the First Feast.", "honk": "honk_happy"},
+		{"art": "cards/mock_direction", "text": "Then a great gust blew the book's six Flavor Pages away. Hungry creatures gobbled them up, every one!"},
+		{"art": "tato_big/cheer", "text": "Tato honked his bravest honk. He would eat, bounce and bop his way through six worlds and bring every page home.", "honk": "honk"}
+	],
+	"page_w1": [
+		{"art": "bosses/mega_mushroot", "text": "Mega Mushroot coughs up the Golden Crumb Page, grumbles, and toddles off for a nap."},
+		{"art": "cards/scene_orchard", "text": "One page home, five to go. Next stop: the Orchard, where the apples bite back."}
+	],
+	"page_w2": [
+		{"art": "bosses/gigantapple", "text": "Gigantapple spits out the Amber Glaze Page. It was not very tasty anyway."},
+		{"art": "cards/scene_candy", "text": "Music drifts over the hills. The Candy Carnival is in town, and so is a very greedy king."}
+	],
+	"page_w3": [
+		{"art": "bosses/candy_king", "text": "The Candy King hands over the Frosted Sugar Page, and promises to share his sweets from now on."},
+		{"art": "cards/scene_icy", "text": "Brr! The trail leads across the Icy Pond. Mind your step, little goose."}
+	],
+	"page_w4": [
+		{"art": "bosses/frost_puffin_lord", "text": "The Frost Puffin Lord bows and returns the Tangy Spark Page. He only wanted it for the pretty pictures."},
+		{"art": "cards/scene_windy", "text": "A warm wind blows from the hills. High above the Windy Mill, something is flying off with the next page."}
+	],
+	"page_w5": [
+		{"art": "bosses/sky_airship_turtle", "text": "The Sky Airship Turtle lands, yawns, and lets the Midnight Berry Page flutter down."},
+		{"art": "cards/scene_castle", "text": "One page left. It is in the grandest kitchen of all: the castle, where a giant chef is cooking up trouble."}
+	],
+	"ending": [
+		{"art": "bosses/chef_castle_golem", "text": "The Chef Castle Golem sets down his spoon. He only took the pages because nobody had ever invited him to the feast."},
+		{"art": "cards/mock_castle", "text": "So Tato invited him. And the Mushroot, the Apple, the King, the Puffin and the Turtle too."},
+		{"art": "cards/scene_castle", "text": "With all six Flavor Pages home, the Great Recipe Book glowed, and the First Feast was the biggest Crumboria had ever seen."},
+		{"art": "tato_big/cheer", "text": "And Tato? Tato had seconds. And thirds. HONK! The End.", "honk": "honk_happy"}
+	]
+}

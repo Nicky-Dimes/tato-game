@@ -2,22 +2,22 @@ class_name Tato
 extends CharacterBody2D
 ## Tato the gosling. Origin is at the feet.
 ##
-## Movement is intent based: input is read into `move_x` / `move_y` and a few
-## "pressed this frame" flags, the state machine decides what Tato is doing,
-## and snack powers (AbilityRunner) may take over movement for a while.
-## The collision capsule never changes because of animation squash/stretch;
-## only crouch/slide and ball powers switch it on purpose.
+## Three buttons: move, jump (again in the air to flap), attack. With no
+## power-up the attack is a honk; with one it is that power's attack. Input
+## is read into `move_x` / `move_y` and a few "pressed this frame" flags, a
+## small state machine decides what Tato is doing, and a power (AbilityRunner)
+## may take over movement for a moment (Garlic Dash). Animation squash and
+## stretch never touch the collision capsule.
 
 signal state_changed(state: int)
 signal honked(kind: StringName)
-signal ate(food: StringName)
+signal power_changed(power: StringName)
 signal got_hurt
 signal fell_out
-signal replace_needed(food: StringName)
 signal interact_target_changed(target: Node)
 signal landed(impact: float)
 
-enum State { IDLE, WALK, RUN, JUMP, FALL, CROUCH, SLIDE, SWIM, HONK, EAT, ABILITY, HURT, DISABLED }
+enum State { IDLE, WALK, RUN, JUMP, FALL, CROUCH, SLIDE, SWIM, ATTACK, ABILITY, HURT, DISABLED }
 
 # --- tuning (pixels, seconds). Starting values from the design doc, adjusted by play.
 const WALK_SPEED := 215.0
@@ -41,18 +41,19 @@ const COYOTE_TIME := 0.10
 const JUMP_BUFFER := 0.12
 const SWIM_SPEED := 165.0
 const SLIDE_MAX := 540.0
-const HONK_COOLDOWN := 0.3
-const HONK_RADIUS := 190.0
+const HONK_COOLDOWN := 0.32
+const HONK_RADIUS := 120.0
 const INVULN_TIME := 1.6
 const STAND_HEIGHT := 56.0
 const LOW_HEIGHT := 40.0
 const BODY_RADIUS := 20.0
+const STOMP_BOUNCE := -520.0
 
 var state: int = State.IDLE
 var facing := 1.0
 var move_x := 0.0
 var move_y := 0.0
-var inventory := FoodInventory.new()
+var power := PowerSlot.new()
 var runner: AbilityRunner
 var visual: TatoVisual
 var level: Node = null                 # the Level that owns this Tato (may be null in tests)
@@ -68,15 +69,18 @@ var control_lock := 0.0                # seconds input is ignored (eat, hurt)
 var honk_cd := 0.0
 var last_safe_position := Vector2.ZERO
 var interact_target: Node = null
-## Overrides set by snack powers.
-var gravity_scale := 1.0
 var speed_scale := 1.0
-var extra_air_jumps := 0
-var sticky := false                    # honey: cling to walls / ceilings
-var bouncy := false                    # popcorn: every landing bounces
-var noise := 0.0                       # 0 silent .. 1 loud; listening creatures read this
 var hurt_count := 0
-var slide_lock := 0.0                  # keeps a belly slide going (Ice Slide dash)
+var slide_lock := 0.0                  # keeps a belly slide going (forced slides)
+
+## Timed boosts from level pickups (seconds left).
+var wings_time := 0.0                  # endless flaps
+var super_jump_time := 0.0             # mushroom: bigger jumps
+var slow_fall_time := 0.0              # feather: floaty falls
+var magnet_time := 0.0                 # coins fly to Tato
+var star_time := 0.0                   # rainbow star: nothing hurts, creatures poof on touch
+var luck_time := 0.0                   # clover: coins count double
+var orb_guard := false                 # orb: soaks up the next hit
 
 var _coyote := 0.0
 var _jump_buffer := 0.0
@@ -93,8 +97,7 @@ var _shape: CapsuleShape2D
 var _collider: CollisionShape2D
 var _interact_area: Area2D
 var _step_timer := 0.0
-var _pending_food: StringName = &""
-var _honk_held := false
+var _attack_repeat := 0.0
 var _jump_cut_ready := false
 
 
@@ -141,6 +144,7 @@ func _ready() -> void:
 	_interact_area.add_child(ics)
 	add_child(_interact_area)
 
+	power.changed.connect(func(p: StringName, _prev: StringName) -> void: power_changed.emit(p))
 	last_safe_position = global_position
 
 
@@ -153,7 +157,7 @@ func _physics_process(delta: float) -> void:
 		_finish_frame(delta)
 		return
 	_read_input()
-	_handle_actions()
+	_handle_actions(delta)
 	runner.tick(delta)
 	if runner.overrides_movement():
 		runner.current.move(delta)
@@ -168,11 +172,19 @@ func _tick_timers(delta: float) -> void:
 	honk_cd = maxf(honk_cd - delta, 0.0)
 	_jump_buffer = maxf(_jump_buffer - delta, 0.0)
 	_drop_timer = maxf(_drop_timer - delta, 0.0)
+	wings_time = maxf(wings_time - delta, 0.0)
+	super_jump_time = maxf(super_jump_time - delta, 0.0)
+	slow_fall_time = maxf(slow_fall_time - delta, 0.0)
+	magnet_time = maxf(magnet_time - delta, 0.0)
+	luck_time = maxf(luck_time - delta, 0.0)
+	if star_time > 0.0:
+		star_time = maxf(star_time - delta, 0.0)
+		if star_time <= 0.0:
+			visual.tint = Color.WHITE
 	if _pose_timer > 0.0:
 		_pose_timer -= delta
 		if _pose_timer <= 0.0:
 			_pose = ""
-	noise = move_toward(noise, 0.0, delta * 2.5)
 	if _drop_timer <= 0.0:
 		collision_mask |= Layers.ONEWAY
 
@@ -187,29 +199,28 @@ func _read_input() -> void:
 	move_y = Input.get_axis("move_up", "move_down")
 	if absf(move_x) < 0.2:
 		move_x = 0.0
-	_jump_held = Input.is_action_pressed("jump") or Input.is_action_pressed("flap")
-	if Input.is_action_just_pressed("jump") or Input.is_action_just_pressed("flap"):
+	_jump_held = Input.is_action_pressed("jump")
+	if Input.is_action_just_pressed("jump"):
 		_jump_buffer = JUMP_BUFFER
 
 
-func _handle_actions() -> void:
+func _handle_actions(delta: float) -> void:
 	if control_lock > 0.0:
 		return
-	if Input.is_action_just_pressed("ability_swap"):
-		var before := inventory.active
-		inventory.cycle_active()
-		if inventory.active != before:
-			AudioService.play("swap")
-	if Input.is_action_just_pressed("eat_interact"):
+	if Input.is_action_just_pressed("move_up") and interact_target != null:
 		try_interact()
-	if Input.is_action_just_pressed("honk_primary"):
-		_honk_held = true
-		press_honk()
-	elif _honk_held and not Input.is_action_pressed("honk_primary"):
-		_honk_held = false
-		runner.button_released()
-	if Input.is_action_just_pressed("fusion"):
-		press_fusion()
+		return
+	_attack_repeat = maxf(_attack_repeat - delta, 0.0)
+	var pressed := Input.is_action_just_pressed("attack")
+	if not pressed and Settings.flag("hold_to_attack") and Input.is_action_pressed("attack") and _attack_repeat <= 0.0:
+		pressed = true
+	if pressed:
+		_attack_repeat = 0.18
+		# the attack button also talks / goes through doors when one is right here
+		if interact_target != null and is_instance_valid(interact_target) and interact_target.has_method("uses_attack_button") and interact_target.call("uses_attack_button"):
+			try_interact()
+		else:
+			press_attack()
 
 
 # ------------------------------------------------------------- normal move --
@@ -293,9 +304,9 @@ func _move_normal(delta: float) -> void:
 	else:
 		_coyote = maxf(_coyote - delta, 0.0)
 		var g := GRAVITY if (velocity.y < 0.0 and _jump_held) else FALL_GRAVITY
-		velocity.y += g * gravity_scale * delta
+		velocity.y += g * delta
 		var cap := MAX_FALL
-		if _glide and _jump_held and velocity.y > 0.0:
+		if (_glide and _jump_held and velocity.y > 0.0) or (slow_fall_time > 0.0 and velocity.y > 0.0):
 			cap = GLIDE_FALL
 		velocity.y = minf(velocity.y, cap)
 
@@ -308,13 +319,8 @@ func _move_normal(delta: float) -> void:
 			position.y += 2.0
 			_coyote = 0.0
 		elif _coyote > 0.0:
-			do_jump(JUMP_VELOCITY)
-		elif extra_air_jumps > 0:
-			extra_air_jumps -= 1
-			_jump_buffer = 0.0
-			velocity.y = JUMP_VELOCITY * 0.9
-			air_jump_used()
-		elif flaps_left > 0:
+			do_jump(JUMP_VELOCITY * (1.22 if super_jump_time > 0.0 else 1.0))
+		elif flaps_left > 0 or wings_time > 0.0:
 			do_flap()
 
 	# variable jump height: letting go early cuts the rise once
@@ -344,7 +350,8 @@ func do_jump(speed: float) -> void:
 
 func do_flap() -> void:
 	_jump_buffer = 0.0
-	flaps_left -= 1
+	if wings_time <= 0.0:
+		flaps_left -= 1
 	_glide = true
 	velocity.y = minf(velocity.y, 0.0) * 0.35 + FLAP_VELOCITY
 	visual.flap()
@@ -369,10 +376,13 @@ func take_jump_press() -> bool:
 	return false
 
 
-func air_jump_used() -> void:
-	visual.squash(Vector2(0.85, 1.2))
-	AudioService.play_varied("pop", -3.0)
-	Fx.pop_ring(get_parent(), global_position + Vector2(0, -10), Color(0.6, 0.85, 1.0), 46.0)
+## Hop off something bouncy (a stomped creature, a spring).
+func bounce(speed: float = STOMP_BOUNCE) -> void:
+	velocity.y = speed * (1.25 if _jump_held else 1.0)
+	flaps_left = MAX_FLAPS
+	_jump_cut_ready = false
+	_glide = false
+	visual.squash(Vector2(0.8, 1.25))
 
 
 func _after_slide(_delta: float) -> void:
@@ -385,14 +395,11 @@ func _after_slide(_delta: float) -> void:
 
 func _on_land(impact: float) -> void:
 	landed.emit(impact)
-	if bouncy:
-		return
 	if impact > 260.0:
 		var amount := clampf(impact / MAX_FALL, 0.2, 1.0)
 		visual.squash(Vector2(1.0 + 0.3 * amount, 1.0 - 0.28 * amount))
 		Fx.puff(get_parent(), global_position, Color(1, 1, 1, 0.75), 4)
 		AudioService.play_varied("land", lerpf(-12.0, -3.0, amount))
-		noise = maxf(noise, 0.35)
 
 
 # ------------------------------------------------------------------- swim --
@@ -465,7 +472,6 @@ func _finish_frame(delta: float) -> void:
 	_track_safe_ground(delta)
 	_update_interact_target()
 	_footsteps(delta)
-	GameState.tick_charge(delta)
 	if level != null and level.has_method("kill_plane_y") and global_position.y > level.kill_plane_y():
 		fell_out.emit()
 
@@ -476,8 +482,6 @@ func _update_state() -> void:
 	var s := State.IDLE
 	if control_lock > 0.0 and _pose == "hurt":
 		s = State.HURT
-	elif _pose == "eat":
-		s = State.EAT
 	elif runner.overrides_movement():
 		s = State.ABILITY
 	elif in_water:
@@ -489,7 +493,7 @@ func _update_state() -> void:
 	elif crouching:
 		s = State.CROUCH
 	elif _pose == "honk":
-		s = State.HONK
+		s = State.ATTACK
 	elif absf(velocity.x) > RUN_SPEED * 0.82:
 		s = State.RUN
 	elif absf(velocity.x) > 18.0:
@@ -534,9 +538,7 @@ func _footsteps(delta: float) -> void:
 	_step_timer -= delta
 	if _step_timer <= 0.0:
 		_step_timer = 0.3 if state == State.WALK else 0.2
-		if not is_quiet():
-			AudioService.play_varied("step", -14.0, 0.15)
-			noise = maxf(noise, 0.25 if state == State.WALK else 0.5)
+		AudioService.play_varied("step", -14.0, 0.15)
 
 
 func _floor_is_ice() -> bool:
@@ -581,161 +583,98 @@ func _can_stand() -> bool:
 	return space.intersect_shape(q, 1).is_empty()
 
 
-## Used by ball powers: swap the capsule for a circle of the given radius.
-func set_ball_shape(radius: float) -> void:
-	if radius <= 0.0:
-		_shape.radius = BODY_RADIUS
-		low_shape = true      # force a recompute
-		_set_low_shape(false)
-		if low_shape:
-			# no headroom: stay small until there is space
-			_shape.height = LOW_HEIGHT
-			_collider.position = Vector2(0, -LOW_HEIGHT * 0.5)
+# ------------------------------------------------------------------ attack --
+
+## Where shots leave from (just in front of the beak).
+func muzzle() -> Vector2:
+	return global_position + Vector2(facing * 26.0, -42.0 if not low_shape else -24.0)
+
+
+func press_attack() -> void:
+	var def := power.definition()
+	if def != null:
+		if runner.try_activate(def):
+			honk_pose(0.22)
 		return
-	_shape.radius = radius
-	_shape.height = radius * 2.0
-	_collider.position = Vector2(0, -radius)
-	low_shape = false
-
-
-func ball_fits(radius: float) -> bool:
-	var space := get_world_2d().direct_space_state
-	var probe := CircleShape2D.new()
-	probe.radius = radius - 2.0
-	var q := PhysicsShapeQueryParameters2D.new()
-	q.shape = probe
-	q.transform = Transform2D(0.0, global_position + Vector2(0, -radius - 1.0))
-	q.collision_mask = Layers.WORLD | Layers.PROP
-	q.exclude = [get_rid()]
-	return space.intersect_shape(q, 1).is_empty()
-
-
-# ------------------------------------------------------------ honk & foods --
-
-func is_quiet() -> bool:
-	return runner.current != null and runner.current.is_quiet()
-
-
-func is_stealthy() -> bool:
-	return runner.current != null and runner.current.is_stealthy()
-
-
-func press_honk() -> void:
-	var food_id := inventory.active_food()
-	if food_id != &"":
-		var def := FoodDB.food(food_id)
-		if def != null and runner.try_activate(def):
-			return
-		if def != null and runner.current == null and not GameState.can_spend(def.charge_cost):
-			Fx.float_text(get_parent(), global_position + Vector2(0, -90), "Need more honk!", UITheme.YELLOW)
 	plain_honk()
 
 
-## The neutral honk: a ring that shakes fruit loose, rings chimes and startles
-## light creatures. Free, with a short cooldown.
-func plain_honk(quiet: bool = false) -> void:
+## The plain honk: a short ring that bops creatures right in front of Tato,
+## shoves them back and rattles blocks. Free, with a short cooldown.
+func plain_honk() -> void:
 	if honk_cd > 0.0:
 		return
 	honk_cd = HONK_COOLDOWN
 	honk_pose()
-	var hush := quiet or is_quiet()
-	if hush:
-		AudioService.voice("honk_quiet", -6.0)
-	else:
-		AudioService.voice("honk", 0.0, randf_range(0.96, 1.06))
-		noise = 1.0
-	var tags := PackedStringArray(["quiet"]) if hush else PackedStringArray(["honk"])
-	EffectPulse.emit(get_parent(), global_position + Vector2(facing * 14.0, -40.0), tags,
-		HONK_RADIUS * Settings.honk_range_factor(),
-		{"life": 0.32, "color": Color(1, 1, 1, 0.9) if not hush else Color(0.6, 1.0, 0.9, 0.6), "source": self})
-	honked.emit(&"quiet" if hush else &"plain")
+	AudioService.voice("honk", 0.0, randf_range(0.96, 1.06))
+	Hit.burst(get_parent(), global_position + Vector2(facing * 46.0, -36.0), HONK_RADIUS, 1, &"honk", self,
+		{"color": Color(1, 1, 1, 0.9), "knock": 260.0})
+	honked.emit(&"plain")
 
 
-func honk_pose(seconds: float = 0.28) -> void:
+func honk_pose(seconds: float = 0.26) -> void:
 	_pose = "honk"
 	_pose_timer = seconds
 	visual.squash(Vector2(1.16, 0.88))
 	visual.honk_flash()
 
 
-func press_fusion() -> void:
-	var rec := inventory.current_recipe()
-	if rec == null:
-		if not inventory.is_full():
-			Fx.float_text(get_parent(), global_position + Vector2(0, -90), "Need two snacks!", UITheme.CREAM)
-			AudioService.play("deny", -6.0)
+## A power bowl was touched: the new power replaces the old one. Swapping
+## two different powers sets off their Flavor Burst.
+func collect_power(id: StringName) -> void:
+	var def := FoodDB.food(id)
+	if def == null:
 		return
-	if runner.current != null and runner.current.def == rec:
-		runner.try_activate(rec)
-		return
-	if not GameState.can_spend(rec.charge_cost):
-		Fx.float_text(get_parent(), global_position + Vector2(0, -90), "Need more honk!", UITheme.YELLOW)
-		AudioService.play("deny", -6.0)
-		return
-	if runner.try_activate(rec):
-		GameState.discover_recipe(rec)
+	runner.cancel()
+	var previous := power.pick_up(id)
+	visual.squash(Vector2(1.18, 0.84))
+	AudioService.play("power_up")
+	AudioService.voice("honk_happy", -2.0)
+	Fx.sparkle(get_parent(), global_position + Vector2(0, -44), def.color.lightened(0.3), 8)
+	Fx.float_text(get_parent(), global_position + Vector2(0, -100), def.ability_name + "!", def.color.lightened(0.4))
+	if GameState.unlock_food(def.id):
+		GameState.toast.emit("New power: %s" % def.display_name, FoodDB.icon(def.icon_path))
+	if previous != &"":
+		var rec := FoodDB.resolve(previous, id)
+		if rec != null:
+			GameState.discover_recipe(rec)
+			Hit.burst(get_parent(), global_position + Vector2(0, -36), 210.0, 2, &"burst", self,
+				{"color": rec.color, "knock": 320.0})
+			Fx.float_text(get_parent(), global_position + Vector2(0, -132), rec.display_name + "!", rec.color.lightened(0.45))
+			AudioService.play("blend")
+			if level != null:
+				level.shake(5.0)
 
 
-## Eat / talk button.
+## Up button / attack button next to a friend or a door.
 func try_interact() -> void:
 	if interact_target != null and is_instance_valid(interact_target) and interact_target.has_method("interact"):
 		interact_target.call("interact", self)
 
 
-## Called by a snack bowl. Returns true when the food went into a pocket.
-func eat(food: StringName) -> bool:
-	if not FoodDB.has_food(food):
-		return false
-	var def := FoodDB.food(food)
-	var had := inventory.has(food)
-	var slot := inventory.add(food)
-	if slot == FoodInventory.NONE:
-		_pending_food = food
-		replace_needed.emit(food)
-		return false
-	_eat_feedback(def, not had)
-	return true
-
-
-## Answer from the replace prompt (slot 0/1), or -1 to keep both pockets.
-func resolve_replace(slot: int) -> void:
-	var food := _pending_food
-	_pending_food = &""
-	if food == &"" or slot < 0:
-		return
-	if inventory.replace(slot, food):
-		_eat_feedback(FoodDB.food(food), true)
-
-
-func _eat_feedback(def: FoodDefinition, fresh: bool) -> void:
-	_pose = "eat"
-	_pose_timer = 0.42
-	control_lock = maxf(control_lock, 0.3)
-	velocity.x = 0.0
-	visual.squash(Vector2(1.15, 0.86))
-	AudioService.play("eat")
-	Fx.burst(get_parent(), global_position + Vector2(facing * 22.0, -34.0), "crumbs", def.color, 6, {"spread": 26.0, "life": 0.5, "size": 8.0})
-	if fresh:
-		Fx.float_text(get_parent(), global_position + Vector2(0, -96), def.ability_name + "!", def.color.lightened(0.35))
-	if GameState.unlock_food(def.id):
-		GameState.toast.emit("New snack: %s" % def.display_name, FoodDB.icon(def.icon_path))
-	ate.emit(def.id)
-
-
 # -------------------------------------------------------------------- hurt --
 
-## Environmental "ouch": knocked back, one Comfort Feather lost (unless Cozy).
+func is_shielded() -> bool:
+	return star_time > 0.0 or (runner.current != null and runner.current.blocks_hurt())
+
+
+## Something bonked Tato: knocked back, one heart lost (unless Cozy Mode).
 func hurt(from: Vector2, knock: float = 1.0) -> void:
-	if invuln > 0.0 or state == State.DISABLED:
+	if invuln > 0.0 or state == State.DISABLED or is_shielded():
 		return
-	if runner.current != null and runner.current.blocks_hurt():
+	if orb_guard:
+		orb_guard = false
+		invuln = 0.8
+		visual.start_blink(0.8)
+		Fx.pop_ring(get_parent(), global_position + Vector2(0, -36), Color(0.8, 0.7, 1.0), 70.0)
+		AudioService.play_varied("pop")
 		return
 	runner.cancel()
 	sliding = false
 	invuln = INVULN_TIME
-	control_lock = 0.38
+	control_lock = 0.34
 	_pose = "hurt"
-	_pose_timer = 0.38
+	_pose_timer = 0.34
 	hurt_count += 1
 	var dir := signf(global_position.x - from.x)
 	if dir == 0.0:
@@ -751,7 +690,7 @@ func hurt(from: Vector2, knock: float = 1.0) -> void:
 		level.shake(7.0)
 
 
-## Moves Tato somewhere safe (after a fall or a snack-break respawn).
+## Moves Tato somewhere safe (after a fall or a respawn).
 func teleport_to(point: Vector2, keep_invuln: bool = true) -> void:
 	runner.cancel()
 	velocity = Vector2.ZERO
@@ -765,6 +704,11 @@ func teleport_to(point: Vector2, keep_invuln: bool = true) -> void:
 	flaps_left = MAX_FLAPS
 	_coyote = 0.0
 	in_water = false
+
+
+func start_star(seconds: float) -> void:
+	star_time = seconds
+	visual.tint = Color(1.0, 0.95, 0.6)
 
 
 # ---------------------------------------------------------------- interact --
@@ -786,8 +730,6 @@ func _update_interact_target() -> void:
 	if best != interact_target:
 		interact_target = best
 		interact_target_changed.emit(best)
-		if best != null and Settings.flag("auto_eat") and best.is_in_group("food_bowl") and not inventory.is_full():
-			try_interact()
 
 
 func _find_interactable(node: Node) -> Node:

@@ -1,0 +1,28 @@
+; Built by tools/build_levels.py from chunks: arena
+[meta]
+id = W2-B
+world = 2
+theme = orchard
+kind = boss
+hints = Gigantapple charges straight across: jump it. | Seeds come in threes. | Attack while it catches its breath.
+[legend]
+P = power WATERMELON
+1 = sign text=boss
+X = boss gigantapple
+E = goal needs=boss
+[map]
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+     =n=      n         ==n
+ 
+ @  1   P           X    E
+##############################
+##############################
+##############################

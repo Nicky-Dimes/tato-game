@@ -4,7 +4,7 @@ extends Prop
 ##   dx=4 dy=0    how far it travels (cells)
 ##   t=3          seconds for one trip
 ##   id=<id>      if set, it only moves while that link is on (and returns when off)
-##   pull         it is a hanging platform a Taffy Balloon can tug (starts still)
+##   thin         you can jump up through it
 
 var _body: AnimatableBody2D
 var _from := Vector2.ZERO
@@ -38,15 +38,8 @@ func _configure() -> void:
 	_body.add_child(cs)
 	add_child(_body)
 	for i in _width:
-		var piece := "props/lift_mid"
-		if _width == 1:
-			piece = "props/lift_single"
-		elif i == 0:
-			piece = "props/lift_left"
-		elif i == _width - 1:
-			piece = "props/lift_right"
-		var s := Art.centered(piece)
-		s.position = Vector2((i + 0.5) * Layers.TILE, 16)
+		var s := Art.icon(WorldKit.art(level.theme, "plat"), 64.0)
+		s.position = Vector2((i + 0.5) * Layers.TILE, 14)
 		_body.add_child(s)
 	if p_flag("pull"):
 		add_to_group("taffy_target")

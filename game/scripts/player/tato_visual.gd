@@ -72,6 +72,7 @@ var _force_left := 0.0
 var _honk_marks := 0.0
 var _marks: Node2D
 var _idle_timer := 0.0
+var _hat: Sprite2D
 
 
 func setup(owner_player: Tato) -> void:
@@ -99,6 +100,7 @@ func setup(owner_player: Tato) -> void:
 	shadow.z_index = 1
 	add_child(shadow)
 	_set_anim("idle")
+	refresh_cosmetics()
 
 
 static func shadow_texture() -> Texture2D:
@@ -126,6 +128,19 @@ static func frame_texture(frame: String) -> Texture2D:
 		tex = load(path) as Texture2D
 	_textures[frame] = tex
 	return tex
+
+
+## Shows the hat picked in the wardrobe (a small picture on Tato's head).
+func refresh_cosmetics() -> void:
+	if _hat != null and is_instance_valid(_hat):
+		_hat.queue_free()
+		_hat = null
+	var art := WardrobePanel.hat_art(GameState.equipped("hat"))
+	if art == "" or not Art.has(art):
+		return
+	_hat = Art.icon(art, 34.0)
+	_hat.position = Vector2(4, -94)
+	body.add_child(_hat)
 
 
 func squash(amount: Vector2) -> void:

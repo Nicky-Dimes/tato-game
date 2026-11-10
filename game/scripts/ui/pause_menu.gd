@@ -41,8 +41,8 @@ func setup(lv: Level) -> void:
 	stage.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(stage)
 	_first = _add(box, "Resume", close)
-	_add(box, "Recipe Notebook", func() -> void: _show_sub("journal"))
-	_add(box, "Hint Nest", func() -> void:
+	_add(box, "Snack Notebook", func() -> void: _show_sub("journal"))
+	_add(box, "Hint", func() -> void:
 		close()
 		level.show_hint_nest())
 	_add(box, "Settings", func() -> void: _show_sub("settings"))

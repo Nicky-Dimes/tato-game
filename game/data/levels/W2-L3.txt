@@ -1,0 +1,37 @@
+; Built by tools/build_levels.py from chunks: start bowl_p w2_branches pillars cp w2_apples moving_plat climb lift cp w2_hive key_gate star_c pit_plat end
+[meta]
+id = W2-L3
+world = 2
+theme = orchard
+kind = core
+hints = Find the key on the little platform, then walk into the lock. | Turtles hide in their shells after a hit. | Check the dip for the Star.
+[legend]
+a = apple_chomper
+t = turtle_tank
+r = carrot_archer
+P = power WATERMELON
+U = pickup leaf
+D = decor
+M = platform w=2 dx=9 dy=0 t=3 thin
+V = platform w=2 dx=0 dy=-5 t=2.6 thin
+1 = sign text=key
+2 = sign text=notes
+g = faller every=3
+y = hive
+m = mole_digger
+[map]
+ 
+ 
+ 
+ 
+ 
+ 
+                                          o o   n    o o                                             g      g      g                                                                    n
+                                         ====       =====                                                                                                        n                    =====                         y
+                                                                      o     o                                                                                  ######                                                                   k                             =====                  o o
+                          o o         ====              ====                                                                      o   o   o              ===   ######                                           ====    ====           ===          ###
+                                                                    ##    ##    ##                                                                             ######                                                                               ###         a                           =====
+ @  1   2     D   P     a    a   B          m        a              ##    ##    ##       C   h     a           m                                     ===       ######   t       V                C   h      a                 r      a              L    U  ######          ########                         D      E
+##################################################################  ##    ##    ##  ###########################################  M          #####################################################################################################################     *     ##############         #######################
+##################################################################  ##    ##    ##  ###########################################             ##############################################################################################################################################         #######################
+##################################################################  ##    ##    ##  ###########################################             ##############################################################################################################################################         #######################

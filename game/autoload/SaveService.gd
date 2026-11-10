@@ -6,7 +6,7 @@ extends Node
 signal save_failed(message: String)
 signal saved(slot: int)
 
-const SCHEMA_VERSION := 1
+const SCHEMA_VERSION := 2
 const SLOT_COUNT := 3
 const DIR := "user://saves"
 
@@ -20,20 +20,20 @@ const PROFILE_DEFAULTS := {
 	"level_clear_ids": [],
 	"current_level": "",
 	"checkpoint": "",
-	"food_unlocks": [],
-	"recipe_discoveries": [],
-	"recipe_scraps": [],
-	"goose_pins": [],
-	"secret_dishes": [],
+	"food_unlocks": [],          # power-ups met
+	"recipe_discoveries": [],    # Flavor Bursts found ("A|B")
+	"treasure_notes": [],
+	"stars": [],
 	"flavor_pages": [],
+	"enemies_met": [],
+	"coins": 0,
+	"coins_total": 0,
 	"medals": {},
 	"best_times": {},
 	"cosmetic_unlocks": [],
 	"equipped_cosmetics": {},
 	"story_flags": [],
 	"hints_used": 0,
-	"comfort_feathers": 3,
-	"honk_charge": 100,
 	"game_complete": false,
 }
 
@@ -125,9 +125,9 @@ func slot_summary(slot: int) -> Dictionary:
 	return {
 		"empty": false,
 		"pages": (p["flavor_pages"] as Array).size(),
-		"scraps": (p["recipe_scraps"] as Array).size(),
-		"pins": (p["goose_pins"] as Array).size(),
-		"dishes": (p["secret_dishes"] as Array).size(),
+		"notes": (p["treasure_notes"] as Array).size(),
+		"stars": (p["stars"] as Array).size(),
+		"coins": int(p["coins_total"]),
 		"levels": (p["level_clear_ids"] as Array).size(),
 		"played_seconds": float(p["played_seconds"]),
 		"complete": bool(p["game_complete"]),
@@ -147,6 +147,16 @@ func migrate(data: Dictionary) -> Dictionary:
 			out["recipe_scraps"] = out["scraps"]
 		out.erase("cleared")
 		out.erase("scraps")
+	if version < 2:
+		# v1 was the two-pocket design: scraps became Treasure Notes; pins,
+		# dishes, feathers and honk charge no longer exist.
+		if out.has("recipe_scraps") and not out.has("treasure_notes"):
+			out["treasure_notes"] = out["recipe_scraps"]
+		for old_key: String in ["recipe_scraps", "goose_pins", "secret_dishes", "comfort_feathers", "honk_charge"]:
+			out.erase(old_key)
+		# old recipe keys named foods that are gone
+		out["recipe_discoveries"] = []
+		out["food_unlocks"] = []
 	for key: String in PROFILE_DEFAULTS.keys():
 		var def: Variant = PROFILE_DEFAULTS[key]
 		if not out.has(key):
@@ -164,7 +174,7 @@ func migrate(data: Dictionary) -> Dictionary:
 			out[key] = def.duplicate(true) if (def is Array or def is Dictionary) else def
 	# id lists must hold strings only, without repeats
 	for key: String in ["world_unlocks", "level_clear_ids", "food_unlocks", "recipe_discoveries",
-			"recipe_scraps", "goose_pins", "secret_dishes", "flavor_pages", "cosmetic_unlocks", "story_flags"]:
+			"treasure_notes", "stars", "flavor_pages", "enemies_met", "cosmetic_unlocks", "story_flags"]:
 		var clean: Array = []
 		for item: Variant in out[key]:
 			if typeof(item) == TYPE_STRING and not clean.has(item) and (item as String).length() <= 64:
@@ -172,8 +182,8 @@ func migrate(data: Dictionary) -> Dictionary:
 		out[key] = clean
 	if not (out["world_unlocks"] as Array).has("W1"):
 		(out["world_unlocks"] as Array).append("W1")
-	out["comfort_feathers"] = clampi(int(out["comfort_feathers"]), 0, 3)
-	out["honk_charge"] = clampi(int(out["honk_charge"]), 0, 100)
+	out["coins"] = clampi(int(out["coins"]), 0, 999999)
+	out["coins_total"] = clampi(int(out["coins_total"]), 0, 9999999)
 	out["schema_version"] = SCHEMA_VERSION
 	return out
 

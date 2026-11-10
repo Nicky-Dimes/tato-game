@@ -1,0 +1,41 @@
+; Built by tools/build_levels.py from chunks: start bowl_p w1_logs pit_double cp w1_bushes crate_wall moving_plat lift cp gauntlet climb star_c w1_shrooms end
+[meta]
+id = W1-L3
+world = 1
+theme = grassland
+kind = core
+hints = Hedgehogs are too prickly to jump on: use an attack. | Ride the moving platform across the big gap. | Look down in the dip for the Star.
+[legend]
+a = slime_blob
+b = mushroom_hopper
+c = hedgehog_roller
+t = hedgehog_roller
+r = mushroom_hopper
+P = power FIRE_PEPPER
+q = pickup banana
+u = pickup clover
+e = pickup rainbow_star
+D = decor
+x = spiky
+M = platform w=2 dx=9 dy=0 t=3 thin
+V = platform w=2 dx=0 dy=-5 t=2.6 thin
+1 = sign text=stomp
+2 = sign text=notes
+g = shroom
+y = roller dx=4 t=3
+[map]
+ 
+ 
+ 
+ 
+ 
+ 
+                                                                                                                                                                                  n
+                                                                                                                                                                                =====                                                  n
+                                                                                                            n                                                                                         e     ?                        ######               =====               o o  o o  o o
+                          o o            o o o     o o o           o       o                         ====     ====              o                   o   o   o                                                                  ===   ######
+                                                                                                                               BB    q                                                                                               ######         a
+ @  1   2     D   P     a    a   B     y          y        b     a      b              C   h     x    x   a    x    x      a   BB        u                                V                C   h     a   c    r    t       ===       ######   t ######          ########       g    g    g           D      E
+####################################################################  ####  #####################################################################  M          #######################################################################################     *     #############  #    #    #   #####################
+####################################################################  ####  #####################################################################             ###############################################################################################################  #    #    #   #####################
+####################################################################  ####  #####################################################################             ###############################################################################################################  #    #    #   #####################

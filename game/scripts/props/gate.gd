@@ -18,7 +18,8 @@ func _configure() -> void:
 	_art = Node2D.new()
 	add_child(_art)
 	for i in _h:
-		var seg := Art.standing("props/gate")
+		var seg := Art.sized(WorldKit.art(level.theme, "block2"), 64.0)
+		seg.scale.x *= 0.7
 		seg.position = Vector2(0, -i * Layers.TILE)
 		_art.add_child(seg)
 	on_link(0)

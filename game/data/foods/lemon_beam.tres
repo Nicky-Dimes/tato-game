@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="FoodDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/food/food_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"LEMON_BEAM"
+display_name = "Lemon Beam"
+ability_name = "Laser Beam"
+description = "A bright beam that goes through everything in a line."
+color = Color(1.0000, 0.9137, 0.2902, 1)
+accent = Color(1.0000, 0.9686, 0.6902, 1)
+icon_path = "res://assets/sprites/powers/lemon_beam.png"
+demo_path = "res://assets/sprites/cards/demo_lemon_beam.png"
+ability_script = "res://scripts/food/abilities/lemon_beam.gd"
+damage = 1
+cooldown = 0.60
+duration = 0.25
+element = &"light"
+unlock_world = 6
+blend_adjective = "Zesty"
+blend_noun = "Zing"
+honk_sound = "honk_zing"
+tags = PackedStringArray("light")

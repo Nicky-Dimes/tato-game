@@ -1,0 +1,36 @@
+; Built by tools/build_levels.py from chunks: start bowl_r coin_run boost w1_shrooms coin_run cp flyers high_road spring_up tower star_a coin_run end
+[meta]
+id = W1-X
+world = 1
+theme = grassland
+kind = optional
+hints = This stage is all about coins. | 100 coins refill Tato's hearts. | Bees dip down at you: bop them from below.
+[legend]
+a = slime_blob
+b = mushroom_hopper
+c = hedgehog_roller
+f = bee_buzzer up=1.5 range=3
+F = bee_buzzer up=3 range=4
+R = power FIRE_PEPPER
+U = pickup egg
+w = pickup wings
+D = decor
+1 = sign text=qblock
+2 = sign text=hearts
+g = shroom
+[map]
+ 
+ 
+ 
+ 
+                                                                                                                                                                                                                    n
+                                                                                                                                                                                                                  =====                  *
+                                                                                                                                                                                                n o o                                   ===
+                                                                                                                                                                                               ======         ====       ====
+                                                                 ?   ?              o o  o o  o o                                               o   o   o   o        oooooooo  n                                                    ===     ===
+                                     ooo   ooo   ooo   ooo                                                 ooo   ooo   ooo   ooo                                    ==============                                  ====                                 ooo   ooo   ooo   ooo
+                                              w                                                                     w                                                                                                            ===           ===                w
+ @  1   2     D   R      c     a        f        F                  U     a          g    g    g              f        F             C   h     f       F     f         a     b            S           a         a         b                                 f        F             D      E
+###################################################################################  #    #    #   #############################################################################################################################################################################################
+###################################################################################  #    #    #   #############################################################################################################################################################################################
+###################################################################################  #    #    #   #############################################################################################################################################################################################

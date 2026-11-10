@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="FoodDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/food/food_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"COCOA_SHIELD"
+display_name = "Cocoa Shield"
+ability_name = "Shield Guard"
+description = "A warm cocoa bubble. Nothing hurts Tato inside it, and shots bounce back."
+color = Color(0.5412, 0.3529, 0.2353, 1)
+accent = Color(1.0000, 0.8510, 0.6588, 1)
+icon_path = "res://assets/sprites/powers/cocoa_shield.png"
+demo_path = "res://assets/sprites/cards/demo_cocoa_shield.png"
+ability_script = "res://scripts/food/abilities/cocoa_shield.gd"
+damage = 1
+cooldown = 2.40
+duration = 2.20
+element = &"shield"
+unlock_world = 4
+blend_adjective = "Cozy"
+blend_noun = "Guard"
+honk_sound = "honk_puff"
+tags = PackedStringArray("shield")

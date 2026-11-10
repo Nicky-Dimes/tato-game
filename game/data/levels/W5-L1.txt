@@ -1,0 +1,33 @@
+; Built by tools/build_levels.py from chunks: start bowl_p w5_gust qblocks cp w5_bridges steps w5_updraft cp pit_double w5_gust high_road star_b flat_coins end
+[meta]
+id = W5-L1
+world = 5
+theme = windy
+kind = core
+hints = Gusts carry Tato over the gap: jump in and glide. | Garlic Dash zooms through creatures. | Fire Slimes are too hot to jump on.
+[legend]
+a = fire_slime
+b = pepper_goblin
+P = power GARLIC_DASH
+p = pickup leaf
+D = decor
+x = spiky
+1 = sign text=wind
+2 = sign text=power
+g = wind w=12 h=6 dir=1 power=0.9
+[map]
+ 
+ 
+ 
+ 
+ 
+                                                                                                                                                                n
+                                                                                                                                                              =====
+                                                                                                  o o      o o
+                                              o  o  o             ?%?    o o                                                          ooo                                                                           o  o  o            oooooooo  n
+                          o o                               n                                  =====    =====    ====               ######                                               o       o                                    ==============    ########                   ooo
+                                                                                                                                ##########                                                                                                              #      #
+ @  1   2     D   P     a    a   B                                   a      p      C   h                                    ##############   a      a    x          x        C   h     a      b                                          a     b        #  *   B      a          D    a      D     D      E
+##########################################g           ########################################                      ######################################################################  ####  ##############g           ####################################################################################
+##########################################            ########################################                      ######################################################################  ####  ##############            ####################################################################################
+##########################################            ########################################                      ######################################################################  ####  ##############            ####################################################################################

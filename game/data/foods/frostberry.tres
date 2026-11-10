@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="FoodDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/food/food_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"FROSTBERRY"
+display_name = "Frostberry"
+ability_name = "Freeze Shot"
+description = "Icy shards freeze creatures solid. Frozen ones make handy steps, and water turns to ice."
+color = Color(0.3490, 0.7137, 0.9412, 1)
+accent = Color(0.9098, 0.9843, 1.0000, 1)
+icon_path = "res://assets/sprites/powers/frostberry.png"
+demo_path = "res://assets/sprites/cards/demo_frostberry.png"
+ability_script = "res://scripts/food/abilities/frostberry.gd"
+damage = 1
+cooldown = 0.40
+duration = 0.20
+element = &"ice"
+unlock_world = 4
+blend_adjective = "Frosty"
+blend_noun = "Chill"
+honk_sound = "honk_ice"
+tags = PackedStringArray("ice")

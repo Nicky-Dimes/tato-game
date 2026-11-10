@@ -1,31 +1,32 @@
 extends Node
 ## The player's progress (the saved profile) plus the values that only live
-## during a stage (Comfort Feathers, Honk Charge).
+## during a stage: hearts, keys and the coins picked up so far.
 
-signal feathers_changed(value: int)
-signal charge_changed(value: float)
+signal hearts_changed(value: int)
+signal coins_changed(stage_coins: int, wallet: int)
+signal keys_changed(value: int)
 signal collected(kind: String, id: String)
 signal recipe_discovered(recipe: RecipeDefinition)
 signal food_unlocked(id: StringName)
 signal progress_changed
 signal toast(text: String, icon: Texture2D)
 
-const MAX_FEATHERS := 3
-const MAX_CHARGE := 100.0
+const MAX_HEARTS := 5
+const COINS_FOR_HEAL := 100
 const KIND_KEYS := {
-	"scrap": "recipe_scraps",
-	"pin": "goose_pins",
-	"dish": "secret_dishes",
+	"note": "treasure_notes",
+	"star": "stars",
 	"page": "flavor_pages",
 }
+const NOTES_PER_STAGE := 3
 
 var slot: int = -1
 var profile: Dictionary = {}
 
-var feathers: int = MAX_FEATHERS
-var honk_charge: float = MAX_CHARGE
-## Seconds since the last ability use; charge trickles back after a pause.
-var _since_spend := 99.0
+var hearts: int = MAX_HEARTS
+var keys: int = 0
+var stage_coins: int = 0
+var _heal_counter := 0
 var _play_clock := 0.0
 
 
@@ -67,12 +68,10 @@ func load_profile(load_slot_index: int) -> bool:
 func save() -> bool:
 	if slot < 0:
 		return true
-	profile["comfort_feathers"] = feathers
-	profile["honk_charge"] = int(honk_charge)
 	return SaveService.save_slot(slot, profile)
 
 
-## Used by tests and by "play a stage directly" debugging: a throwaway profile.
+## Used by tests and by "play a stage directly": a throwaway profile.
 func use_temp_profile() -> void:
 	slot = -1
 	profile = SaveService.new_profile(0)
@@ -80,11 +79,13 @@ func use_temp_profile() -> void:
 
 
 func reset_session() -> void:
-	feathers = MAX_FEATHERS
-	honk_charge = MAX_CHARGE
-	_since_spend = 99.0
-	feathers_changed.emit(feathers)
-	charge_changed.emit(honk_charge)
+	hearts = MAX_HEARTS
+	keys = 0
+	stage_coins = 0
+	_heal_counter = 0
+	hearts_changed.emit(hearts)
+	keys_changed.emit(keys)
+	coins_changed.emit(stage_coins, wallet())
 
 
 # -------------------------------------------------------------------- flags --
@@ -99,62 +100,69 @@ func set_flag(flag: String) -> void:
 		flags.append(flag)
 
 
-# ------------------------------------------------------------------ feathers --
+# ------------------------------------------------------------------- hearts --
 
-func lose_feather() -> bool:
-	## Returns true when Tato is out of feathers (snack-break respawn).
-	if Settings.feathers_protected():
+## Returns true when Tato is out of hearts (he respawns at the checkpoint).
+func lose_heart(amount: int = 1) -> bool:
+	if Settings.hearts_protected():
 		return false
-	feathers = maxi(feathers - 1, 0)
-	feathers_changed.emit(feathers)
-	return feathers <= 0
+	hearts = maxi(hearts - amount, 0)
+	hearts_changed.emit(hearts)
+	return hearts <= 0
 
 
-func restore_feathers() -> void:
-	feathers = MAX_FEATHERS
-	feathers_changed.emit(feathers)
+func restore_hearts() -> void:
+	hearts = MAX_HEARTS
+	hearts_changed.emit(hearts)
 
 
-func add_feather() -> bool:
-	if feathers >= MAX_FEATHERS:
+func add_heart(amount: int = 1) -> bool:
+	if hearts >= MAX_HEARTS:
 		return false
-	feathers += 1
-	feathers_changed.emit(feathers)
+	hearts = mini(hearts + amount, MAX_HEARTS)
+	hearts_changed.emit(hearts)
 	return true
 
 
-# -------------------------------------------------------------- honk charge --
+# -------------------------------------------------------------- coins, keys --
 
-func can_spend(amount: float) -> bool:
-	return honk_charge + 0.01 >= cost_for(amount)
-
-
-func cost_for(amount: float) -> float:
-	return amount * (0.6 if Settings.flag("cozy_mode") else 1.0)
+func wallet() -> int:
+	return int(profile.get("coins", 0))
 
 
-func spend_charge(amount: float) -> bool:
-	var cost := cost_for(amount)
-	if honk_charge + 0.01 < cost:
+func add_coins(amount: int) -> void:
+	if amount <= 0:
+		return
+	stage_coins += amount
+	profile["coins"] = wallet() + amount
+	profile["coins_total"] = int(profile.get("coins_total", 0)) + amount
+	_heal_counter += amount
+	if _heal_counter >= COINS_FOR_HEAL:
+		_heal_counter -= COINS_FOR_HEAL
+		if add_heart(MAX_HEARTS):
+			toast.emit("100 coins! Hearts refilled", null)
+	coins_changed.emit(stage_coins, wallet())
+
+
+func spend_coins(amount: int) -> bool:
+	if wallet() < amount:
 		return false
-	honk_charge = maxf(honk_charge - cost, 0.0)
-	_since_spend = 0.0
-	charge_changed.emit(honk_charge)
+	profile["coins"] = wallet() - amount
+	coins_changed.emit(stage_coins, wallet())
 	return true
 
 
-func add_charge(amount: float) -> void:
-	var before := honk_charge
-	honk_charge = minf(honk_charge + amount, MAX_CHARGE)
-	if honk_charge != before:
-		charge_changed.emit(honk_charge)
+func add_key() -> void:
+	keys += 1
+	keys_changed.emit(keys)
 
 
-## Slow refill so no puzzle can be starved of charge. Called by the stage.
-func tick_charge(delta: float) -> void:
-	_since_spend += delta
-	if _since_spend > 1.2 and honk_charge < MAX_CHARGE:
-		add_charge(9.0 * delta)
+func use_key() -> bool:
+	if keys <= 0:
+		return false
+	keys -= 1
+	keys_changed.emit(keys)
+	return true
 
 
 # -------------------------------------------------------------- collectibles --
@@ -165,8 +173,8 @@ func has_collected(kind: String, id: String) -> bool:
 	return (profile[KIND_KEYS[kind]] as Array).has(id)
 
 
+## Returns true when this is a new find.
 func collect(kind: String, id: String) -> bool:
-	## Returns true when this is a new find.
 	if not KIND_KEYS.has(kind):
 		return false
 	var list: Array = profile[KIND_KEYS[kind]]
@@ -204,7 +212,13 @@ func count_in_level(kind: String, level_id: String) -> int:
 	return n
 
 
-# ---------------------------------------------------------- foods & recipes --
+func meet_enemy(kind: String) -> void:
+	var list: Array = profile["enemies_met"]
+	if not list.has(kind):
+		list.append(kind)
+
+
+# ---------------------------------------------------------- powers & bursts --
 
 func unlock_food(id: StringName) -> bool:
 	var list: Array = profile["food_unlocks"]
@@ -237,16 +251,8 @@ func knows_recipe(rec: RecipeDefinition) -> bool:
 	return rec != null and (profile["recipe_discoveries"] as Array).has(rec.pair_key())
 
 
-func named_recipes_found() -> int:
-	var n := 0
-	for rec in FoodDB.named_recipes():
-		if knows_recipe(rec):
-			n += 1
-	return n
-
-
-func experiments_found() -> int:
-	return (profile["recipe_discoveries"] as Array).size() - named_recipes_found()
+func bursts_found() -> int:
+	return (profile["recipe_discoveries"] as Array).size()
 
 
 # ----------------------------------------------------------------- progress --
@@ -270,13 +276,9 @@ func world_unlocked(world_id: String) -> bool:
 	return is_unlocked(world_id + "-L1")
 
 
-func finale_scraps_needed() -> int:
-	return LevelDB.FINALE_SCRAPS_COZY if Settings.flag("cozy_mode") else LevelDB.FINALE_SCRAPS
-
-
-## Records a finished stage. stats: {time, hurt, scraps_found, scraps_total}
+## Records a finished stage. stats: {time, hurt, notes_found, notes_total, coins}
 func mark_cleared(level_id: String, stats: Dictionary = {}) -> Dictionary:
-	var result := {"first_clear": false, "new_medals": []}
+	var result := {"first_clear": false, "new_stars": []}
 	var list: Array = profile["level_clear_ids"]
 	if not list.has(level_id):
 		list.append(level_id)
@@ -293,21 +295,15 @@ func mark_cleared(level_id: String, stats: Dictionary = {}) -> Dictionary:
 				unlocks.append(nxt)
 			if int(w["index"]) == LevelDB.WORLDS.size():
 				profile["game_complete"] = true
-	# Feather Medals: cosmetic stage achievements
-	var medals: Dictionary = profile["medals"]
-	var mine: Dictionary = medals.get(level_id, {})
+	# Stars: one for finishing, one for finding every Treasure Note. (A third
+	# is the Star hidden in the stage itself.)
 	var earned: Array = []
-	if not mine.get("clear", false):
-		mine["clear"] = true
+	if collect("star", level_id + "-clear"):
 		earned.append("clear")
-	if stats.get("scraps_total", 0) > 0 and stats.get("scraps_found", 0) >= stats.get("scraps_total", 0) and not mine.get("explorer", false):
-		mine["explorer"] = true
-		earned.append("explorer")
-	if stats.has("hurt") and int(stats["hurt"]) == 0 and not mine.get("gentle", false):
-		mine["gentle"] = true
-		earned.append("gentle")
-	medals[level_id] = mine
-	result["new_medals"] = earned
+	if int(stats.get("notes_total", 0)) > 0 and int(stats.get("notes_found", 0)) >= int(stats.get("notes_total", 0)):
+		if collect("star", level_id + "-notes"):
+			earned.append("notes")
+	result["new_stars"] = earned
 	if stats.has("time"):
 		var best: Dictionary = profile["best_times"]
 		var t := float(stats["time"])
@@ -321,21 +317,15 @@ func mark_cleared(level_id: String, stats: Dictionary = {}) -> Dictionary:
 	return result
 
 
-func medal_count() -> int:
-	var n := 0
-	var medals: Dictionary = profile["medals"]
-	for level_id: String in medals.keys():
-		var m: Dictionary = medals[level_id]
-		for k: String in m.keys():
-			if m[k]:
-				n += 1
-	return n
+func stars_in_level(level_id: String) -> int:
+	return count_in_level("star", level_id)
 
 
-## 0..1 overall completion used on the save-slot card and the ending.
+## 0..1 overall completion for the save-slot card and the ending.
 func completion() -> float:
-	var have := float(count("scrap") + count("pin") + count("dish") + count("page") * 4 + named_recipes_found() * 2)
-	var total := float(LevelDB.scrap_total() + LevelDB.pin_total() + LevelDB.dish_total() + LevelDB.WORLDS.size() * 4 + FoodDB.RECIPE_IDS.size() * 2)
+	var stage_count := float(LevelDB.all_stage_ids().size())
+	var have := float(count("star") + count("note") + count("page") * 3)
+	var total := stage_count * 3.0 + stage_count * NOTES_PER_STAGE + LevelDB.WORLDS.size() * 3.0
 	return clampf(have / maxf(total, 1.0), 0.0, 1.0)
 
 
@@ -348,6 +338,10 @@ func unlock_cosmetic(id: String) -> bool:
 	list.append(id)
 	progress_changed.emit()
 	return true
+
+
+func owns_cosmetic(id: String) -> bool:
+	return (profile["cosmetic_unlocks"] as Array).has(id)
 
 
 func equipped(slot_name: String) -> String:

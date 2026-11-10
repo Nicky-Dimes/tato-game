@@ -20,47 +20,51 @@ G = 24          # cap thickness
 W = 6           # outline weight
 R = 26          # outer corner radius
 
+ICE = {"body": "#a9e4f5", "speck": "#8fd2ea", "under": "#79bfdc", "cap": "#f1fdff", "cap_light": "#ffffff", "cap_shadow": "#8fd2ea", "line": "#35507a", "style": "ice"}
+
+# Colours follow the "TATO World" level-asset board: brown brick earth with a
+# bright grass cap, pink frosting on cake, snow on blue ice, castle stone.
 THEMES = {
-    "picnic": {
-        "ground": {"body": "#c58d5e", "speck": "#b07a4d", "under": "#9a6642", "cap": "#7fd35b", "cap_light": "#b4ee82", "cap_shadow": "#96693f", "line": "#4a2b45", "style": "soil"},
-        "struct": {"body": "#e2ab6c", "speck": "#c98f52", "under": "#b57a44", "cap": "#f3c88a", "cap_light": "#ffe2b0", "cap_shadow": "#c08a50", "line": "#4a2b45", "style": "planks"},
-        "ice": {"body": "#a9e4f5", "speck": "#8fd2ea", "under": "#79bfdc", "cap": "#f1fdff", "cap_light": "#ffffff", "cap_shadow": "#8fd2ea", "line": "#35507a", "style": "ice"},
+    "grassland": {
+        "ground": {"body": "#b9793f", "speck": "#9c602c", "under": "#8a5326", "cap": "#7fd13b", "cap_light": "#b6f06a", "cap_shadow": "#7a4a22", "line": "#4a2b45", "style": "bricks"},
+        "struct": {"body": "#a79bc4", "speck": "#8c80ad", "under": "#766a98", "cap": "#c9bfe0", "cap_light": "#e8e2f5", "cap_shadow": "#7d7199", "line": "#3b2850", "style": "bricks"},
+        "ice": ICE,
         "plank": {"body": "#e8b06e", "light": "#ffd9a0", "dark": "#b9803f", "cloth": "#f0452e"},
     },
-    "farm": {
-        "ground": {"body": "#cf9b55", "speck": "#b9853f", "under": "#9c6d33", "cap": "#f4d35e", "cap_light": "#fff0a0", "cap_shadow": "#a87838", "line": "#4a2b45", "style": "soil"},
-        "struct": {"body": "#d2604c", "speck": "#b74a3a", "under": "#9c3b30", "cap": "#f08a6c", "cap_light": "#ffb497", "cap_shadow": "#a8443a", "line": "#45203c", "style": "planks"},
-        "ice": {"body": "#a9e4f5", "speck": "#8fd2ea", "under": "#79bfdc", "cap": "#f1fdff", "cap_light": "#ffffff", "cap_shadow": "#8fd2ea", "line": "#35507a", "style": "ice"},
-        "plank": {"body": "#d9a25c", "light": "#f6cf8c", "dark": "#a9722f", "cloth": "#f5a623"},
+    "orchard": {
+        "ground": {"body": "#b06f3a", "speck": "#93582a", "under": "#804a22", "cap": "#63c148", "cap_light": "#a0e670", "cap_shadow": "#73431f", "line": "#4a2b45", "style": "bricks"},
+        "struct": {"body": "#d39a58", "speck": "#b97f3f", "under": "#9c6730", "cap": "#f0c58a", "cap_light": "#ffe2b5", "cap_shadow": "#a8733a", "line": "#4a2b45", "style": "planks"},
+        "ice": ICE,
+        "plank": {"body": "#d9a25c", "light": "#f6cf8c", "dark": "#a9722f", "cloth": "#e0392e"},
     },
-    "fair": {
-        "ground": {"body": "#8ea7d6", "speck": "#7b93c4", "under": "#6a80b3", "cap": "#ffffff", "cap_light": "#ffffff", "cap_shadow": "#7890c2", "line": "#33305f", "style": "soil"},
-        "struct": {"body": "#f2a7c3", "speck": "#e58aad", "under": "#cf6f95", "cap": "#fff3f8", "cap_light": "#ffffff", "cap_shadow": "#d97fa3", "line": "#4a2550", "style": "stripes"},
-        "ice": {"body": "#a9e9f8", "speck": "#8ed7ee", "under": "#72c3e0", "cap": "#f4feff", "cap_light": "#ffffff", "cap_shadow": "#8ed7ee", "line": "#2f4f80", "style": "ice"},
-        "plank": {"body": "#f6d27a", "light": "#fff0b8", "dark": "#c99a3c", "cloth": "#e0389a"},
+    "candy": {
+        "ground": {"body": "#e9b877", "speck": "#d39d58", "under": "#bd8646", "cap": "#ff8fc4", "cap_light": "#ffd1e6", "cap_shadow": "#c98a4c", "line": "#5a2848", "style": "soil"},
+        "struct": {"body": "#f0b45a", "speck": "#d6933a", "under": "#bb7a2a", "cap": "#ffd98a", "cap_light": "#fff0c4", "cap_shadow": "#c98a3a", "line": "#5a2848", "style": "bricks"},
+        "ice": ICE,
+        "plank": {"body": "#ff9ccb", "light": "#ffd6ea", "dark": "#d9639d", "cloth": "#ffffff"},
     },
-    "market": {
-        "ground": {"body": "#b1a7c4", "speck": "#9c91b3", "under": "#857a9f", "cap": "#5fc2b0", "cap_light": "#9ae8d8", "cap_shadow": "#8a7fa5", "line": "#3b2850", "style": "stone"},
-        "struct": {"body": "#e0926a", "speck": "#c97a54", "under": "#ac6341", "cap": "#f5bd8f", "cap_light": "#ffe0c0", "cap_shadow": "#b86f4a", "line": "#4a2540", "style": "bricks"},
-        "ice": {"body": "#a9e4f5", "speck": "#8fd2ea", "under": "#79bfdc", "cap": "#f1fdff", "cap_light": "#ffffff", "cap_shadow": "#8fd2ea", "line": "#35507a", "style": "ice"},
-        "plank": {"body": "#c9694f", "light": "#f09a7c", "dark": "#93412f", "cloth": "#ff9a1f"},
+    "icy": {
+        "ground": {"body": "#7cc7ee", "speck": "#62b2de", "under": "#4f9fce", "cap": "#ffffff", "cap_light": "#ffffff", "cap_shadow": "#62b2de", "line": "#2c4a7a", "style": "ice"},
+        "struct": {"body": "#cfe9f7", "speck": "#b2d6ea", "under": "#97c2da", "cap": "#ffffff", "cap_light": "#ffffff", "cap_shadow": "#a9cfe4", "line": "#2c4a7a", "style": "bricks"},
+        "ice": ICE,
+        "plank": {"body": "#bfe9fb", "light": "#ffffff", "dark": "#7fbfe0", "cloth": "#59b6f0"},
     },
-    "marsh": {
-        "ground": {"body": "#46647c", "speck": "#3a566d", "under": "#2e465b", "cap": "#55d9a5", "cap_light": "#a8ffd8", "cap_shadow": "#33506a", "line": "#1e1a3c", "style": "soil"},
-        "struct": {"body": "#7a5fa5", "speck": "#684e92", "under": "#553e7b", "cap": "#a88bd4", "cap_light": "#d1bcf2", "cap_shadow": "#5d4585", "line": "#231540", "style": "planks"},
-        "ice": {"body": "#8fd6ea", "speck": "#78c3da", "under": "#62afc9", "cap": "#e6fbff", "cap_light": "#ffffff", "cap_shadow": "#78c3da", "line": "#22406a", "style": "ice"},
-        "plank": {"body": "#8a6fb5", "light": "#bca6df", "dark": "#5a4285", "cloth": "#3ccfb4"},
+    "windy": {
+        "ground": {"body": "#bd8046", "speck": "#a06731", "under": "#8c5829", "cap": "#8bd94a", "cap_light": "#c2f27e", "cap_shadow": "#7d4f25", "line": "#4a2b45", "style": "bricks"},
+        "struct": {"body": "#a79bc4", "speck": "#8c80ad", "under": "#766a98", "cap": "#c9bfe0", "cap_light": "#e8e2f5", "cap_shadow": "#7d7199", "line": "#3b2850", "style": "bricks"},
+        "ice": ICE,
+        "plank": {"body": "#e3ab63", "light": "#ffd596", "dark": "#b07a38", "cloth": "#8bd94a"},
     },
-    "kitchen": {
-        "ground": {"body": "#c99a46", "speck": "#b38436", "under": "#96692a", "cap": "#f6d98a", "cap_light": "#fff3c4", "cap_shadow": "#a87a30", "line": "#402040", "style": "plates"},
-        "struct": {"body": "#9aa3bd", "speck": "#858eaa", "under": "#6e7794", "cap": "#cfd6ea", "cap_light": "#f1f4ff", "cap_shadow": "#7780a0", "line": "#2c2748", "style": "bricks"},
-        "ice": {"body": "#a9e4f5", "speck": "#8fd2ea", "under": "#79bfdc", "cap": "#f1fdff", "cap_light": "#ffffff", "cap_shadow": "#8fd2ea", "line": "#35507a", "style": "ice"},
-        "plank": {"body": "#d8a650", "light": "#ffe09a", "dark": "#9a6f2a", "cloth": "#7a4fcf"},
+    "castle": {
+        "ground": {"body": "#9a8fb8", "speck": "#8176a1", "under": "#6b608c", "cap": "#c9bfe0", "cap_light": "#ece6f8", "cap_shadow": "#75698f", "line": "#33244a", "style": "bricks"},
+        "struct": {"body": "#d9ab4c", "speck": "#bf8f34", "under": "#a37727", "cap": "#f6d98a", "cap_light": "#fff3c4", "cap_shadow": "#b08530", "line": "#402040", "style": "plates"},
+        "ice": ICE,
+        "plank": {"body": "#d93a4a", "light": "#ff7a86", "dark": "#a32232", "cloth": "#ffd84a"},
     },
     "nest": {
-        "ground": {"body": "#c9956a", "speck": "#b58157", "under": "#9d6c47", "cap": "#9bd96a", "cap_light": "#c9f29a", "cap_shadow": "#9a6d47", "line": "#4a2b45", "style": "soil"},
+        "ground": {"body": "#c58d5e", "speck": "#b07a4d", "under": "#9a6642", "cap": "#9bd96a", "cap_light": "#c9f29a", "cap_shadow": "#96693f", "line": "#4a2b45", "style": "soil"},
         "struct": {"body": "#f0c98e", "speck": "#deb174", "under": "#c2935a", "cap": "#fde4b8", "cap_light": "#fff5dc", "cap_shadow": "#c99b60", "line": "#4a2b45", "style": "planks"},
-        "ice": {"body": "#a9e4f5", "speck": "#8fd2ea", "under": "#79bfdc", "cap": "#f1fdff", "cap_light": "#ffffff", "cap_shadow": "#8fd2ea", "line": "#35507a", "style": "ice"},
+        "ice": ICE,
         "plank": {"body": "#e8b06e", "light": "#ffd9a0", "dark": "#b9803f", "cloth": "#f5a2a8"},
     },
 }

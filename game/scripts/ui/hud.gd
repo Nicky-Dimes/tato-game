@@ -1,17 +1,26 @@
 class_name HUD
 extends CanvasLayer
-## In-stage display: Comfort Feathers, the two Flavor Pockets, Honk Charge,
-## the fusion hint, finds, prompts, tips, captions-style messages and the
-## recipe discovery card. It only listens to signals; it never drives play.
+## In-stage display, laid out like the HUD on the item board: hearts and the
+## active power badge on the left; coins, Treasure Notes and keys on the
+## right; boosts under the hearts; a boss bar when there is a boss. It only
+## listens to signals; it never drives play.
+
+const BOOSTS := [
+	["wings_time", "pickups/wings", 10.0], ["magnet_time", "pickups/magnet", 12.0],
+	["super_jump_time", "pickups/mushroom", 12.0], ["slow_fall_time", "pickups/feather", 12.0],
+	["luck_time", "pickups/clover", 15.0], ["star_time", "pickups/rainbow_star", 8.0],
+]
 
 var level: Level
 var root: Control
-var _feathers: Array[TextureRect] = []
-var _pockets: Array[PocketWidget] = []
-var _beak: PocketWidget
-var _charge: ChargeMeter
-var _fusion: Label
-var _scraps: Label
+var _hearts: Array[TextureRect] = []
+var _badge: PowerBadge
+var _coins: Label
+var _notes: Label
+var _keys: Label
+var _key_icon: TextureRect
+var _boost_row: HBoxContainer
+var _boost_icons: Dictionary = {}
 var _timer_label: Label
 var _prompt: PanelContainer
 var _prompt_label: Label
@@ -22,6 +31,8 @@ var _banner: VBoxContainer
 var _message: Label
 var _card: PanelContainer
 var _toast_box: VBoxContainer
+var _boss_bar: ProgressBar
+var _boss_name: Label
 var _hint_step := 0
 var _hint_lines: Array = []
 
@@ -29,6 +40,16 @@ var _hint_lines: Array = []
 func _ready() -> void:
 	layer = 10
 	process_mode = Node.PROCESS_MODE_ALWAYS
+
+
+func _icon(short: String, size: float) -> TextureRect:
+	var t := TextureRect.new()
+	t.texture = Art.tex(short)
+	t.custom_minimum_size = Vector2(size, size)
+	t.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	t.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	t.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return t
 
 
 func setup(lv: Level) -> void:
@@ -39,77 +60,70 @@ func setup(lv: Level) -> void:
 	root.theme = UITheme.theme()
 	add_child(root)
 
-	# --- top-left cluster
+	# --- top-left: hearts + power badge, boosts underneath
 	var left := VBoxContainer.new()
-	left.position = Vector2(24, 18)
+	left.position = Vector2(22, 16)
 	left.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	left.add_theme_constant_override("separation", 6)
+	left.add_theme_constant_override("separation", 4)
 	root.add_child(left)
+	var top := HBoxContainer.new()
+	top.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	top.add_theme_constant_override("separation", 4)
+	left.add_child(top)
+	for i in GameState.MAX_HEARTS:
+		var h := _icon("items/heart", 44.0)
+		top.add_child(h)
+		_hearts.append(h)
+	var gap := Control.new()
+	gap.custom_minimum_size = Vector2(8, 0)
+	top.add_child(gap)
+	_badge = PowerBadge.new()
+	top.add_child(_badge)
+	_boost_row = HBoxContainer.new()
+	_boost_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_boost_row.add_theme_constant_override("separation", 6)
+	left.add_child(_boost_row)
+	for b: Array in BOOSTS:
+		var bi := BoostIcon.new()
+		bi.texture = Art.tex(b[1])
+		bi.visible = false
+		_boost_row.add_child(bi)
+		_boost_icons[b[0]] = bi
+	var orb := BoostIcon.new()
+	orb.texture = Art.tex("pickups/orb")
+	orb.visible = false
+	_boost_row.add_child(orb)
+	_boost_icons["orb_guard"] = orb
+	var slow := BoostIcon.new()
+	slow.texture = Art.tex("pickups/time")
+	slow.visible = false
+	_boost_row.add_child(slow)
+	_boost_icons["slow"] = slow
 
-	var feather_row := HBoxContainer.new()
-	feather_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	feather_row.add_theme_constant_override("separation", 2)
-	left.add_child(feather_row)
-	for i in GameState.MAX_FEATHERS:
-		var f := TextureRect.new()
-		f.texture = Art.tex("items/feather")
-		f.custom_minimum_size = Vector2(40, 40)
-		f.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		f.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		f.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		feather_row.add_child(f)
-		_feathers.append(f)
-
-	var pocket_row := HBoxContainer.new()
-	pocket_row.add_theme_constant_override("separation", 8)
-	pocket_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	left.add_child(pocket_row)
-	for i in 2:
-		var pw := PocketWidget.new()
-		pw.letter = "A" if i == 0 else "B"
-		pw.slot = i
-		pw.tapped.connect(_on_pocket_tapped)
-		pocket_row.add_child(pw)
-		_pockets.append(pw)
-	_beak = PocketWidget.new()
-	_beak.letter = ""
-	_beak.slot = FoodInventory.NONE
-	_beak.small = true
-	_beak.icon = Art.tex("ui/honk")
-	_beak.tapped.connect(_on_pocket_tapped)
-	pocket_row.add_child(_beak)
-	_charge = ChargeMeter.new()
-	pocket_row.add_child(_charge)
-
-	_fusion = UITheme.outlined_label("", 20)
-	_fusion.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	left.add_child(_fusion)
-
-	# --- top-right cluster
+	# --- top-right: coins, notes, keys (leaves room for the pause button)
 	var right := HBoxContainer.new()
 	right.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
-	right.offset_left = -330.0
-	right.offset_right = -96.0
-	right.offset_top = 22.0
+	right.offset_left = -470.0
+	right.offset_right = -100.0
+	right.offset_top = 20.0
 	right.alignment = BoxContainer.ALIGNMENT_END
 	right.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	right.add_theme_constant_override("separation", 10)
+	right.add_theme_constant_override("separation", 8)
 	root.add_child(right)
-	_timer_label = UITheme.outlined_label("", 24)
-	_timer_label.visible = false
+	_timer_label = UITheme.outlined_label("", 26)
+	_timer_label.visible = Settings.flag("show_timer") or level.kind == "optional"
 	right.add_child(_timer_label)
-	var scrap_icon := TextureRect.new()
-	scrap_icon.texture = Art.tex("items/scrap")
-	scrap_icon.custom_minimum_size = Vector2(36, 36)
-	scrap_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	scrap_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	scrap_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	right.add_child(scrap_icon)
-	_scraps = UITheme.outlined_label("0/0", 24)
-	right.add_child(_scraps)
-	if level.scraps_total == 0:
-		scrap_icon.visible = false
-		_scraps.visible = false
+	_key_icon = _icon("items/key", 38.0)
+	right.add_child(_key_icon)
+	_keys = UITheme.outlined_label("0", 28)
+	right.add_child(_keys)
+	right.add_child(_icon("items/treasure_note", 40.0))
+	_notes = UITheme.outlined_label("0/3", 28)
+	right.add_child(_notes)
+	right.add_child(_icon("items/coin", 38.0))
+	_coins = UITheme.outlined_label("0", 28)
+	_coins.custom_minimum_size = Vector2(54, 0)
+	right.add_child(_coins)
 
 	# --- interact prompt (bottom centre)
 	_prompt = PanelContainer.new()
@@ -139,7 +153,6 @@ func setup(lv: Level) -> void:
 	_tip.add_child(_tip_label)
 	root.add_child(_tip)
 
-	# --- stage banner
 	_banner = VBoxContainer.new()
 	_banner.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
 	_banner.grow_horizontal = Control.GROW_DIRECTION_BOTH
@@ -160,39 +173,66 @@ func setup(lv: Level) -> void:
 	_toast_box.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
 	_toast_box.offset_left = -380.0
 	_toast_box.offset_right = -20.0
-	_toast_box.offset_top = 80.0
+	_toast_box.offset_top = 84.0
 	_toast_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(_toast_box)
 
-	var inv := level.player.inventory
-	inv.slot_changed.connect(func(_s: int, _f: StringName) -> void: _refresh_pockets())
-	inv.active_changed.connect(func(_a: int) -> void: _refresh_pockets())
-	GameState.feathers_changed.connect(_on_feathers)
-	GameState.charge_changed.connect(func(v: float) -> void: _charge.set_value(v / GameState.MAX_CHARGE))
+	# --- boss bar (hidden until a boss says hello)
+	var boss_box := VBoxContainer.new()
+	boss_box.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
+	boss_box.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	boss_box.offset_top = -74.0
+	boss_box.offset_bottom = -18.0
+	boss_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(boss_box)
+	_boss_name = UITheme.outlined_label("", 22)
+	_boss_name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	boss_box.add_child(_boss_name)
+	_boss_bar = ProgressBar.new()
+	_boss_bar.show_percentage = false
+	_boss_bar.custom_minimum_size = Vector2(460, 22)
+	_boss_bar.max_value = 1.0
+	_boss_bar.value = 1.0
+	var fill := StyleBoxFlat.new()
+	fill.bg_color = UITheme.RED
+	fill.set_corner_radius_all(10)
+	fill.border_color = UITheme.PLUM
+	fill.set_border_width_all(3)
+	_boss_bar.add_theme_stylebox_override("fill", fill)
+	boss_box.add_child(_boss_bar)
+	_boss_bar.visible = false
+	_boss_name.visible = false
+
+	GameState.hearts_changed.connect(_on_hearts)
+	GameState.coins_changed.connect(func(_s: int, _w: int) -> void: refresh_counts())
+	GameState.keys_changed.connect(func(_k: int) -> void: refresh_counts())
 	GameState.toast.connect(show_toast)
+	level.player.power_changed.connect(func(_p: StringName) -> void: _badge.set_power(level.player.power.power))
 	level.player.interact_target_changed.connect(_on_target)
-	level.player.runner.ability_denied.connect(func(_d: Resource, reason: String) -> void:
-		if reason == "charge":
-			_charge.flash())
-	Controls.device_changed.connect(func(_d: String) -> void: _refresh_pockets(); _on_target(level.player.interact_target))
-	_refresh_pockets()
-	_on_feathers(GameState.feathers)
-	_charge.set_value(GameState.honk_charge / GameState.MAX_CHARGE)
-	_update_scraps()
+	Controls.device_changed.connect(func(_d: String) -> void: _on_target(level.player.interact_target))
+	_badge.set_power(level.player.power.power)
+	_on_hearts(GameState.hearts)
+	refresh_counts()
 
 
 func _process(_delta: float) -> void:
 	if level == null or level.player == null:
 		return
-	var runner := level.player.runner
-	for pw in _pockets:
-		pw.timer_fraction = 0.0
-	if runner.current != null:
-		var id := runner.active_id()
-		for pw in _pockets:
-			if level.player.inventory.food_in(pw.slot) == id:
-				pw.timer_fraction = runner.time_fraction()
-				pw.queue_redraw()
+	var p := level.player
+	for b: Array in BOOSTS:
+		var left := float(p.get(b[0]))
+		var icon: BoostIcon = _boost_icons[b[0]]
+		icon.visible = left > 0.0
+		if left > 0.0:
+			icon.fraction = clampf(left / float(b[2]), 0.0, 1.0)
+			icon.queue_redraw()
+	(_boost_icons["orb_guard"] as BoostIcon).visible = p.orb_guard
+	(_boost_icons["slow"] as BoostIcon).visible = level.enemy_time < 1.0
+	_badge.cooldown = 0.0
+	var def := p.power.definition()
+	if def != null and p.runner.cooldowns.has(def.id):
+		_badge.cooldown = clampf(float(p.runner.cooldowns[def.id]) / maxf(def.cooldown, 0.01), 0.0, 1.0)
+	_badge.queue_redraw()
 	if _timer_label.visible:
 		_timer_label.text = format_time(level.elapsed)
 
@@ -202,57 +242,31 @@ static func format_time(seconds: float) -> String:
 	return "%d:%02d" % [s / 60, s % 60]
 
 
-func show_timer(value: bool) -> void:
-	_timer_label.visible = value
+func _on_hearts(value: int) -> void:
+	for i in _hearts.size():
+		_hearts[i].modulate = Color.WHITE if i < value else Color(0.2, 0.12, 0.3, 0.45)
+	if Settings.hearts_protected():
+		for h in _hearts:
+			h.modulate = Color(1.0, 0.95, 0.75)
 
 
-func _refresh_pockets() -> void:
-	var inv := level.player.inventory
-	for pw in _pockets:
-		var food := inv.food_in(pw.slot)
-		pw.icon = FoodDB.food_icon(food) if food != &"" else null
-		pw.tint = FoodDB.food(food).color if food != &"" else UITheme.CREAM_DARK
-		pw.active = inv.active == pw.slot
-		pw.queue_redraw()
-	_beak.active = inv.active == FoodInventory.NONE
-	_beak.queue_redraw()
-	var rec := inv.current_recipe()
-	if rec == null:
-		_fusion.text = ""
-	else:
-		var known := GameState.knows_recipe(rec)
-		_fusion.text = "%s  Fuse: %s" % [Controls.prompt("fusion"), rec.display_name if known else "? ? ?"]
+func refresh_counts() -> void:
+	_coins.text = str(GameState.stage_coins)
+	_notes.text = "%d/%d" % [level.notes_found, level.notes_total]
+	_keys.text = str(GameState.keys)
+	_keys.visible = GameState.keys > 0
+	_key_icon.visible = GameState.keys > 0
 
 
-func _on_pocket_tapped(_slot: int) -> void:
-	# tapping a pocket is the touch way to swap
-	Input.action_press("ability_swap")
-	await get_tree().physics_frame
-	await get_tree().physics_frame
-	Input.action_release("ability_swap")
-
-
-func _on_feathers(value: int) -> void:
-	for i in _feathers.size():
-		_feathers[i].modulate = Color.WHITE if i < value else Color(0.25, 0.15, 0.35, 0.45)
-	if Settings.feathers_protected():
-		for f in _feathers:
-			f.modulate = Color(1.0, 0.95, 0.7)
-
-
-func _update_scraps() -> void:
-	_scraps.text = "%d/%d" % [level.scraps_found, level.scraps_total]
-
-
-func on_collect(_kind: String, _fresh: bool) -> void:
-	_update_scraps()
+func on_boost() -> void:
+	pass
 
 
 func _on_target(target: Node) -> void:
 	if target == null or not is_instance_valid(target) or not target.has_method("prompt"):
 		_prompt.visible = false
 		return
-	_prompt_label.text = "%s   %s" % [Controls.prompt("eat_interact"), str(target.call("prompt"))]
+	_prompt_label.text = "%s   %s" % [Controls.prompt("move_up" if Controls.device != Controls.DEVICE_TOUCH else "attack"), str(target.call("prompt"))]
 	_prompt.visible = true
 	_prompt.reset_size()
 
@@ -294,6 +308,27 @@ func show_message(text: String, seconds: float = 1.4) -> void:
 	t.tween_callback(func() -> void: _message.visible = false)
 
 
+## The friendly "oops" when hearts run out: the flopped-Tato drawing from
+## the redesign board, then straight back to the checkpoint.
+func show_defeat() -> void:
+	var pic := TextureRect.new()
+	pic.texture = Art.tex("tato_big/defeat")
+	pic.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	pic.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	pic.grow_vertical = Control.GROW_DIRECTION_BOTH
+	pic.custom_minimum_size = Vector2(220, 170)
+	pic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	pic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	pic.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	pic.offset_top = -60.0
+	root.add_child(pic)
+	show_message("Oops! Back to the checkpoint", 1.0)
+	var t := pic.create_tween()
+	t.tween_interval(1.0)
+	t.tween_property(pic, "modulate:a", 0.0, 0.3)
+	t.tween_callback(pic.queue_free)
+
+
 func show_toast(text: String, icon: Texture2D = null) -> void:
 	var panel := PanelContainer.new()
 	panel.add_theme_stylebox_override("panel", UITheme.box(UITheme.CREAM, UITheme.PLUM, 18, 4))
@@ -319,21 +354,20 @@ func show_toast(text: String, icon: Texture2D = null) -> void:
 	t.tween_callback(panel.queue_free)
 
 
-## The "delight" card when a recipe is used for the first time. About two
-## seconds; any button skips it.
+## The little card when a Flavor Burst is found for the first time.
 func show_recipe(rec: RecipeDefinition) -> void:
 	if _card != null and is_instance_valid(_card):
 		_card.queue_free()
 	_card = PanelContainer.new()
-	_card.add_theme_stylebox_override("panel", UITheme.box(UITheme.CREAM, UITheme.PLUM, 28, 6))
+	_card.add_theme_stylebox_override("panel", UITheme.box(UITheme.CREAM, UITheme.PLUM, 24, 5))
 	_card.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
 	_card.grow_horizontal = Control.GROW_DIRECTION_BOTH
-	_card.offset_top = 150.0
+	_card.offset_top = 140.0
 	_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var box := VBoxContainer.new()
 	box.alignment = BoxContainer.ALIGNMENT_CENTER
 	_card.add_child(box)
-	var head := UITheme.label("New recipe!" if rec.named else "Kitchen experiment!", 22, UITheme.PLUM_SOFT, true)
+	var head := UITheme.label("New Flavor Burst!", 20, UITheme.PLUM_SOFT, true)
 	head.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(head)
 	var icons := HBoxContainer.new()
@@ -342,31 +376,20 @@ func show_recipe(rec: RecipeDefinition) -> void:
 	for fid: StringName in [rec.food_a, rec.food_b]:
 		var tr := TextureRect.new()
 		tr.texture = FoodDB.food_icon(fid)
-		tr.custom_minimum_size = Vector2(56, 56)
+		tr.custom_minimum_size = Vector2(48, 48)
 		tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		icons.add_child(tr)
 		if fid == rec.food_a:
-			icons.add_child(UITheme.label("+", 34, UITheme.PLUM, true))
-	box.add_child(UITheme.title_label(rec.display_name, 42, rec.color.lightened(0.2)))
-	var desc := UITheme.label(rec.description, 22)
-	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	desc.custom_minimum_size = Vector2(460, 0)
-	desc.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	box.add_child(desc)
+			icons.add_child(UITheme.label("+", 30, UITheme.PLUM, true))
+	box.add_child(UITheme.title_label(rec.display_name, 36, rec.color.lightened(0.2)))
 	root.add_child(_card)
 	AudioService.play("recipe")
-	AudioService.duck_music(1.6)
-	Captions.caption("♪ A happy jingle: new recipe")
-	_card.pivot_offset = Vector2(250, 80)
-	_card.scale = Vector2(0.6, 0.6)
 	var card := _card
 	var t := card.create_tween()
-	t.tween_property(card, "scale", Vector2.ONE, 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	t.tween_interval(2.0)
+	t.tween_interval(1.8)
 	t.tween_property(card, "modulate:a", 0.0, 0.3)
 	t.tween_callback(card.queue_free)
-	_refresh_pockets()
 
 
 func show_hint(lines: Array) -> void:
@@ -374,96 +397,77 @@ func show_hint(lines: Array) -> void:
 		_hint_lines = lines
 		_hint_step = 0
 	var text := str(_hint_lines[mini(_hint_step, _hint_lines.size() - 1)])
-	_hint_step = mini(_hint_step + 1, _hint_lines.size() - 1)
+	_hint_step = (_hint_step + 1) % _hint_lines.size()
 	GameState.profile["hints_used"] = int(GameState.profile.get("hints_used", 0)) + 1
-	show_tip(self, "Hint Nest: " + text)
+	show_tip(self, "Hint: " + text)
 	var t := create_tween()
 	t.tween_interval(6.0)
 	t.tween_callback(func() -> void: hide_tip(self))
 
 
-## One Flavor Pocket.
-class PocketWidget:
+func show_boss(boss_name: String) -> void:
+	_boss_name.text = boss_name
+	_boss_name.visible = true
+	_boss_bar.visible = true
+	_boss_bar.value = 1.0
+
+
+func set_boss_health(fraction: float) -> void:
+	_boss_bar.value = clampf(fraction, 0.0, 1.0)
+
+
+func hide_boss() -> void:
+	_boss_name.visible = false
+	_boss_bar.visible = false
+
+
+## The round yellow badge that shows the active power (as on the item board).
+class PowerBadge:
 	extends Control
 
-	signal tapped(slot: int)
-
-	var letter := "A"
-	var slot := 0
 	var icon: Texture2D
-	var tint := Color("f3e6d2")
-	var active := false
-	var small := false
-	var timer_fraction := 0.0
-
-	func _init() -> void:
-		mouse_filter = Control.MOUSE_FILTER_STOP
+	var cooldown := 0.0
 
 	func _ready() -> void:
-		custom_minimum_size = Vector2(52, 52) if small else Vector2(70, 70)
-
-	func _gui_input(event: InputEvent) -> void:
-		if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-			tapped.emit(slot)
-			accept_event()
-
-	func _draw() -> void:
-		var r := size.x * 0.5
-		var c := size * 0.5
-		if active:
-			draw_circle(c, r, Color("ffcf3f"))
-		draw_circle(c, r - 4.0, Color("301444"))
-		draw_circle(c, r - 8.0, tint.lerp(Color("fff9ef"), 0.62) if icon != null and not small else Color("fff9ef"))
-		if icon != null:
-			var s := (r - 12.0) * 2.0
-			draw_texture_rect(icon, Rect2(c - Vector2(s, s) * 0.5, Vector2(s, s)), false)
-		if timer_fraction > 0.0:
-			draw_arc(c, r - 6.0, -PI * 0.5, -PI * 0.5 + TAU * timer_fraction, 32, Color("ffffff"), 5.0, true)
-		if letter != "":
-			var font := UITheme.font_bold()
-			if font:
-				draw_string_outline(font, Vector2(2, 18), letter, HORIZONTAL_ALIGNMENT_LEFT, -1, 20, 6, Color("301444"))
-				draw_string(font, Vector2(2, 18), letter, HORIZONTAL_ALIGNMENT_LEFT, -1, 20, Color.WHITE)
-
-
-## Honk Charge: an arc that fills.
-class ChargeMeter:
-	extends Control
-
-	var value := 1.0
-	var _flash := 0.0
-
-	func _ready() -> void:
-		custom_minimum_size = Vector2(70, 70)
+		custom_minimum_size = Vector2(62, 62)
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
 
-	func set_value(v: float) -> void:
-		value = clampf(v, 0.0, 1.0)
+	func set_power(id: StringName) -> void:
+		icon = FoodDB.food_icon(id) if id != &"" else Art.tex("ui/btn_jump")
+		modulate = Color.WHITE
 		queue_redraw()
-
-	func flash() -> void:
-		_flash = 0.5
-		set_process(true)
-
-	func _process(delta: float) -> void:
-		if _flash > 0.0:
-			_flash -= delta
-			queue_redraw()
-		else:
-			set_process(false)
 
 	func _draw() -> void:
 		var c := size * 0.5
-		var r := size.x * 0.5 - 8.0
-		var start := PI * 0.75
-		var sweep := PI * 1.5
-		draw_arc(c, r, start, start + sweep, 32, Color("301444"), 14.0, true)
-		draw_arc(c, r, start, start + sweep, 32, Color("5b3a78"), 8.0, true)
-		var col := Color("ffcf3f") if value > 0.3 else Color("ff9a1f")
-		if _flash > 0.0 and fmod(_flash, 0.16) > 0.08:
-			col = Color("f0452e")
-		if value > 0.01:
-			draw_arc(c, r, start, start + sweep * value, 32, col, 8.0, true)
-		var icon := Art.tex("ui/honk")
+		var r := size.x * 0.5
+		draw_circle(c, r, Color("301444"))
+		draw_circle(c, r - 4.0, Color("ffcf3f"))
+		draw_circle(c, r - 9.0, Color("fff3c4"))
 		if icon != null:
-			draw_texture_rect(icon, Rect2(c - Vector2(17, 17), Vector2(34, 34)), false)
+			var s := (r - 9.0) * 1.7
+			var k := s / float(maxi(icon.get_width(), icon.get_height()))
+			var sz := Vector2(icon.get_width(), icon.get_height()) * k
+			draw_texture_rect(icon, Rect2(c - sz * 0.5, sz), false)
+		if cooldown > 0.0:
+			draw_arc(c, r - 6.0, -PI * 0.5, -PI * 0.5 + TAU * cooldown, 24, Color(0.19, 0.08, 0.27, 0.7), 6.0, true)
+
+
+## A boost icon with a ring that runs down.
+class BoostIcon:
+	extends Control
+
+	var texture: Texture2D
+	var fraction := 1.0
+
+	func _ready() -> void:
+		custom_minimum_size = Vector2(40, 40)
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	func _draw() -> void:
+		var c := size * 0.5
+		draw_circle(c, 20.0, Color(0.19, 0.08, 0.27, 0.55))
+		if texture != null:
+			var k := 28.0 / float(maxi(texture.get_width(), texture.get_height()))
+			var sz := Vector2(texture.get_width(), texture.get_height()) * k
+			draw_texture_rect(texture, Rect2(c - sz * 0.5, sz), false)
+		draw_arc(c, 19.0, -PI * 0.5, -PI * 0.5 + TAU * fraction, 24, Color("ffcf3f"), 3.0, true)
