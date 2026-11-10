@@ -255,3 +255,30 @@ A look-at-everything pass on the web build, fixing what it showed:
 
 Nothing is half-edited. The tree was committed after a clean import and a full passing
 test run.
+
+---
+
+## Handoff verification (second handoff, 2026-11-10)
+
+The ZIP is made from the Git commit with `git archive`: 1,615 files, about 61 MB. Left
+out because they are recreated: `game/.godot/` (import cache), `build/` (exports),
+`.git/` (history, kept on the development Mac).
+
+A copy unpacked into an empty folder was checked with Godot 4.7.2 on macOS:
+
+| Check | Result |
+|---|---|
+| `tools/check.sh` step 1: open the project from nothing (`--import`) | exit 0, 0 error or warning lines |
+| step 2: load every script, scene and resource | 122 files, 0 problems |
+| step 3: full test suite | 39 passed, 0 failed |
+| Run the real game window: stage `W5-L1`, about 4 s with input | no errors |
+
+Earlier the same day, on this code: all six worlds and the Mega Mushroot arena were
+captured from the desktop build, and the exported macOS app was launched and ran a
+stage.
+
+Still not verified: Safari, iPhone / iPad, performance on older devices, the Windows
+and Linux exports, this version's web build in a browser, a full human play-through,
+and the sound by ear. `tools/check.sh` has only been run on macOS.
+
+Nothing was removed or hidden to make these checks pass.
