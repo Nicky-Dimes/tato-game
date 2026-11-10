@@ -27,7 +27,7 @@ ICE = {"body": "#a9e4f5", "speck": "#8fd2ea", "under": "#79bfdc", "cap": "#f1fdf
 THEMES = {
     "grassland": {
         "ground": {"body": "#b9793f", "speck": "#9c602c", "under": "#8a5326", "cap": "#7fd13b", "cap_light": "#b6f06a", "cap_shadow": "#7a4a22", "line": "#4a2b45", "style": "bricks"},
-        "struct": {"body": "#a79bc4", "speck": "#8c80ad", "under": "#766a98", "cap": "#c9bfe0", "cap_light": "#e8e2f5", "cap_shadow": "#7d7199", "line": "#3b2850", "style": "bricks"},
+        "struct": {"body": "#a79bc4", "speck": "#8c80ad", "under": "#766a98", "cap": "#c9bfe0", "cap_light": "#e8e2f5", "cap_shadow": "#7d7199", "line": "#3b2850", "style": "bricks", "flat": True},
         "ice": ICE,
         "plank": {"body": "#e8b06e", "light": "#ffd9a0", "dark": "#b9803f", "cloth": "#f0452e"},
     },
@@ -39,24 +39,24 @@ THEMES = {
     },
     "candy": {
         "ground": {"body": "#e9b877", "speck": "#d39d58", "under": "#bd8646", "cap": "#ff8fc4", "cap_light": "#ffd1e6", "cap_shadow": "#c98a4c", "line": "#5a2848", "style": "soil"},
-        "struct": {"body": "#f0b45a", "speck": "#d6933a", "under": "#bb7a2a", "cap": "#ffd98a", "cap_light": "#fff0c4", "cap_shadow": "#c98a3a", "line": "#5a2848", "style": "bricks"},
+        "struct": {"body": "#f0b45a", "speck": "#d6933a", "under": "#bb7a2a", "cap": "#ffd98a", "cap_light": "#fff0c4", "cap_shadow": "#c98a3a", "line": "#5a2848", "style": "bricks", "flat": True},
         "ice": ICE,
         "plank": {"body": "#ff9ccb", "light": "#ffd6ea", "dark": "#d9639d", "cloth": "#ffffff"},
     },
     "icy": {
         "ground": {"body": "#7cc7ee", "speck": "#62b2de", "under": "#4f9fce", "cap": "#ffffff", "cap_light": "#ffffff", "cap_shadow": "#62b2de", "line": "#2c4a7a", "style": "ice"},
-        "struct": {"body": "#cfe9f7", "speck": "#b2d6ea", "under": "#97c2da", "cap": "#ffffff", "cap_light": "#ffffff", "cap_shadow": "#a9cfe4", "line": "#2c4a7a", "style": "bricks"},
+        "struct": {"body": "#cfe9f7", "speck": "#b2d6ea", "under": "#97c2da", "cap": "#ffffff", "cap_light": "#ffffff", "cap_shadow": "#a9cfe4", "line": "#2c4a7a", "style": "bricks", "flat": True},
         "ice": ICE,
         "plank": {"body": "#bfe9fb", "light": "#ffffff", "dark": "#7fbfe0", "cloth": "#59b6f0"},
     },
     "windy": {
         "ground": {"body": "#bd8046", "speck": "#a06731", "under": "#8c5829", "cap": "#8bd94a", "cap_light": "#c2f27e", "cap_shadow": "#7d4f25", "line": "#4a2b45", "style": "bricks"},
-        "struct": {"body": "#a79bc4", "speck": "#8c80ad", "under": "#766a98", "cap": "#c9bfe0", "cap_light": "#e8e2f5", "cap_shadow": "#7d7199", "line": "#3b2850", "style": "bricks"},
+        "struct": {"body": "#a79bc4", "speck": "#8c80ad", "under": "#766a98", "cap": "#c9bfe0", "cap_light": "#e8e2f5", "cap_shadow": "#7d7199", "line": "#3b2850", "style": "bricks", "flat": True},
         "ice": ICE,
         "plank": {"body": "#e3ab63", "light": "#ffd596", "dark": "#b07a38", "cloth": "#8bd94a"},
     },
     "castle": {
-        "ground": {"body": "#9a8fb8", "speck": "#8176a1", "under": "#6b608c", "cap": "#c9bfe0", "cap_light": "#ece6f8", "cap_shadow": "#75698f", "line": "#33244a", "style": "bricks"},
+        "ground": {"body": "#9a8fb8", "speck": "#8176a1", "under": "#6b608c", "cap": "#c9bfe0", "cap_light": "#ece6f8", "cap_shadow": "#75698f", "line": "#33244a", "style": "bricks", "flat": True},
         "struct": {"body": "#d9ab4c", "speck": "#bf8f34", "under": "#a37727", "cap": "#f6d98a", "cap_light": "#fff3c4", "cap_shadow": "#b08530", "line": "#402040", "style": "plates"},
         "ice": ICE,
         "plank": {"body": "#d93a4a", "light": "#ff7a86", "dark": "#a32232", "cloth": "#ffd84a"},
@@ -93,14 +93,13 @@ def interior(svg, pal, q, variant):
         svg.rect(jx, 0, 4, S - 4, sp)
         svg.circle(jx - 7, 14, 2.5, darken(sp, 0.2))
     elif style == "bricks":
-        svg.rect(-1, S - 4, S + 2, 4, sp)
-        svg.rect(-1, 28, S + 2, 4, sp)
+        mortar = mix(pal["body"], sp, 0.6)
+        svg.rect(-1, S - 3, S + 2, 3, mortar)
+        svg.rect(-1, 0, S + 2, 3, lighten(pal["body"], 0.14), opacity=0.6)
         if q in (0, 3):
-            svg.rect(30, 0, 4, 28, sp)
-            svg.rect(-2, 32, 4, 28, sp)
-        else:
-            svg.rect(-2, 0, 4, 28, sp)
-            svg.rect(30, 32, 4, 28, sp)
+            svg.rect(30, 0, 3, S - 3, mortar)
+        if (variant + q) % 3 == 0:
+            svg.ellipse(18, 30, 7, 4, sp, opacity=0.35)
     elif style == "stripes":
         for i in range(-2, 4):
             x = i * 32 + (0 if q % 2 == 0 else 0)
@@ -135,7 +134,7 @@ def edge_piece(svg, pal, kind, top, material):
     """Draws edge decoration in canonical orientation: exposed side is LEFT.
     kind: 0 outer corner, 1 horizontal edge (top or bottom exposed), 2 side edge, 3 inner corner."""
     line = pal["line"]
-    flat_cap = pal["style"] in ("planks", "bricks", "stripes", "plates")
+    flat_cap = pal.get("flat", pal["style"] in ("planks", "stripes", "plates"))
     if kind in (0, 1):
         if top:
             if flat_cap:
@@ -237,7 +236,7 @@ def draw_slope(svg, col, row, pal, rising_right):
     inner = svg.clip_path("M-2 %d L%d -2 L%d %d Z" % (T + 2, T + 2, T + 2, T + 2))
     svg.group_open(clip=inner)
     svg.rect(0, 0, T, T, pal["body"])
-    flat_cap = pal["style"] in ("planks", "bricks", "stripes", "plates")
+    flat_cap = pal.get("flat", pal["style"] in ("planks", "stripes", "plates"))
     k = 1.42
     cap_h = (G - 4 if flat_cap else G + 3) * k
     svg.poly([(-2, T + 2 + cap_h + 8), (T + 2, -2 + cap_h + 8), (T + 2, -2), (-2, T + 2)], pal["cap_shadow"])

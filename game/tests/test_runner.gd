@@ -1,12 +1,27 @@
 extends Node
 ## Runs every test script under res://tests/{unit,integration,smoke}.
-##   godot --headless --path game res://tests/TestRunner.tscn
+##   godot --headless --fixed-fps 60 --path game res://tests/TestRunner.tscn
+## (--fixed-fps lets the headless run go faster than real time)
 ## Optional after "--":  --only=<text in file name>   --group=unit|integration|smoke
 ## Exit code is 0 only when every test passes.
 
 var _passed := 0
 var _failed := 0
 var _report: Array[String] = []
+var _limit_seconds := 1500.0        # real seconds; --timeout=<seconds> changes it
+var _deadline_ms := 0
+
+
+## Safety net measured in real time (tests may run with --fixed-fps, where
+## game time races ahead): a stuck test must not hang CI forever.
+func _process(_delta: float) -> void:
+	if _deadline_ms > 0 and Time.get_ticks_msec() > _deadline_ms:
+		_deadline_ms = 0
+		print("")
+		for line in _report:
+			print(line)
+		print("TESTS: timed out after %.0fs" % _limit_seconds)
+		get_tree().quit(2)
 
 
 func _ready() -> void:
@@ -18,15 +33,14 @@ func _ready() -> void:
 			only = arg.substr(7)
 		elif arg.begins_with("--group="):
 			group = arg.substr(8)
+		elif arg.begins_with("--timeout="):
+			_limit_seconds = float(arg.substr(10))
 	# Stay alive across the scene changes tests make: this node stops being
 	# "the current scene", so change_scene_to_file() leaves it alone.
 	await get_tree().process_frame
 	get_tree().current_scene = null
-	# safety net: a stuck test must not hang CI forever
-	get_tree().create_timer(540.0, true, false, true).timeout.connect(func() -> void:
-		print("TESTS: timed out")
-		get_tree().quit(2))
 	var started := Time.get_ticks_msec()
+	_deadline_ms = started + int(_limit_seconds * 1000.0)
 	for folder: String in ["unit", "integration", "smoke"]:
 		if group != "" and group != folder:
 			continue

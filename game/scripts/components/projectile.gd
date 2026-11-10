@@ -41,7 +41,9 @@ func _ready() -> void:
 	collision_layer = Layers.EFFECT
 	collision_mask = Layers.WORLD | (Layers.PLAYER if hostile else (Layers.ENEMY | Layers.INTERACT | Layers.PROP))
 	monitoring = true
-	monitorable = hostile          # so a Cocoa Shield can find and bounce it
+	# (must stay monitorable: with it off, this engine version stops the area
+	# from noticing solid ground at all)
+	monitorable = true
 	z_index = 12
 	if hostile:
 		add_to_group("enemy_shot")

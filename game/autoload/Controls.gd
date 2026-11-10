@@ -198,7 +198,9 @@ func _store() -> void:
 
 
 func key_name(code: int) -> String:
-	var s := OS.get_keycode_string(DisplayServer.keyboard_get_keycode_from_physical(code as Key))
+	var s := ""
+	if DisplayServer.get_name() != "headless":
+		s = OS.get_keycode_string(DisplayServer.keyboard_get_keycode_from_physical(code as Key))
 	if s == "":
 		s = OS.get_keycode_string(code as Key)
 	match s:

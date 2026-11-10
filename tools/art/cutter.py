@@ -434,3 +434,30 @@ def trim_thin(cut, min_run=5):
         s = ((y + y0) * w + x0) * 4
         out[y * nw * 4:(y + 1) * nw * 4] = px[s:s + nw * 4]
     return {"w": nw, "h": nh, "px": out, "box": cut.get("box"), "origin": cut.get("origin")}
+
+
+def strip_white(cut, level=236):
+    """Removes leftover panel-white that hangs on the outside of a cut-out
+    (white reached from the transparent surround, never white enclosed by
+    the drawing's own outline)."""
+    w, h, px = cut["w"], cut["h"], cut["px"]
+    seen = bytearray(w * h)
+    q = deque()
+    for i in range(w * h):
+        if px[i * 4 + 3] == 0:
+            seen[i] = 1
+            q.append(i)
+    while q:
+        p = q.popleft()
+        x = p % w
+        y = p // w
+        for nb in ((p - 1) if x > 0 else -1, (p + 1) if x < w - 1 else -1, (p - w) if y > 0 else -1, (p + w) if y < h - 1 else -1):
+            if nb < 0 or seen[nb]:
+                continue
+            a = px[nb * 4 + 3]
+            if a < 255 or (px[nb * 4] >= level and px[nb * 4 + 1] >= level and px[nb * 4 + 2] >= level):
+                seen[nb] = 1
+                if a == 255 or (px[nb * 4] >= level and px[nb * 4 + 1] >= level and px[nb * 4 + 2] >= level):
+                    px[nb * 4 + 3] = 0
+                    q.append(nb)
+    return cut

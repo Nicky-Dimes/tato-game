@@ -103,7 +103,13 @@ func setup(lv: Level, e: Dictionary) -> void:
 
 
 func _ready() -> void:
-	level.hud.show_boss(str(info["name"]))
+	# the stage builds its HUD after its creatures: say hello a moment later
+	_announce.call_deferred()
+
+
+func _announce() -> void:
+	if level != null and level.hud != null:
+		level.hud.show_boss(str(info["name"]))
 	Captions.caption("%s appears!" % str(info["name"]))
 	AudioService.music("boss")
 
@@ -131,7 +137,8 @@ func take_hit(damage: int, hit: Dictionary) -> bool:
 	_flash = 0.14
 	if dmg > 0:
 		AudioService.play_varied("enemy_hit", -3.0)
-		level.hud.set_boss_health(float(hp) / float(max_hp))
+		if level.hud != null:
+			level.hud.set_boss_health(float(hp) / float(max_hp))
 		Fx.burst(level, global_position + Vector2(0, -height * 0.5), "sparkle", Color(1, 1, 0.6), 4, {"spread": 50.0, "life": 0.3, "size": 7.0})
 	else:
 		AudioService.play_varied("clink", -6.0)

@@ -278,7 +278,9 @@ func _bump(player: Tato) -> void:
 	if player.is_shielded():
 		return
 	# jumping on top of most creatures bops them
-	var from_above := player.velocity.y > 40.0 and player.global_position.y < global_position.y - height * 0.45
+	# (overlaps are reported a frame late, so be generous about "from above":
+	# falling, with Tato's feet above the creature's feet, is a stomp)
+	var from_above := player.velocity.y > 40.0 and player.global_position.y < global_position.y - height * 0.12
 	if from_above and not player.is_on_floor():
 		if bool(stats.get("stomp", true)):
 			take_hit(1, {"element": &"stomp", "source": player, "dir": Vector2.ZERO, "knock": 0.0})

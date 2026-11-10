@@ -78,6 +78,12 @@ func _ready() -> void:
 	player.level = self
 	player.position = data.spawn_point()
 	add_child(player)
+	if Game.debug_column >= 0:
+		var col := clampi(Game.debug_column, 1, data.width - 2)
+		for row in data.height:
+			if data.is_block(col, row):
+				player.position = Vector2((col + 0.5) * TILE, row * TILE)
+				break
 	checkpoint_position = player.position
 	player.last_safe_position = player.position
 
@@ -265,7 +271,13 @@ func collect(collect_kind: String, id: String, at: Vector2) -> void:
 
 
 ## Coins hop out (of a defeated creature, a crate, a block).
+## Coins and prizes are added a moment later (deferred): these are usually
+## called from inside a physics callback, where new shapes may not be created.
 func drop_coins(at: Vector2, count: int) -> void:
+	_drop_coins_now.call_deferred(at, count)
+
+
+func _drop_coins_now(at: Vector2, count: int) -> void:
 	for i in count:
 		var coin := EntityFactory.create(self, {"type": "coin", "cell": cell_at(at), "args": [], "params": {}})
 		if coin == null:
@@ -278,13 +290,16 @@ func drop_coins(at: Vector2, count: int) -> void:
 ## What was inside a crate or a Question Block: "coins:3", "heart", "key",
 ## "pickup:wings", "power:FROSTBERRY".
 func spill(holds: String, at: Vector2) -> void:
-	if holds == "":
-		return
+	if holds != "":
+		_spill_now.call_deferred(holds, at)
+
+
+func _spill_now(holds: String, at: Vector2) -> void:
 	var parts := holds.split(":")
 	var what := parts[0]
 	var extra := parts[1] if parts.size() > 1 else ""
 	if what == "coins":
-		drop_coins(at, maxi(int(extra), 1))
+		_drop_coins_now(at, maxi(int(extra), 1))
 		return
 	var entry := {"type": what, "cell": cell_at(at), "args": [], "params": {}}
 	if what == "pickup" or what == "power":

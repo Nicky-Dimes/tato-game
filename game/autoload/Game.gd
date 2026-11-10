@@ -19,6 +19,8 @@ var scene_args: Dictionary = {}
 var is_transitioning := false
 ## Set by tests / the autoplay bot so stages skip intros and prompts.
 var headless_test := false
+## Debug: start a stage this many columns in (set by ?at= / --at=).
+var debug_column := -1
 
 var _fade_layer: CanvasLayer
 var _fade_rect: ColorRect

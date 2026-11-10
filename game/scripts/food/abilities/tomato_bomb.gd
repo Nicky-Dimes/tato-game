@@ -3,9 +3,9 @@ extends AbilityStrategy
 ## near it and breaks cracked walls.
 
 func start() -> void:
-	shoot(Vector2(390, -500), {
+	shoot(Vector2(380, -330), {
 		"look": "tomato", "life": 1.4, "radius": 15.0, "fall": 1300.0, "spin": 6.0,
-		"splash": 125.0, "splash_damage": damage(), "damage": 1,
+		"splash": 140.0, "splash_damage": damage(), "damage": 1,
 	})
 	AudioService.voice("honk_boom")
 	AudioService.play_varied("throw", -3.0)
