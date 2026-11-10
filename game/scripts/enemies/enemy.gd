@@ -32,6 +32,9 @@ var _ice: StaticBody2D
 var _art_faces := 1.0
 var _base_scale := 0.5
 var _spawned := false
+var _visual_time := 0.0
+var _visual_squash := 1.0
+var _visual_recoil := 0.0
 
 
 func setup(lv: Level, e: Dictionary) -> void:
@@ -145,6 +148,7 @@ func take_hit(damage: int, info: Dictionary) -> bool:
 			stun_left = maxf(stun_left, 0.3)
 	hp -= dmg
 	flash_left = 0.14
+	_visual_recoil = 1.0
 	if not bool(stats.get("heavy", false)) and frozen_left <= 0.0 and bubble_left <= 0.0:
 		var dir: Vector2 = info.get("dir", Vector2.ZERO)
 		velocity.x = dir.x * float(info.get("knock", 180.0))
@@ -217,6 +221,8 @@ func _physics_process(delta: float) -> void:
 		_spawned = true
 		GameState.meet_enemy(kind) if false else null
 	var d := delta * clock()
+	_visual_time += d
+	_visual_recoil = move_toward(_visual_recoil, 0.0, 5.5 * delta)
 	flash_left = maxf(flash_left - delta, 0.0)
 	if frozen_left > 0.0:
 		frozen_left -= delta
@@ -297,6 +303,12 @@ func _look() -> void:
 	if sprite == null:
 		return
 	sprite.flip_h = (facing * _art_faces) < 0.0
+	var frame_id := int(_visual_time * (9.0 if absf(velocity.x) > 15.0 else 4.0)) % 4
+	if frozen_left > 0.0 or Settings.flag("reduced_motion"):
+		frame_id = 0
+	var animation_tex := Art.tex("enemies/anim/%s_%d" % [kind, frame_id])
+	if animation_tex != null:
+		sprite.texture = animation_tex
 	var m := Color.WHITE
 	if frozen_left > 0.0:
 		m = Color(0.6, 0.85, 1.0)
@@ -309,9 +321,28 @@ func _look() -> void:
 	if flash_left > 0.0 and not Settings.flag("reduce_flashes"):
 		m = Color(2.0, 2.0, 2.0)
 	sprite.modulate = m
-	if stun_left > 0.0 and not Settings.flag("reduced_motion"):
-		sprite.rotation = sin(Time.get_ticks_msec() * 0.03) * 0.14
+	# Give even single-image creatures a readable locomotion and impact cycle.
+	# This is procedural support until proper multi-pose enemy art is integrated.
+	var reduced := Settings.flag("reduced_motion")
+	var active := not reduced and not is_busy()
+	var moving := active and absf(velocity.x) > 10.0
+	var pace := 10.0 if moving else 2.7
+	var motion := sin(_visual_time * pace)
+	var bob := -absf(motion) * (3.5 if moving else 1.2)
+	if kind in ["bee_buzzer", "crow_swooper", "pie_bat", "ghost_poof", "balloon_jelly"]:
+		bob = sin(_visual_time * 5.6) * (3.0 if not reduced else 0.0)
 	elif frozen_left > 0.0 or stuck_left > 0.0:
+		bob = 0.0
+	var recover := _visual_recoil
+	var wide := 1.0 + (absf(motion) * 0.045 if moving else sin(_visual_time * 2.7) * 0.012)
+	var tall := 1.0 - (absf(motion) * 0.042 if moving else sin(_visual_time * 2.7) * 0.012)
+	sprite.scale = Vector2(_base_scale * (wide + recover * 0.14), _base_scale * (tall - recover * 0.12))
+	sprite.position = Vector2(-facing * recover * 6.0, bob)
+	if stun_left > 0.0 and not reduced:
+		sprite.rotation = sin(_visual_time * 27.0) * 0.11
+	elif active:
+		sprite.rotation = sin(_visual_time * pace) * (0.035 if moving else 0.012)
+	else:
 		sprite.rotation = 0.0
 
 

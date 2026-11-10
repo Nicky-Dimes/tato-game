@@ -60,9 +60,30 @@ func setup(lv: Level) -> void:
 	root.theme = UITheme.theme()
 	add_child(root)
 
+	# Production HUD plates: actual painted assets behind existing functional controls.
+	var health_plate := TextureRect.new()
+	health_plate.texture = Art.tex("ui/hud_left")
+	health_plate.position = Vector2(8, 6)
+	health_plate.size = Vector2(436, 102)
+	health_plate.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	health_plate.stretch_mode = TextureRect.STRETCH_SCALE
+	health_plate.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(health_plate)
+	var counter_plate := TextureRect.new()
+	counter_plate.texture = Art.tex("ui/hud_right")
+	counter_plate.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+	counter_plate.offset_left = -555.0
+	counter_plate.offset_right = -101.0
+	counter_plate.offset_top = 8.0
+	counter_plate.offset_bottom = 104.0
+	counter_plate.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	counter_plate.stretch_mode = TextureRect.STRETCH_SCALE
+	counter_plate.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(counter_plate)
+
 	# --- top-left: hearts + power badge, boosts underneath
 	var left := VBoxContainer.new()
-	left.position = Vector2(22, 16)
+	left.position = Vector2(30, 27)
 	left.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	left.add_theme_constant_override("separation", 4)
 	root.add_child(left)
@@ -105,7 +126,7 @@ func setup(lv: Level) -> void:
 	right.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
 	right.offset_left = -470.0
 	right.offset_right = -100.0
-	right.offset_top = 20.0
+	right.offset_top = 29.0
 	right.alignment = BoxContainer.ALIGNMENT_END
 	right.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	right.add_theme_constant_override("separation", 8)

@@ -277,6 +277,12 @@ func _wind(delta: float) -> void:
 
 func _look() -> void:
 	sprite.flip_h = (facing * float(info.get("faces", 1))) < 0.0
+	var frame_id := int(_clock * (11.0 if mode == Mode.ATTACK else 5.0)) % 4
+	if Settings.flag("reduced_motion"):
+		frame_id = 0
+	var animation_tex := Art.tex("bosses/anim/%s_%d" % [boss_id, frame_id])
+	if animation_tex != null:
+		sprite.texture = animation_tex
 	var m := Color.WHITE
 	if mode == Mode.WARN and fmod(_clock, 0.2) > 0.1:
 		m = Color(1.35, 1.25, 0.8)

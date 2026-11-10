@@ -152,9 +152,18 @@ func _draw() -> void:
 	var r := radius
 	match look:
 		"fire":
-			draw_colored_polygon(PackedVector2Array([Vector2(-r * 2.2, 0), Vector2(-r * 0.4, -r), Vector2(r * 0.2, 0), Vector2(-r * 0.4, r)]), Color(1.0, 0.55, 0.1, 0.8))
-			draw_circle(Vector2.ZERO, r, Color("f0452e"))
-			draw_circle(Vector2(r * 0.1, 0), r * 0.62, Color("ffcf3f"))
+			var wave := sin(_age * 22.0)
+			for i in 3:
+				var tail := r * (1.35 + i * 0.55)
+				var height_factor := r * (0.8 - i * 0.17)
+				draw_colored_polygon(PackedVector2Array([Vector2(-tail * 1.8, wave * (2.0 + i)), Vector2(-r * 0.24, -height_factor), Vector2(r * 0.55, 0), Vector2(-r * 0.24, height_factor)]), Color("f45135") if i == 0 else Color(1.0, 0.52 + i * 0.08, 0.14, 0.53))
+			draw_circle(Vector2(-r * 0.17, 0), r * 1.22, Color(1.0, 0.24, 0.09, 0.2))
+			draw_circle(Vector2.ZERO, r, Color("e8442f"))
+			draw_circle(Vector2(r * 0.12, -r * 0.06), r * 0.73, Color("ffab2b"))
+			draw_circle(Vector2(r * 0.25, -r * 0.14), r * 0.42, Color("fff0a5"))
+			for j in 2:
+				var fx := -r * (1.9 + j * 0.8) + sin(_age * 18.0 + j) * r * 0.2
+				draw_circle(Vector2(fx, sin(_age * 14.0 + j * 3.0) * r * 0.55), r * (0.24 - j * 0.055), Color(1, 0.75, 0.18, 0.8))
 		"ice":
 			var pts := PackedVector2Array([Vector2(r * 1.5, 0), Vector2(0, -r * 0.7), Vector2(-r * 1.2, 0), Vector2(0, r * 0.7)])
 			draw_colored_polygon(pts, Color("a9e9f8"))

@@ -129,6 +129,8 @@ func _ready() -> void:
 	runner.name = "AbilityRunner"
 	runner.player = self
 	add_child(runner)
+	# AbilityRunner is initialized after Visual; hook the attack pose here.
+	runner.ability_started.connect(visual._on_ability_started)
 
 	_interact_area = Area2D.new()
 	_interact_area.name = "InteractArea"

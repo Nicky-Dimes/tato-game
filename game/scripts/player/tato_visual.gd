@@ -13,29 +13,31 @@ const SPRITE_SCALE := 0.76
 
 ## name -> [frames, fps, loop]
 const ANIMS := {
-	"idle": [["jump_land"], 1.0, true],
-	"look": [["walk_2"], 1.0, true],
-	"walk": [["walk_0", "walk_1", "walk_2", "walk_3", "walk_4", "walk_1", "walk_2", "walk_3"], 12.0, true],
-	"run": [["run_0", "run_1", "run_2", "run_3", "run_4", "run_1", "run_2", "run_3"], 16.0, true],
-	"jump": [["jump_takeoff"], 1.0, true],
-	"fall": [["jump_flap"], 1.0, true],
+	"idle": [["idle_0", "idle_1", "idle_2", "idle_3", "idle_4", "idle_5"], 5.0, true],
+	"look": [["idle_4", "idle_3", "idle_2"], 3.0, true],
+	"walk": [["walk_0", "walk_1", "walk_2", "walk_3", "walk_4", "walk_extra_0", "walk_extra_1", "walk_extra_2"], 12.0, true],
+	"run": [["run_0", "run_1", "run_2", "run_3", "run_4", "run_extra_0", "run_extra_1", "run_extra_2"], 16.0, true],
+	"jump": [["jump_start_0", "jump_start_1", "jump_start_2"], 15.0, false],
+	"fall": [["fall_0", "fall_1", "fall_2"], 8.0, true],
+	"land": [["land_0", "land_1", "land_2", "land_3"], 18.0, false],
+	"attack": [["attack_0", "attack_1", "attack_2", "attack_3"], 18.0, false],
 	"glide": [["jump_air", "jump_flap"], 11.0, true],
 	"flap": [["jump_air"], 1.0, true],
 	"crouch": [["jump_crouch"], 1.0, true],
 	"slide": [["jump_crouch"], 1.0, true],
 	"swim": [["walk_2", "walk_1", "walk_2", "walk_3"], 5.0, true],
-	"honk": [["jump_air"], 1.0, true],
-	"eat": [["jump_crouch", "jump_land"], 9.0, true],
-	"hurt": [["jump_air"], 1.0, true],
+	"honk": [["attack_0", "attack_1", "attack_2", "attack_3"], 16.0, false],
+	"eat": [["pickup_0", "pickup_1", "pickup_2", "pickup_3"], 11.0, false],
+	"hurt": [["hurt_0", "hurt_1", "hurt_2", "hurt_3"], 14.0, false],
 	"cheer": [["cheer", "jump_air", "cheer", "jump_flap"], 6.0, true],
 	"ball": [["roll_3"], 1.0, true],
 	"roll": [["roll_2"], 1.0, true],
 	"curl": [["roll_0"], 1.0, true],
 	"float": [["jump_land"], 1.0, true],
 	"puffed": [["size_puffed"], 1.0, true],
-	"climb": [["walk_0", "walk_1", "walk_2", "walk_3", "walk_4", "walk_1", "walk_2", "walk_3"], 10.0, true],
+	"climb": [["walk_0", "walk_1", "walk_2", "walk_3", "walk_4", "walk_extra_0", "walk_extra_1", "walk_extra_2"], 10.0, true],
 	"stretch": [["jump_takeoff"], 1.0, true],
-	"charge": [["jump_crouch"], 1.0, true],
+	"charge": [["attack_0", "attack_1"], 7.0, true],
 	"back": [["back_view"], 1.0, true],
 }
 
@@ -72,6 +74,8 @@ var _force_left := 0.0
 var _honk_marks := 0.0
 var _marks: Node2D
 var _idle_timer := 0.0
+var _land_left := 0.0
+var _attack_left := 0.0
 var _hat: Sprite2D
 
 
@@ -101,6 +105,7 @@ func setup(owner_player: Tato) -> void:
 	add_child(shadow)
 	_set_anim("idle")
 	refresh_cosmetics()
+	player.landed.connect(_on_landed)
 
 
 static func shadow_texture() -> Texture2D:
@@ -152,8 +157,18 @@ func flap() -> void:
 
 
 func honk_flash() -> void:
+	_attack_left = 0.23
 	_honk_marks = 0.24
 	_marks.visible = true
+
+
+func _on_landed(impact: float) -> void:
+	if impact > 90.0:
+		_land_left = 0.24
+
+
+func _on_ability_started(_definition: Resource) -> void:
+	_attack_left = 0.25
 
 
 func start_blink(seconds: float) -> void:
@@ -180,6 +195,12 @@ func _process(delta: float) -> void:
 		return
 	_clock += delta
 	var hint := player.anim_hint()
+	_land_left = maxf(0.0, _land_left - delta)
+	_attack_left = maxf(0.0, _attack_left - delta)
+	if _land_left > 0.0 and player.is_on_floor() and hint in ["idle", "walk", "run"]:
+		hint = "land"
+	elif _attack_left > 0.0 and hint in ["idle", "walk", "run", "jump", "fall"]:
+		hint = "attack"
 	if _force_left > 0.0:
 		_force_left -= delta
 		hint = _force_anim
@@ -219,6 +240,13 @@ func _process(delta: float) -> void:
 			s *= Vector2(1.0 - breathe * 0.6, 1.0 + breathe)
 		"run":
 			lean_target = 0.07
+			bob = -absf(sin(_clock * 17.0)) * 2.8
+		"walk":
+			bob = -absf(sin(_clock * 11.0)) * 1.4
+		"land":
+			s *= Vector2(1.045, 0.97)
+		"attack":
+			lean_target = -0.045
 		"slide":
 			lean_target = 0.38
 			s *= Vector2(1.12, 0.86)

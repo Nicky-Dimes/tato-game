@@ -104,15 +104,23 @@ func _draw() -> void:
 	match kind:
 		"puff":
 			for d in _dirs:
-				draw_circle(d * spread * ease_t + Vector2(0, -rise * ease_t * 0.4), size * (1.0 + t * 0.6) * (0.6 + d.length() * 0.5), c)
+				var center := d * spread * ease_t + Vector2(0, -rise * ease_t * 0.4)
+				var rad := size * (1.0 + t * 0.65) * (0.7 + d.length() * 0.45)
+				var rim := Color(0.33, 0.19, 0.4, c.a * 0.22)
+				draw_circle(center + Vector2(0, 1.3), rad + 1.2, rim)
+				draw_circle(center, rad, c)
+				draw_circle(center + Vector2(-rad * 0.24, -rad * 0.28), rad * 0.42, Color(1, 1, 1, c.a * 0.48))
 		"sparkle":
 			for d in _dirs:
 				var p := d * spread * ease_t + Vector2(0, -rise * t)
-				var s := size * (1.0 - t * 0.7)
-				draw_rect(Rect2(p - Vector2(s, s * 0.28), Vector2(s * 2.0, s * 0.56)), c)
-				draw_rect(Rect2(p - Vector2(s * 0.28, s), Vector2(s * 0.56, s * 2.0)), c)
+				var r := size * (1.0 - t * 0.7)
+				var star := PackedVector2Array([p + Vector2(0, -r * 1.6), p + Vector2(r * 0.3, -r * 0.3), p + Vector2(r * 1.6, 0), p + Vector2(r * 0.3, r * 0.3), p + Vector2(0, r * 1.6), p + Vector2(-r * 0.3, r * 0.3), p + Vector2(-r * 1.6, 0), p + Vector2(-r * 0.3, -r * 0.3)])
+				draw_colored_polygon(star, c)
+				draw_circle(p, r * 0.33, Color(1, 1, 1, c.a))
 		"ring":
-			draw_arc(Vector2.ZERO, spread * lerpf(0.3, 1.0, ease_t), 0.0, TAU, 28, c, lerpf(7.0, 2.0, t), true)
+			var rad := spread * lerpf(0.26, 1.0, ease_t)
+			draw_arc(Vector2.ZERO, rad, 0.0, TAU, 36, c, lerpf(6.5, 1.0, t), true)
+			draw_arc(Vector2.ZERO, rad * 0.85, 0.0, TAU, 36, Color(1, 1, 1, c.a * 0.42), 1.5, true)
 		"crumbs":
 			for d in _dirs:
 				var p2 := d * spread * ease_t + Vector2(0, 60.0 * t * t)

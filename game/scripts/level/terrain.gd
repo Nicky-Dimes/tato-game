@@ -190,7 +190,9 @@ func water_at(point: Vector2) -> bool:
 # -------------------------------------------------------------------- tiles --
 
 func _build_tiles() -> void:
-	var path := "res://assets/tiles/tiles_%s.svg" % theme
+	var path := "res://assets/tiles/tiles_%s.png" % theme
+	if not ResourceLoader.exists(path):
+		path = "res://assets/tiles/tiles_%s.svg" % theme
 	if not ResourceLoader.exists(path):
 		path = "res://assets/tiles/tiles_grassland.svg"
 	var tex := load(path) as Texture2D
