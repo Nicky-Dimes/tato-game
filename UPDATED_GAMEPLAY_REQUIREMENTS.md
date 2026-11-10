@@ -20,14 +20,14 @@ around and solving simple power-up puzzles.
 | 2 | Collecting a new power replaces the current one | **Met.** |
 | 3 | Every food power gives a useful attack or combat ability | **Met mechanically.** All 12 attack. Their look and punch are weak. |
 | 4 | No mandatory two-food combinations | **Met.** Nothing needs two foods. A "Flavor Burst" flourish plays when a power is swapped; it is optional and can be removed. |
-| 5 | Many enemies with varied attack patterns and behaviours | **Partly.** 21 creatures exist, but behaviours are simple (patrol, hop, lunge, shoot, swoop) and they do not animate. |
+| 5 | Many enemies with varied attack patterns and behaviours | **Partly.** 21 creatures exist, but behaviours are simple (patrol, hop, lunge, shoot, swoop). They now wobble through four motion frames; no drawn attack or hurt poses. |
 | 6 | More engaging combat, movement, secrets and collectibles | **Partly.** Coins, 3 Treasure Notes and a hidden Star per stage, keys, 20 pickups, world treats. Stages are formulaic and flat in places. |
-| 7 | Strong visual feedback for attacks and enemy reactions | **Not met.** Hits flash white, squash and pop; shots are plain shapes. |
+| 7 | Strong visual feedback for attacks and enemy reactions | **Partly (improved in 0.2.0).** Every hit has a brief pause, shake, sparks and a ring; defeated creatures fly off spinning. Shots are still plain shapes apart from the fire shot. |
 | 8 | Five starting hearts and plentiful health recovery | **Met.** 5 hearts; heart pickups, Extra Heal, fruit, 100 coins refill. |
-| 9 | Frequent checkpoints and forgiving respawns | **Met, could be more generous.** Two checkpoint bells in each main stage, one in each bonus stage; a boss arena restarts at its entrance. Respawn keeps coins, notes and keys; no lives, no game over. |
+| 9 | Frequent checkpoints and forgiving respawns | **Met.** Three checkpoint bells in each main stage, two in each bonus stage; a boss arena restarts at its entrance. Respawn keeps coins, notes and keys; no lives, no game over. |
 | 10 | Accessible for children, enjoyable for all ages | **Unproven.** Cozy Mode, Endless hearts, hold-to-attack and captions exist. No child or adult has play-tested it. |
-| 11 | Fully animated Tato with no extra limbs | **Not met.** Two wings and two feet in every frame, but few frames; see `DEVELOPMENT_STATUS.md` section 7. |
-| 12 | Beautiful layered environments across all six worlds | **Not met.** Three flat generated layers per world. |
+| 11 | Fully animated Tato with no extra limbs | **Partly.** Two wings and two feet in every frame. Idle, walk, run, jump, fall, land, attack, pickup and hurt animations exist, but the added frames are re-posed copies, not new drawings. |
+| 12 | Beautiful layered environments across all six worlds | **Not met.** Three layers per world; one tree shape recoloured across worlds. |
 
 ## Character rule (unchanged, absolute)
 

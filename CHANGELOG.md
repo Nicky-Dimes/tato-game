@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.2.0 — 2026-11-11
+## 0.2.0 — 2026-11-10
 
 - Overhaul v1 merged into `main`.
 - Hits feel solid: a blink of hit-pause, a small shake, sparks and a ring on every hit;
@@ -14,7 +14,7 @@
   launched and ran a stage. Windows and Linux files were built but not run.
 - README screenshots.
 
-## Overhaul v1 merged — 2026-11-11 (branch `overhaul-v1`)
+## Overhaul v1 merged — 2026-11-10 (branch `overhaul-v1`)
 
 ChatGPT's `TATO_PRODUCTION_OVERHAUL_V1.zip` brought in as received, then checked in Godot
 (ChatGPT could not run it): clean import, 122 files load, 39 of 39 tests pass, all six

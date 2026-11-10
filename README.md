@@ -10,7 +10,8 @@ Plays in a browser (including iPad and iPhone), and on Windows, macOS and Linux.
 > **Status (2026-11-10): development is paused for an art, animation and gameplay
 > overhaul.** Read [`DEVELOPMENT_STATUS.md`](DEVELOPMENT_STATUS.md) for what is built,
 > tested and still weak, [`UPDATED_GAMEPLAY_REQUIREMENTS.md`](UPDATED_GAMEPLAY_REQUIREMENTS.md)
-> for the direction, [`PROJECT_ARCHITECTURE.md`](PROJECT_ARCHITECTURE.md) for how the code
+> for the direction, [`GODOT_SETUP_FOR_CHATGPT.md`](GODOT_SETUP_FOR_CHATGPT.md) for the exact engine and
+> the one-command check, [`PROJECT_ARCHITECTURE.md`](PROJECT_ARCHITECTURE.md) for how the code
 > works, and [`CHATGPT_HANDOFF.md`](CHATGPT_HANDOFF.md) for how to change it safely.
 
 ## Screenshots

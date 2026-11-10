@@ -1,208 +1,190 @@
-# TATO! — Handoff notes for ChatGPT
+# TATO! — Handoff notes for ChatGPT (round two)
 
-You are receiving the real, current TATO! project (Godot 4.7.2, GDScript) for an art,
-animation, gameplay and quality overhaul. Claude will take the project back afterwards,
-merge your work and finish the game. These notes are meant to make your changes drop in
-cleanly.
+This is the real, current TATO! project (Godot 4.7.2, GDScript), version 0.2.0. It
+already contains everything from your first pass (`TATO_PRODUCTION_OVERHAUL_V1`),
+tested and merged, plus the work done since. Claude takes the project back afterwards.
 
 The Godot project is the `game/` folder. Open `game/project.godot`.
 
-## 1. Read these first, in this order
+**New this round: you can run it.** `GODOT_SETUP_FOR_CHATGPT.md` gives the exact engine
+version, the official download, and one command (`tools/check.sh`) that imports the
+project, loads every file and runs all 39 tests.
 
-1. `UPDATED_GAMEPLAY_REQUIREMENTS.md` — what the game must be.
-2. `DEVELOPMENT_STATUS.md` — what exists, what is weak, what is untested.
-3. `PROJECT_ARCHITECTURE.md` — how the code is organised and what is fragile.
-4. `assets/reference/` — the owner's eight approved art boards. **This is the art
-   direction.** Tato's look comes from `approved_concept_sheet.png`,
-   `refined_game_sheet.png`, `movement_anatomy_sheet.png` and `direction_sheet.png`.
-5. `docs/art/*.png` — contact sheets of every picture currently in the game, so you can
-   see today's art at a glance (`tato_contact_sheet.png` is all of Tato's frames).
+## 1. What happened to round one
 
-Then the code that matters most for the overhaul:
+Brought in unchanged, then run in Godot for the first time: clean import, every file
+loads, 39 of 39 tests pass, all six worlds seen on screen. Nothing of yours was removed.
+
+Kept and working:
+
+- 34 Tato frames and the longer animation table (idle, jump, fall, land, attack,
+  pickup, hurt), landing and attack states.
+- Four motion frames per creature and boss with frame switching, bob, recoil, squash.
+- PNG tile atlases, HUD backplates, the fire shot and effect changes.
+- PNG parallax layers for the six worlds.
+
+Fixed after the merge:
+
+- **The parallax layers did not repeat.** Trees were cut in half and hills stepped at
+  every repeat (left and right edges did not match). `backdrop.gd` now doubles any
+  such layer with a mirrored copy. New layers should simply be seamless.
+
+Honest assessment, agreeing with your own README:
+
+- Tato's new frames are re-posed copies of the earlier drawings (rotated, squashed,
+  reused), not new animation drawings.
+- Creature and boss frames are the same picture slightly warped.
+- The backgrounds use one tree shape recoloured for every world (pink in Candy, purple
+  in Castle with plain box houses) and have stair-stepped edges when enlarged. They are
+  not yet better than the generated layers they replaced.
+
+Added by Claude since (version 0.2.0):
+
+- Hit-pause, shake, sparks and a ring on every hit; defeated creatures fly off spinning.
+- Creatures far from Tato rest until he comes near.
+- One more checkpoint per stage; web, macOS, Windows and Linux exports build.
+- A screenshot option for the desktop build and `tools/check.sh`.
+
+## 2. What is still missing (the owner's list, unchanged)
+
+Read `UPDATED_GAMEPLAY_REQUIREMENTS.md`. In priority order:
+
+1. **Tato drawn as real animation**: distinct key poses for idle, walk, run, jump,
+   fall, land, attack and hurt, with consistent wing anatomy. He stays a fluffy white
+   baby goose with big eyes, rosy cheeks, tiny wings and orange feet, with **exactly
+   two wings and two legs in every frame**.
+2. **Creatures and bosses drawn in more than one pose** (move, attack, hurt, defeat).
+3. **Attack and projectile art.** Only the fire shot has been improved.
+4. **Backgrounds**: distinct, layered scenery per world, seamless left to right.
+5. **Tiles, platforms, props**: the small world pieces are 40–60 px in the source.
+6. **Stage design**: built from repeating chunks; flat stretches; little surprise.
+7. **Interface art** beyond the two HUD plates (buttons, panels, menus).
+
+The approved art direction is the eight boards in `assets/reference/`. Screenshots of
+the game as it looks now are in `docs/screenshots/` and `docs/art/overhaul_v1_*.png`.
+
+## 3. Where things are
 
 | What | File |
 |---|---|
 | Tato's animation table and drawing | `game/scripts/player/tato_visual.gd` |
 | Tato's movement, attack, hurt | `game/scripts/player/tato.gd` |
-| Creature numbers and which picture each uses | `game/scripts/enemies/enemy_data.gd` |
-| Creature base behaviour and how its picture is shown | `game/scripts/enemies/enemy.gd` (+ `walker.gd`, `flyer.gd`, `mole.gd`) |
+| Creature numbers | `game/scripts/enemies/enemy_data.gd` |
+| Creature behaviour, frame switching, hit feedback | `game/scripts/enemies/enemy.gd` (+ `walker.gd`, `flyer.gd`, `mole.gd`) |
 | Bosses | `game/scripts/bosses/boss.gd` |
-| Shots (drawn in code) | `game/scripts/components/projectile.gd`, function `_draw()` |
-| Hit bursts, sparkles, floating text | `game/scripts/core/fx.gd` |
+| Shots (drawn in code) | `game/scripts/components/projectile.gd`, `_draw()` |
+| Bursts, sparkles, rings, floating text | `game/scripts/core/fx.gd` |
 | The 12 powers | `game/scripts/food/abilities/*.gd`, numbers in `game/data/foods/*.tres` |
-| Backgrounds | `game/scripts/level/backdrop.gd` |
-| Terrain drawing | `game/scripts/level/terrain.gd`, atlas layout in `tools/art/art_tiles.py` |
+| Backgrounds (and the mirror fix) | `game/scripts/level/backdrop.gd` |
+| Terrain drawing | `game/scripts/level/terrain.gd`; atlas layout in `tools/art/art_tiles.py` |
 | Stage layouts | `tools/build_levels.py` → `game/data/levels/*.txt` |
-| Interface look | `game/scripts/ui/ui_theme.gd`, `hud.gd`, `touch_controls.gd` |
+| Interface | `game/scripts/ui/ui_theme.gd`, `hud.gd`, `touch_controls.gd` |
 
-## 2. What needs the most improvement (in priority order)
+`PROJECT_ARCHITECTURE.md` explains how each system works and what is fragile.
+`DEVELOPMENT_STATUS.md` says what is tested and what is not.
 
-1. **Tato's animation.** Few frames, several states borrow frames, no idle, no blink, no
-   landing, no attack pose, wing shape varies. He must stay a fluffy white baby goose
-   with big eyes, rosy cheeks, tiny wings and orange feet, with **exactly two wings and
-   two legs in every frame**.
-2. **Creatures and bosses do not animate at all.** One still picture each; they slide.
-3. **Attack and hit feedback.** Shots are plain shapes; hits only flash and squash.
-4. **Backgrounds.** Three flat generated layers per world.
-5. **Tiles, platforms and props.** Generated autotile; props are tiny and soft.
-6. **Stage design.** Built from repeating chunks; flat stretches; little surprise.
-7. **Interface art.** Flat code-built panels and buttons.
-8. **Boss presentation** and the nearly empty **Home Nest**.
+## 4. Art contracts (as the code works today)
 
-## 3. Where the art lives and the exact rules for replacing it
+### Tato — `game/assets/sprites/tato/*.png` (70 files)
 
-All game pictures are under `game/assets/`. Sizes below are today's files.
+- Loaded by file name from this folder. **192×192 px, transparent, facing right, feet
+  at x = 96, y = 168** (`ANCHOR`, `SPRITE_SCALE = 0.76` in `tato_visual.gd`).
+- For sharper art, 384×384 with feet at (192, 336) works if `ANCHOR` becomes
+  `Vector2(192, 336)` and `SPRITE_SCALE` 0.38. Every frame must share one size.
+- Animations are the `ANIMS` table: `"name": [[frame names], frames per second, loop]`.
+  In use now: `idle` (idle_0..5), `walk` (walk_0..4 + walk_extra_0..2), `run`
+  (run_0..4 + run_extra_0..2), `jump` (jump_start_0..2), `fall` (fall_0..2), `land`
+  (land_0..3), `attack` and `honk` (attack_0..3), `eat` (pickup_0..3), `hurt`
+  (hurt_0..3), plus glide, flap, crouch, slide, swim, cheer, roll.
+- Redrawing a frame under its existing name needs no code change.
 
-### Tato — `game/assets/sprites/tato/*.png` (36 files)
+### Creatures — `game/assets/sprites/enemies/`
 
-- Loaded by `TatoVisual.frame_texture()` straight from this folder by file name.
-- **Every frame: 192×192 px, transparent, facing right, feet resting at x = 96, y = 168.**
-  The constants are `ANCHOR` and `SPRITE_SCALE` (0.76) in `tato_visual.gd`.
-- To redraw a frame, keep its file name and that geometry.
-- For sharper art you may use 384×384 with feet at (192, 336); then `ANCHOR` must become
-  `Vector2(192, 336)` and `SPRITE_SCALE` 0.38. All frames must share one size.
-- To add frames, add PNGs with new names (suggested: `idle_0..3`, `blink_0`, `fall_0..1`,
-  `land_0..2`, `attack_0..2`, `hurt_0`, `swim_0..3`, `turn_0`) and list them in the
-  `ANIMS` table at the top of `tato_visual.gd`. One line per animation:
-  `"walk": [["walk_0", "walk_1", ...], frames_per_second, loop]`.
-- Names the game already asks for: `idle, look, walk, run, jump, fall, glide, flap,
-  crouch, slide, swim, honk, eat, hurt, cheer, ball, roll, curl, float, climb, stretch,
-  charge`. "honk" is the attack pose.
-- There is no landing animation state yet; adding one needs a small code change in
-  `tato.gd` (`anim_hint()`) — do it or leave a note and Claude will.
+- Base picture `<kind>.png`; motion frames `anim/<kind>_0.png` … `_3.png`.
+- `enemy.gd` cycles the four frames by time (faster while moving) and falls back to the
+  base picture if a frame is missing. All frames of one creature must share one canvas
+  size, feet on the bottom edge, centred.
+- The game scales to the height `h` in `EnemyData.STATS`, so resolution is free. Aim
+  for about twice the on-screen height (46–86 px on screen).
+- `faces` in `EnemyData.STATS`: which way the picture looks (1 right, −1 left).
+- There are no separate attack, hurt or defeat frames yet. If you draw them, name them
+  `anim/<kind>_attack_0..n.png`, `anim/<kind>_hurt_0.png`, `anim/<kind>_defeat_0..n.png`
+  and wire them in `enemy.gd`, or leave a note.
 
-### Creatures — `game/assets/sprites/enemies/<kind>.png` (21 files, 68–95 px tall)
+### Bosses — `game/assets/sprites/bosses/`
 
-- One picture per creature, drawn standing with its feet on the bottom edge, centred.
-- The game scales it to the height `h` in `EnemyData.STATS` (46–86 px on screen), so any
-  resolution works. Aim for about 2× the on-screen height.
-- `faces` in `EnemyData.STATS` says which way the picture looks (1 right, −1 left).
-- **Animation is not wired.** If you draw frames, please use this naming so they can be
-  hooked up without guessing, and keep one canvas size per creature:
-  `<kind>_idle_0.png`, `<kind>_move_0..n.png`, `<kind>_attack_0..n.png`,
-  `<kind>_hurt_0.png`, `<kind>_defeat_0..n.png`. Keep `<kind>.png` as the base picture.
-  The sprite is created in `enemy.gd` (`sprite = Art.standing("enemies/" + kind)`).
+- Same scheme: `<id>.png` and `anim/<id>_0..3.png`. Sources are 124–145 px tall and are
+  shown 170–215 px tall, so they are enlarged and soft. Aim for 400–512 px tall.
 
-### Bosses — `game/assets/sprites/bosses/<id>.png` (6 files, 124–145 px tall)
+### Backgrounds — `game/assets/sprites/bg/<theme>_{clouds,far,mid}.png`
 
-- Shown 170–215 px tall, so today they are enlarged and soft. Aim for 400–512 px tall.
-- Same naming idea for frames: `<id>_idle_0`, `<id>_warn_0`, `<id>_attack_<name>_0..n`,
-  `<id>_hurt_0`, `<id>_defeat_0..n`. Attack names are in `Boss.DATA`.
+- Themes: `grassland, orchard, candy, icy, windy, castle` (and `nest`, still SVG).
+- 1024 px wide today (clouds 280 tall, far 420, mid 380), transparent above the skyline.
+- **Must repeat left to right with matching edges.** Wider (2048) is fine and reduces
+  visible repetition.
+- Sky colours: `SKIES` in `backdrop.gd`. One more layer is one more `_add_layer(...)`.
 
-### Items, pickups, power icons, touch buttons
+### Terrain atlases — `game/assets/tiles/tiles_<theme>.png`
 
-- `sprites/items/`, `sprites/pickups/`, `sprites/powers/`, `sprites/ui/`.
-- Sized in code, so same name at any resolution is a safe replacement.
+- 512×960: 8 columns × 15 rows of 64 px sub-tiles; four sub-tiles make one 64 px cell.
+  Layout is in the comment at the top of `tools/art/art_tiles.py`. `terrain.gd` uses
+  the PNG when present and the SVG otherwise.
 
-### World pieces — `game/assets/sprites/world/<world>_<part><n>.png`
+### HUD — `game/assets/sprites/ui/hud_left.png`, `hud_right.png`
 
-- Tiles, hazards, props, flags, signposts, bowls and treats cut from the world board.
-  Which file plays which role is the `KITS` table in `game/scripts/core/world_kit.gd`.
-- Only the files named `_tile`, `_hazard`, `_prop`, `_flag`, `_sign`, `_bowl`, `_gem`
-  are used. Files named `_a`, `_b`, `_c` are leftovers from an earlier cut.
+- Stretched to fixed rectangles in `hud.gd`. Known issues: the right plate is much
+  wider than its contents, and pop-up messages overlap its corner.
 
-### Backgrounds — `game/assets/sprites/bg/<theme>_{clouds,far,mid}.svg`
+### Everything else
 
-- Themes: `grassland, orchard, candy, icy, windy, castle, nest`. (`picnic_*` is unused.)
-- Each is 1024×420, transparent above the skyline, **tiles left-to-right** (seamless).
-- A PNG with the same base name in the same folder (or in `sprites/override/`) is used
-  instead of the SVG automatically.
-- Sky colours are the `SKIES` table in `backdrop.gd`. A fourth or fifth layer is one
-  more `_add_layer(...)` line there.
+- Items, pickups, power icons, touch buttons, world pieces: same name at any
+  resolution is a safe replacement (they are sized in code).
+- `game/assets/sprites/override/<folder>_<name>.png` replaces any picture loaded
+  through `Art.tex` without code changes. It does not apply to Tato's frames or the
+  terrain atlases.
+- Shots are drawn in code by `look` name: `fire, ice, bubble, honey, melon, kernel,
+  tomato, arrow, bolt`. Picture-based shots would go in `game/assets/sprites/fx/`.
 
-### Terrain atlases — `game/assets/tiles/tiles_<theme>.svg`
-
-- 512×960 px: 8 columns × 15 rows of 64 px sub-tiles; four sub-tiles make one 64 px
-  cell. Three materials (ground rows 0–4, blocks rows 5–9, ice rows 10–14). The exact
-  layout is in the comment at the top of `tools/art/art_tiles.py`.
-- The `.svg` extension is written in `terrain.gd` (`_build_tiles()`). A PNG atlas with
-  the same layout works after changing that one path.
-- The older atlases `tiles_{picnic,farm,fair,market,marsh,kitchen}.svg` are unused.
-
-### Effects and shots
-
-- No picture files today. Shots are drawn in `projectile.gd` `_draw()` by a `look` name:
-  `fire, ice, bubble, honey, melon, kernel, tomato, arrow, bolt`. Bursts are in `fx.gd`.
-- If you draw effect art, put it in a new folder `game/assets/sprites/fx/` named after
-  the look (`fx/fire_0.png` …) and either wire it or note it.
-
-### The `override` folder
-
-`game/assets/sprites/override/<folder>_<name>.png` replaces a picture without code
-changes and leaves the original in place. It works for everything loaded through
-`Art.tex` (creatures, bosses, items, pickups, icons, world pieces, backgrounds, cards).
-It does **not** apply to Tato's frames or the terrain atlases.
-
-## 4. Decisions that must be preserved
+## 5. Decisions that must be preserved
 
 - Godot 4.7.2, GDScript, Compatibility renderer, single-threaded web export.
 - One active food power; a new pickup replaces it. Five hearts. Three buttons.
-- No lives and no game over; checkpoints give everything back.
-- Stages are text files built at run time by `Level` + `EntityFactory`. No per-stage
-  scenes.
-- All damage goes through `Hit` and `take_hit(damage, info)`.
-- Pictures are found by short name through `Art`; input goes through the actions in
-  `Controls`; progress goes through `GameState`; saves through `SaveService`.
-- Save files: if you add a profile field, add its default in
-  `SaveService.new_profile()` so old saves still load.
-- Tato: two wings, two legs, always.
-- Nothing is published or made public. No licence has been chosen.
-- The tests in `game/tests/` should keep passing, or be changed on purpose with a note.
+- No lives, no game over. Tato: two wings, two legs, always.
+- Stages are text files built at run time; all damage goes through `Hit` /
+  `take_hit(damage, info)`; pictures through `Art`; input through `Controls`;
+  progress through `GameState`; saves through `SaveService` (new profile fields need a
+  default in `new_profile()`).
+- Reduced Motion must keep switching off spins, pauses and flashes you add.
+- Nothing is published. No licence has been chosen.
+- The tests should keep passing, or be changed on purpose with a note saying why.
 
-## 5. Things that will break the project if done casually
+## 6. Things that break the project if done casually
 
-- **Do not delete, rename or hand-write `.import` or `.uid` files.** New files you add
-  will get theirs when Godot next opens the project; that is fine.
-- **Do not rename or move existing files or folders.** Code finds them by path.
-- Do not rename `class_name` classes or the autoloads in `project.godot`.
+- Do not delete, rename or hand-write `.import` or `.uid` files. Do not rename or move
+  existing files or folders, `class_name` classes, or autoloads.
 - Do not re-run the generators unless you mean to overwrite their output:
-  `tools/art/extract_tato.py`, `tools/art/extract_sheets.py`, `tools/art/make_art.py`
-  (pictures), `tools/build_levels.py` (all stage files),
-  `tools/audio/make_audio.mjs` (all audio).
-- **Stage files are generated.** To change stages, edit the chunks and stage lists in
-  `tools/build_levels.py` and re-run it, or hand-edit `game/data/levels/<id>.txt` and
-  say so in your change list so the builder is not run over it.
-- Each stage needs exactly three Treasure Notes (`n`), a start `@` and a goal `E`;
-  non-boss stages also need one hidden Star (`*`), a checkpoint and a food bowl. A jump clears two tiles;
-  three needs a flap. Gaps up to four tiles are comfortable.
-- Keep the game light for 2018–2019 iPhones and iPads. Guidelines, not measured limits:
-  Tato frames up to 384 px, creature frames up to about 256 px tall, bosses up to 512,
-  background layers up to 2048×1024, no full-screen shaders, no large particle counts.
-- GDScript here uses static typing and tabs. If Godot cannot be run to check a script,
-  keep code edits small and say which ones were not run.
-
-## 6. Please preserve, do not replace in place where avoidable
-
-The owner wants today's artwork kept as reference even where it will be replaced.
-Preferred: put new pictures in `sprites/override/` or under new file names, so the
-originals stay. Where a file must be overwritten (Tato's frames, tile atlases), that is
-acceptable: the originals are also kept in this ZIP and in Claude's Git history at tag
-`handoff-2026-11-10`.
-
-Do not remove content that looks unfinished or unused. List it instead.
+  `tools/art/extract_tato.py`, `extract_sheets.py`, `make_art.py`,
+  `tools/build_levels.py` (rewrites every stage file), `tools/audio/make_audio.mjs`.
+  **`make_art.py` and the extract scripts would not touch your PNG backgrounds, tiles
+  or `anim/` frames, but they do rewrite the base creature pictures and Tato's original
+  frames.**
+- Stage files are generated: change `tools/build_levels.py` and re-run it, or hand-edit
+  a stage and say so. Each stage needs exactly three Treasure Notes, a start and a
+  goal; non-boss stages also need one hidden Star, a checkpoint and a food bowl. A jump
+  clears two tiles; three needs a flap.
+- Keep it light for 2018–2019 iPhones and iPads (guidelines, not measured limits):
+  Tato frames up to 384 px, creature frames about 256 px tall, bosses up to 512,
+  background layers up to 2048×1024, no full-screen shaders or heavy particles.
 
 ## 7. What to send back
 
-1. **The whole project folder, zipped, with the same structure** (not only the changed
-   files).
-2. A file at the top level named `CHANGES_FROM_CHATGPT.md` listing:
-   - every file added, changed or removed, with a line saying why;
-   - which script changes were actually run in Godot and which were not;
-   - new art and the sizes / anchor points used;
-   - anything left for Claude to wire up (for example creature animation frames);
-   - any change to gameplay rules, numbers or stage files.
-3. Please do not reformat or reorder code you are not changing, so the differences can
-   be compared line by line.
+1. The whole project folder zipped, same structure, **without `game/.godot/`**.
+2. `CHANGES_FROM_CHATGPT.md` at the top level: every file added or changed and why;
+   new art with sizes and anchor points; anything left for Claude to wire; any change
+   to gameplay rules, numbers or stages.
+3. **The output of `tools/check.sh`**, pasted into that file. If Godot could not be
+   run, say so plainly and say which script edits were therefore not executed.
+4. Please do not reformat code you are not changing.
 
-## 8. How Claude checked this snapshot
-
-On 2026-11-10, with Godot 4.7.2 on macOS:
-
-```
-godot --headless --path game --import                                   exit 0, no errors or warnings
-godot --headless --path game res://tools/CheckScripts.tscn              121 files, 0 problems
-godot --headless --fixed-fps 60 --path game res://tests/TestRunner.tscn 39 passed, 0 failed
-```
-
-The same three commands were then repeated on a fresh copy unpacked from the handoff
-ZIP (results in `DEVELOPMENT_STATUS.md`, section "Handoff verification").
+Today's artwork is preserved in this ZIP and in Claude's Git history at tag
+`handoff-2-2026-11-10`, so replacing files in place is acceptable.
