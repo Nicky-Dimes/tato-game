@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="RecipeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/food/recipe_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"THUNDERCLOUD"
+food_a = &"PASTRY"
+food_b = &"TRUFFLE"
+display_name = "Thundercloud"
+description = "Ride a rumbling cloud whose booms wake giant bells."
+color = Color(0.5569, 0.4824, 0.8392, 1)
+accent = Color(1.0000, 0.9451, 0.8627, 1)
+ability_script = "res://scripts/food/abilities/thundercloud.gd"
+charge_cost = 38.0
+duration = 8.00
+cooldown = 1.00
+tags = PackedStringArray("cloud", "resonance")
+named = true
+icon_path = "res://assets/sprites/recipes/thundercloud.svg"

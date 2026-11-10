@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="RecipeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/food/recipe_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"TAFFY_BALLOON"
+food_a = &"BUBBLE"
+food_b = &"HONEY"
+display_name = "Taffy Balloon"
+description = "A stretchy taffy line that tugs hanging platforms closer."
+color = Color(1.0000, 0.6196, 0.7686, 1)
+accent = Color(1.0000, 0.8784, 0.5412, 1)
+ability_script = "res://scripts/food/abilities/taffy_balloon.gd"
+charge_cost = 30.0
+duration = 5.00
+cooldown = 0.80
+tags = PackedStringArray("bubble", "sticky", "pull")
+named = true
+icon_path = "res://assets/sprites/recipes/taffy_balloon.svg"

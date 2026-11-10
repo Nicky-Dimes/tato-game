@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="FoodDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/food/food_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"PEPPER"
+display_name = "Spicy Pepper"
+ability_name = "Fire Honk"
+description = "A warm, crackly honk. Melts wax and ice, lights braziers and spins pinwheels."
+risk = "Too hot for ice bridges, and it wakes sleepy pollen."
+color = Color(0.9412, 0.2706, 0.1804, 1)
+accent = Color(1.0000, 0.7216, 0.1176, 1)
+icon_path = "res://assets/sprites/foods/pepper.svg"
+shape_hint = "flame"
+ability_script = "res://scripts/food/abilities/pepper.gd"
+charge_cost = 14.0
+duration = 0.40
+cooldown = 0.45
+tags = PackedStringArray("heat", "honk")
+unlock_world = 1
+blend_adjective = "Spicy"
+blend_noun = "Sizzle"
+honk_sound = "honk_fire"

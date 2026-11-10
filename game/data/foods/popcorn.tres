@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="FoodDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/food/food_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"POPCORN"
+display_name = "Popcorn"
+ability_name = "Pop Bounce"
+description = "Boing! Every landing pops Tato higher. Pops sealed pods too."
+risk = "Gusts push a bouncing goose around."
+color = Color(1.0000, 0.8471, 0.2902, 1)
+accent = Color(1.0000, 0.9647, 0.8157, 1)
+icon_path = "res://assets/sprites/foods/popcorn.svg"
+shape_hint = "burst"
+ability_script = "res://scripts/food/abilities/popcorn.gd"
+charge_cost = 18.0
+duration = 7.00
+cooldown = 0.50
+tags = PackedStringArray("pop", "impact")
+unlock_world = 3
+blend_adjective = "Poppin'"
+blend_noun = "Pop"
+honk_sound = "honk_pop"

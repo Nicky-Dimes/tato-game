@@ -1,0 +1,21 @@
+{
+	"move": "Waddle with {move_left} and {move_right}. Keep going to break into a run!",
+	"jump": "Press {jump} to jump. Hold it longer to jump higher.",
+	"flap": "In the air, press {jump} again to flap. Three flaps, then hold it to glide.",
+	"honk": "Press {honk_primary} to HONK. Honks ring chimes and shake treats out of bushes.",
+	"eat": "Stand by a snack bowl and press {eat_interact} to eat. Snacks give Tato powers!",
+	"power": "With a snack in your pocket, {honk_primary} uses its power instead of a plain honk.",
+	"swap": "{ability_swap} swaps between pocket A, pocket B and a plain honk.",
+	"fuse": "Two different snacks? Press {fusion} to fuse them into a recipe.",
+	"slide": "Hold {move_down} while running to belly-slide. Wheee!",
+	"drop": "On thin planks, hold {move_down} and press {jump} to drop through.",
+	"swim": "Tato floats! Paddle with {move_left} and {move_right}, and {jump} hops out.",
+	"station": "A snack station! Touch it to rest. If Tato gets bonked too often, you come back here.",
+	"pepper": "Spicy Pepper makes a Fire Honk. Warm things up: wax melts, braziers light.",
+	"bubble": "Bubbleberry makes a Bubble Float. Drift up, steer, and press {jump} to pop out.",
+	"updraft": "Warm air rises. A bubble in warm air goes up, up, up!",
+	"steam": "Carry Pepper AND Bubbleberry, then press {fusion}: Steam Lift!",
+	"thorns": "Brambles are prickly. They pop bubbles, too.",
+	"exit": "Ring the golden dinner bell to finish the stage.",
+	"hint": "Stuck? Press {hint} for the Hint Nest. It never costs anything."
+}

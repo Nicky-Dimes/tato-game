@@ -1,0 +1,32 @@
+# Godot
+.godot/
+.import/
+*.translation
+export_credentials.cfg
+
+# Builds (made by tools/build.sh or CI; never committed)
+build/
+dist/
+public/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+*.tmp
+*.bak
+*.log
+.vscode/
+.idea/
+
+# Secrets
+.env
+.env.*
+!*.example
+
+# iCloud / sync duplicates
+* 2.*
+* 3.*
+
+# Python
+__pycache__/
+*.pyc

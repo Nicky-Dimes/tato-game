@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="FoodDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/food/food_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"JAM"
+display_name = "Starberry Jam"
+ability_name = "Jam Trail"
+description = "Paint sketched outlines with jam to make them real for a while."
+risk = "Rain washes jam away."
+color = Color(0.8784, 0.2196, 0.6039, 1)
+accent = Color(1.0000, 0.7608, 0.8941, 1)
+icon_path = "res://assets/sprites/foods/jam.svg"
+shape_hint = "star"
+ability_script = "res://scripts/food/abilities/jam.gd"
+charge_cost = 18.0
+duration = 7.00
+cooldown = 0.50
+tags = PackedStringArray("paint")
+unlock_world = 5
+blend_adjective = "Jammy"
+blend_noun = "Smear"
+honk_sound = "honk_jam"

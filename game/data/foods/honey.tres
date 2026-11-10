@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="FoodDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/food/food_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"HONEY"
+display_name = "Honeycomb"
+ability_name = "Sticky Waddle"
+description = "Sticky feet! Waddle up walls and across ceilings."
+risk = "Water rinses the stickiness away."
+color = Color(0.9608, 0.6510, 0.1373, 1)
+accent = Color(1.0000, 0.8784, 0.5412, 1)
+icon_path = "res://assets/sprites/foods/honey.svg"
+shape_hint = "hexagon"
+ability_script = "res://scripts/food/abilities/honey.gd"
+charge_cost = 18.0
+duration = 8.00
+cooldown = 0.50
+tags = PackedStringArray("sticky")
+unlock_world = 2
+blend_adjective = "Sticky"
+blend_noun = "Goo"
+honk_sound = "honk_sticky"

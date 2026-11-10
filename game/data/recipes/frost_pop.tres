@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="RecipeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/food/recipe_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"FROST_POP"
+food_a = &"FROST"
+food_b = &"POPCORN"
+display_name = "Frost Pop"
+description = "Rapid bounces that freeze puddles wherever Tato lands."
+color = Color(0.6471, 0.9412, 1.0000, 1)
+accent = Color(1.0000, 0.8471, 0.2902, 1)
+ability_script = "res://scripts/food/abilities/frost_pop.gd"
+charge_cost = 32.0
+duration = 7.00
+cooldown = 0.80
+tags = PackedStringArray("pop", "cold")
+named = true
+icon_path = "res://assets/sprites/recipes/frost_pop.svg"

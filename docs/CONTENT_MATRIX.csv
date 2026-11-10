@@ -1,0 +1,32 @@
+World,Stage_ID,Stage_Name,Category,Core_Technique,New_Food_or_Recipe,Boss_or_Reward
+0,HUB,Home Nest,Hub,Recipe book and world portal,Recipe notebook,Hub access
+1,W1-L1,The Missing Muffin,Core,Movement honk eat,PEPPER,Tutorial
+1,W1-L2,Berry Breeze,Core,Bubble traversal,BUBBLE,Checkpoint
+1,W1-L3,The Warm Windmill,Core,Thermal puzzle,Steam Lift,Windmill
+1,W1-X,Crumb Chase,Optional,Time and shortcuts,None,Goose Pin
+1,W1-B,Puddle Puffer,Finale,Airflow redirect,PEPPER+BUBBLE,Golden Crumb Page
+2,W2-L1,Sticky Situation,Core,Wall walk,HONEY,Checkpoint
+2,W2-L2,Rolling Harvest,Core,Weighted switches,MELON,Checkpoint
+2,W2-L3,The Barn That Turned Sideways,Core,Sticky rolling,Caramel Coat,Shortcut
+2,W2-X,The Great Rolling Race,Optional,Rolling control,Sticky Bowling,Goose Pin
+2,W2-B,Barrelback,Finale,Weight and gum wheels,HONEY+MELON,Amber Glaze Page
+3,W3-L1,A Slippery Welcome,Core,Freeze path,FROST,Checkpoint
+3,W3-L2,Pop Goes the Platform,Core,Bounce rhythm,POPCORN,Checkpoint
+3,W3-L3,The Carousel of Cold,Core,Cold and bounce,Frost Pop,Shortcut
+3,W3-X,Endless Bounce,Optional,Vertical platforming,None,Goose Pin
+3,W3-B,Whirligig,Finale,Frozen motion,Melon+Frost,Frosted Sugar Page
+4,W4-L1,Market Detour,Core,Reach and grab,NOODLE,Checkpoint
+4,W4-L2,Lantern Labyrinth,Core,Light puzzle,CITRUS,Checkpoint
+4,W4-L3,The Longest Noodle,Core,Tether traversal,Noodle+Honey,Shortcut
+4,W4-X,Chef's Secret Alley,Optional,Light redirection,Citrus+Frost,Goose Pin
+4,W4-B,The Twin Teapots,Finale,Spatial dual mechanisms,NOODLE+CITRUS,Tangy Spark Page
+5,W5-L1,A Very Quiet Honk,Core,Sound stealth,MINT,Checkpoint
+5,W5-L2,Painted Paths,Core,Temporary paths,JAM,Checkpoint
+5,W5-L3,The Whispering Bog,Core,Silent paint,Quiet Ink,Shortcut
+5,W5-X,Glow Trail Hunt,Optional,Stealth and route planning,None,Goose Pin
+5,W5-B,The Echo Owl,Finale,Harmony maze,MINT+JAM,Midnight Berry Page
+6,W6-L1,The Quiet Gate,Core,Heavy resonance,TRUFFLE,Checkpoint
+6,W6-L2,Cloud Oven Climb,Core,Temporary clouds,PASTRY,Checkpoint
+6,W6-L3,The Missing Last Note,Core,Multi-recipe sequence,Thundercloud,Shortcut
+6,W6-X,The Perfect Feast Trial,Optional,All-powers test,None,Goose Pin
+6,W6-B,Cloche and the Silent Bell,Finale,Three stage harmony,All unlocked recipes,Hearthsong Page

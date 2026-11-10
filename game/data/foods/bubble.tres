@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="FoodDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/food/food_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"BUBBLE"
+display_name = "Bubbleberry"
+ability_name = "Bubble Float"
+description = "Tato puffs into a bubble and drifts up. Rides warm air even higher."
+risk = "Brambles pop the bubble."
+color = Color(0.3451, 0.7216, 0.9608, 1)
+accent = Color(0.7882, 0.7137, 1.0000, 1)
+icon_path = "res://assets/sprites/foods/bubble.svg"
+shape_hint = "ring"
+ability_script = "res://scripts/food/abilities/bubble.gd"
+charge_cost = 18.0
+duration = 5.00
+cooldown = 0.60
+tags = PackedStringArray("bubble")
+unlock_world = 1
+blend_adjective = "Bubbly"
+blend_noun = "Fizz"
+honk_sound = "honk_bubble"

@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="FoodDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/food/food_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"NOODLE"
+display_name = "Stretchy Noodles"
+ability_name = "Noodle Neck"
+description = "Streeetch! Reach far handles, levers and treats through small openings."
+risk = "Tato stands still for a moment while stretching."
+color = Color(0.9490, 0.7843, 0.4745, 1)
+accent = Color(0.9098, 0.4549, 0.2314, 1)
+icon_path = "res://assets/sprites/foods/noodle.svg"
+shape_hint = "spiral"
+ability_script = "res://scripts/food/abilities/noodle.gd"
+charge_cost = 10.0
+duration = 0.60
+cooldown = 0.35
+tags = PackedStringArray("reach")
+unlock_world = 4
+blend_adjective = "Noodly"
+blend_noun = "Twirl"
+honk_sound = "honk_noodle"

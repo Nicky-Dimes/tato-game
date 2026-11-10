@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="RecipeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/food/recipe_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"CARAMEL_COAT"
+food_a = &"HONEY"
+food_b = &"PEPPER"
+display_name = "Caramel Coat"
+description = "Squirt a stream of honey and bake it into a crunchy bridge."
+color = Color(0.7843, 0.4549, 0.1647, 1)
+accent = Color(1.0000, 0.8235, 0.4784, 1)
+ability_script = "res://scripts/food/abilities/caramel_coat.gd"
+charge_cost = 32.0
+duration = 8.00
+cooldown = 0.80
+tags = PackedStringArray("heat", "sticky", "bridge")
+named = true
+icon_path = "res://assets/sprites/recipes/caramel_coat.svg"

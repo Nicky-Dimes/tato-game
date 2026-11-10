@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="RecipeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/food/recipe_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"STICKY_BOWLING"
+food_a = &"HONEY"
+food_b = &"MELON"
+display_name = "Sticky Bowling"
+description = "A sticky melon ball that rolls up walls and around loops."
+color = Color(0.6078, 0.7725, 0.2392, 1)
+accent = Color(0.9608, 0.6510, 0.1373, 1)
+ability_script = "res://scripts/food/abilities/sticky_bowling.gd"
+charge_cost = 36.0
+duration = 8.00
+cooldown = 0.80
+tags = PackedStringArray("weight", "impact", "sticky")
+named = true
+icon_path = "res://assets/sprites/recipes/sticky_bowling.svg"
