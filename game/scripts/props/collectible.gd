@@ -22,6 +22,15 @@ func _configure() -> void:
 		s.modulate = Color(1, 1, 1, 0.3)
 	var touch := add_touch(Vector2(54, 54))
 	touch.body_entered.connect(_on_touch)
+	add_sense(Vector2(50, 50))
+
+
+## A Noodle Neck can fetch it from far away.
+func on_effect(tag: StringName, _info: Dictionary) -> bool:
+	if tag == &"reach" and level.player != null:
+		_on_touch(level.player)
+		return true
+	return false
 
 
 func _on_touch(body: Node) -> void:

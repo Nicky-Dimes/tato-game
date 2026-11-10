@@ -11,6 +11,15 @@ func _configure() -> void:
 	bob(s, 3.0, 1.2 + fmod(cell.x * 0.37, 0.6))
 	var touch := add_touch(Vector2(44, 44))
 	touch.body_entered.connect(_on_touch)
+	add_sense(Vector2(40, 40))
+
+
+## A Noodle Neck can fetch it from far away.
+func on_effect(tag: StringName, _info: Dictionary) -> bool:
+	if tag == &"reach" and level.player != null:
+		_on_touch(level.player)
+		return true
+	return false
 
 
 func _on_touch(body: Node) -> void:

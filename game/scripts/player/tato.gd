@@ -29,7 +29,7 @@ const AIR_ACCEL := 1150.0
 const AIR_DECEL := 420.0
 const ICE_ACCEL := 420.0
 const ICE_DECEL := 150.0
-const JUMP_VELOCITY := -625.0
+const JUMP_VELOCITY := -690.0     # a held jump clears two tiles with room to spare
 const JUMP_CUT := 0.45
 const GRAVITY := 1500.0
 const FALL_GRAVITY := 1850.0
@@ -76,6 +76,7 @@ var sticky := false                    # honey: cling to walls / ceilings
 var bouncy := false                    # popcorn: every landing bounces
 var noise := 0.0                       # 0 silent .. 1 loud; listening creatures read this
 var hurt_count := 0
+var slide_lock := 0.0                  # keeps a belly slide going (Ice Slide dash)
 
 var _coyote := 0.0
 var _jump_buffer := 0.0
@@ -227,10 +228,11 @@ func _move_normal(delta: float) -> void:
 
 	# --- crouch / belly slide
 	var want_down := move_y > 0.5
+	slide_lock = maxf(slide_lock - delta, 0.0)
 	if floor_now:
 		if sliding:
 			var slow := absf(velocity.x) < 70.0 and absf(get_floor_normal().x) < 0.2
-			if not want_down or slow:
+			if (not want_down and slide_lock <= 0.0) or slow:
 				sliding = false
 		elif want_down and (absf(velocity.x) > 240.0 or absf(get_floor_normal().x) > 0.3):
 			sliding = true
@@ -247,7 +249,10 @@ func _move_normal(delta: float) -> void:
 	if sliding:
 		var n := get_floor_normal() if floor_now else Vector2.UP
 		velocity.x += n.x * GRAVITY * 0.95 * delta
-		velocity.x = move_toward(velocity.x, 0.0, (60.0 if absf(n.x) > 0.2 else 210.0) * delta)
+		var drag := 60.0 if absf(n.x) > 0.2 else 210.0
+		if on_ice:
+			drag = 25.0
+		velocity.x = move_toward(velocity.x, 0.0, drag * delta)
 		velocity.x = clampf(velocity.x, -SLIDE_MAX, SLIDE_MAX)
 		if absf(velocity.x) > 20.0:
 			facing = signf(velocity.x)
@@ -346,6 +351,14 @@ func do_flap() -> void:
 	visual.squash(Vector2(1.12, 0.92))
 	AudioService.play_varied("flap", -5.0, 0.12)
 	Fx.puff(get_parent(), global_position + Vector2(0, -8), Color(1, 1, 1, 0.55), 2)
+
+
+## Starts a belly slide at the given speed that lasts at least `seconds`.
+func force_slide(speed: float, seconds: float) -> void:
+	sliding = true
+	slide_lock = seconds
+	velocity.x = facing * speed
+	visual.squash(Vector2(1.25, 0.78))
 
 
 ## Lets a snack power use up a buffered jump press (true if there was one).

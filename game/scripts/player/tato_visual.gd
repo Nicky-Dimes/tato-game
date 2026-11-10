@@ -55,6 +55,7 @@ var extra_rotation := 0.0   # e.g. wall climbing
 var pivot_height := 0.0     # ball forms rotate around their centre
 var tint := Color.WHITE
 var body_scale := 1.0
+var pose_offset := Vector2.ZERO   # e.g. feet on a wall or ceiling
 
 var _anim := ""
 var _frame_time := 0.0
@@ -155,6 +156,7 @@ func reset_powers() -> void:
 	pivot_height = 0.0
 	tint = Color.WHITE
 	body_scale = 1.0
+	pose_offset = Vector2.ZERO
 	_spin = 0.0
 
 
@@ -220,7 +222,7 @@ func _process(delta: float) -> void:
 	_lean = lerp_angle(_lean, lean_target, clampf(delta * 14.0, 0.0, 1.0))
 
 	_spin = wrapf(_spin + spin_speed * delta, -PI, PI) if spin_speed != 0.0 else 0.0
-	body.position = Vector2(0, bob - pivot_height)
+	body.position = Vector2(0, bob - pivot_height) + pose_offset
 	sprite.position = Vector2(0, pivot_height / maxf(body_scale, 0.01))
 	body.rotation = _lean + extra_rotation + _spin
 	body.scale = s * body_scale

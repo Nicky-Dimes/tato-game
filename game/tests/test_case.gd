@@ -8,6 +8,8 @@ var failures: Array[String] = []
 var checks := 0
 var runner: Node
 
+const ROOM_SKY := 8
+
 
 func before_each() -> void:
 	pass
@@ -91,7 +93,31 @@ func open_text_level(text: String, level_id: String = "UNIT") -> Level:
 	return await open_level(level_id)
 
 
-func place(level: Level, cell_x: float, cell_y: float) -> void:
-	level.player.teleport_to(Vector2((cell_x + 0.5) * Layers.TILE, (cell_y + 1.0) * Layers.TILE), false)
+## Stands Tato in a cell. For rooms made with room(), `row` counts from the
+## first row given to room() (the eight rows of sky are added here).
+func place(level: Level, cell_x: float, row: float, sky_rows: int = ROOM_SKY) -> void:
+	level.player.teleport_to(Vector2((cell_x + 0.5) * Layers.TILE, (row + sky_rows + 1.0) * Layers.TILE), false)
 	level.player.invuln = 0.0
-	await frames(3)
+	level.player.velocity = Vector2.ZERO
+	await frames(4)
+
+
+## Makes level text from map rows; `legend` lines are optional. Eight empty
+## rows of sky are added on top so there is room to jump.
+func room(rows: Array, legend: Array = [], meta: Array = []) -> String:
+	var text := "[meta]\nid = UNIT\ntheme = picnic\nkind = test\n"
+	for m: String in meta:
+		text += m + "\n"
+	text += "[legend]\n"
+	for l: String in legend:
+		text += l + "\n"
+	text += "[map]\n"
+	for i in ROOM_SKY:
+		text += " \n"
+	for r: String in rows:
+		text += r + "\n"
+	return text
+
+
+func floor_y(level: Level, row_in_room: int) -> float:
+	return (ROOM_SKY + row_in_room) * float(Layers.TILE)

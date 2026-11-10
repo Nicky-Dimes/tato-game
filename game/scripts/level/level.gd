@@ -397,6 +397,19 @@ func show_hint_nest() -> void:
 	hud.show_hint(hints)
 
 
+func open_wardrobe() -> void:
+	var panel := WardrobePanel.new()
+	var layer := CanvasLayer.new()
+	layer.layer = 45
+	add_child(layer)
+	layer.add_child(panel)
+	player.set_disabled(true)
+	panel.closed.connect(func() -> void:
+		layer.queue_free()
+		player.set_disabled(false)
+		player.visual.refresh_cosmetics())
+
+
 # ------------------------------------------------------------------ prompts --
 
 func _on_replace_needed(food: StringName) -> void:
