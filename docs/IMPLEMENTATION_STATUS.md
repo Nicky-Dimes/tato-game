@@ -1,5 +1,10 @@
 # TATO! — Implementation status
 
+> **Superseded on 2026-11-10.** The current, accurate status is
+> [`DEVELOPMENT_STATUS.md`](../DEVELOPMENT_STATUS.md) at the top of the project. This
+> file is the older running log, kept unchanged below for history; parts of it are out
+> of date (for example it predates the tests, the audio and the web checks).
+
 Living progress file. Newest facts at the top. `DONE` = built **and** checked the way
 the line says; `BUILT` = code exists but has not been verified yet; `NOT DONE` = still to do.
 

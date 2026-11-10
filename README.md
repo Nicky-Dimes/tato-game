@@ -7,8 +7,11 @@ brings home the six Flavor Pages of the Great Recipe Book.
 **Three buttons: move, jump, attack. One power at a time. Five hearts. No lives.**
 Plays in a browser (including iPad and iPhone), and on Windows, macOS and Linux.
 
-> Status: see [`docs/IMPLEMENTATION_STATUS.md`](docs/IMPLEMENTATION_STATUS.md) for what is
-> built, what has been tested and how, and what is still open. It is kept honest.
+> **Status (2026-11-10): development is paused for an art, animation and gameplay
+> overhaul.** Read [`DEVELOPMENT_STATUS.md`](DEVELOPMENT_STATUS.md) for what is built,
+> tested and still weak, [`UPDATED_GAMEPLAY_REQUIREMENTS.md`](UPDATED_GAMEPLAY_REQUIREMENTS.md)
+> for the direction, [`PROJECT_ARCHITECTURE.md`](PROJECT_ARCHITECTURE.md) for how the code
+> works, and [`CHATGPT_HANDOFF.md`](CHATGPT_HANDOFF.md) for how to change it safely.
 
 ## What is in the game
 

@@ -1,5 +1,11 @@
 # Changelog
 
+## Handoff snapshot — 2026-11-10 (tag `handoff-2026-11-10`)
+
+Development paused for an external art / animation / gameplay overhaul. Added the four
+handoff documents at the top of the project and `game/assets/sprites/override/`.
+No game features changed after the last 0.1.0 work listed below.
+
 ## 0.1.0 — 2026-11-10
 
 First build.
