@@ -236,3 +236,30 @@ A look-at-everything pass on the web build, fixing what it showed:
 
 Nothing is half-edited. The tree was committed after a clean import and a full passing
 test run.
+
+---
+
+## Handoff verification (2026-11-10)
+
+The ZIP is made from the Git commit with `git archive`, so it holds exactly the tracked
+project: 1,259 files, about 38 MB. Left out on purpose because Godot or the build script
+recreates them: `game/.godot/` (import cache), `build/` (exports), `.git/` (history,
+kept on the development Mac).
+
+A copy unpacked from the ZIP into an empty folder was checked with Godot 4.7.2 on macOS:
+
+| Check | Result |
+|---|---|
+| Open the project (`--import`, builds the import cache from nothing) | exit 0, no errors, no warnings |
+| Load every script, scene and resource (`tools/CheckScripts.tscn`) | 121 files, 0 problems |
+| Full test suite (`tests/TestRunner.tscn`) | 39 passed, 0 failed |
+| Run the real game window: title screen, 4 s | no errors |
+| Run the real game window: stage `W1-L1`, 7 s | no errors while running; on the forced quit Godot printed "4 resources still in use at exit" and "8 ObjectDB instances were leaked at exit" (objects alive when the window was closed mid-stage) |
+| Run the real game window: boss stage `W6-B`, 7 s | no errors |
+
+Renderer reported: OpenGL 4.1 (Metal), Compatibility, Apple M1 Pro.
+
+Not verified here, as listed in section 8: Safari, iPhone / iPad, performance on older
+devices, Windows and Linux, a full human play-through, and the sound by ear.
+
+Nothing was removed or hidden to make these checks pass.
