@@ -18,6 +18,7 @@ Chunk letters (besides the built-in terrain / item letters of the level format):
     f F       flying creatures (low, high)        r   ranged creature
     P Q R     food bowls: the world's two powers, and an earlier one
     p q j     charm pickup, fruit pickup, gem     u U  two boost pickups (differ per stage)
+    T         this world's own treat (worlds 2-6; a coin in Grassland)
     N         a Treasure Note spot (three per stage are used, the rest become coins)
     Z         the hidden Star                     D   scenery
     x         a prickly static hazard             M V moving platforms (sideways, up-down)
@@ -69,7 +70,7 @@ C["cp"] = rows("""
 """ % (G(10), G(10), G(10)))
 
 C["flat_coins"] = rows("""
-     ooo
+     oTo
 
    D    a      D
 %s
@@ -115,7 +116,7 @@ C["bowl_r"] = rows("""
 """ % (G(18), G(18), G(18)))
 
 C["steps"] = rows("""
-              ooo
+              oTo
             ######
         ##########
     ##############   a
@@ -169,14 +170,14 @@ C["tower"] = rows("""
 C["tunnel"] = rows("""
      ##############
 
-        c      o o
+        c      oTo
 %s
 %s
 %s
 """ % (G(24), G(24), G(24)))
 
 C["hill"] = rows("""
-          ooo
+          oTo
         /######\\
        /########\\
 %s
@@ -246,7 +247,7 @@ C["lift"] = rows("""
 """ % (G(20), G(20), G(20)))
 
 C["pillars"] = rows("""
-        o     o
+        o     T
 
       ##    ##    ##
       ##    ##    ##
@@ -298,7 +299,7 @@ C["climb"] = rows("""
 """ % (G(24), G(24), G(24)))
 
 C["coin_run"] = rows("""
-   ooo   ooo   ooo   ooo
+   ooo   oTo   ooo   ooo
             w
       f        F
 %s
@@ -737,6 +738,9 @@ def build(stage_id, spec, index):
     if not boss:
         grid = place_notes(grid, stage_id)
     grid = [g.replace("Z", "*") for g in grid]
+    if w["theme"] == "grassland":
+        # Grassland's row on the world board has no treat of its own
+        grid = [g.replace("T", "o") for g in grid]
     if boss:
         # three notes on the arena's ledges
         for (r, c) in ((ROWS - 6, 6), (ROWS - 6, 14), (ROWS - 6, 26)):
@@ -752,7 +756,7 @@ def build(stage_id, spec, index):
         "P = power %s" % w["P"], "Q = power %s" % w["Q"], "R = power %s" % w["R"],
         "p = pickup %s" % w["charm"], "q = pickup %s" % fruit, "j = pickup gem",
         "u = pickup %s" % boost_a, "U = pickup %s" % boost_b,
-        "w = pickup wings", "e = pickup rainbow_star",
+        "w = pickup wings", "e = pickup rainbow_star", "T = pickup treat",
         "D = decor", "x = spiky",
         "M = platform w=2 dx=9 dy=0 t=3 thin", "V = platform w=2 dx=0 dy=-5 t=2.6 thin",
         "1 = sign text=%s" % tips[0], "2 = sign text=%s" % tips[1],

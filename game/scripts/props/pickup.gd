@@ -4,6 +4,7 @@ extends Prop
 ##   coin, heart, extraheal, star, note, key
 ##   pickup <name>   one of the 20 level pickups from the item board:
 ##     gem crystal            treasure (10 / 5 coins)
+##     treat                  this world's own treat from the world board (5 coins)
 ##     flower leaf candy moon sun   charms (2 coins each)
 ##     cherry grape banana corn     fruit: +1 heart if hurt, else 5 coins
 ##     clover        lucky: coins count double for a while
@@ -55,6 +56,10 @@ func _configure() -> void:
 		"pickup":
 			art = "pickups/" + what
 			size = 44.0
+			if what == "treat":
+				# the world's own treat; worlds without one show a crystal
+				art = WorldKit.art(level.theme, "treat") if WorldKit.has_treat(level.theme) else "pickups/crystal"
+				size = 46.0
 	_sprite = Art.icon(art, size)
 	add_child(_sprite)
 	bob(_sprite, 4.0, 1.4 + fmod(cell.x * 0.37, 0.6))
@@ -139,6 +144,9 @@ func _use(item: String, player: Tato, at: Vector2) -> void:
 		Fx.pop_ring(level, at, Color(1, 1, 1), 50.0)
 	if item == "gem":
 		coins = 10
+	elif item == "treat":
+		coins = 5
+		say = str(WorldKit.TREAT_NAMES.get(level.theme, "Treat")) + "!"
 	elif item == "crystal":
 		coins = 5
 	elif CHARMS.has(item):

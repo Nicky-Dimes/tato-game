@@ -14,6 +14,7 @@ F = balloon_jelly up=3 range=4
 R = power WATERMELON
 U = pickup moon
 w = pickup wings
+T = pickup treat
 D = decor
 1 = sign text=flap
 2 = sign text=hearts
@@ -30,7 +31,7 @@ y = saw dx=4 t=2.6
                                                                                                                                                                           n o o                                                                       ===
                                                                                                                                                                          ======                                      o        o        o
                                        ?   ?            o   o   o   o                                                                         o   o   o   o                                                                                       ===     ===           o   o   o   o
-                                                           n                     o o        o o          ooo   ooo   ooo   ooo                         n                                 ooo   ooo   ooo   ooo     y        y
+                                                           n                     o o        o o          ooo   oTo   ooo   ooo                         n                                 ooo   oTo   ooo   ooo     y        y
                                                                                                                   w                                                                               w                                            ===           ===
  @  1   2     D   R      c     a          U     a      f       F     f                                      f        F             C   h     f       F     f        S           a           f        F                  a         b                                    f       F     f       D      E
 ################################################################################G       H       ##########################################################################################################################################################################################################

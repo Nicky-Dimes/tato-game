@@ -67,14 +67,17 @@ func _build_backdrop() -> void:
 		var logo := TextureRect.new()
 		logo.texture = logo_tex
 		logo.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
-		logo.offset_left = 60.0
-		logo.offset_top = 24.0
-		logo.offset_right = 560.0
-		logo.offset_bottom = 330.0
+		logo.offset_left = 70.0
+		logo.offset_top = 28.0
+		logo.offset_right = 70.0 + logo_tex.get_width() * 1.9
+		logo.offset_bottom = 28.0 + logo_tex.get_height() * 1.9
 		logo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		logo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		logo.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(logo)
+		var sub2 := UITheme.outlined_label("A Little Goose With a Big Appetite", 28)
+		sub2.position = Vector2(84, 36.0 + logo_tex.get_height() * 1.9)
+		add_child(sub2)
 	else:
 		var title := UITheme.title_label("TATO!", 120)
 		title.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
@@ -163,7 +166,7 @@ func _show_slots(mode: String) -> void:
 		row.add_theme_constant_override("separation", 10)
 		var text := "Nest %d   -   empty" % (i + 1)
 		if not info["empty"]:
-			text = "Nest %d   -   %d pages, %d scraps, %s" % [i + 1, int(info["pages"]), int(info["scraps"]), _play_time(float(info["played_seconds"]))]
+			text = "Nest %d   -   %d pages, %d stars, %s" % [i + 1, int(info["pages"]), int(info["stars"]), _play_time(float(info["played_seconds"]))]
 			if info["complete"]:
 				text += "  ★"
 		var b := UITheme.button(text, Vector2(620, 70))

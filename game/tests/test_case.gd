@@ -7,6 +7,9 @@ extends Node
 var failures: Array[String] = []
 var checks := 0
 var runner: Node
+## Set true in a test that makes the game log an error on purpose (for
+## example loading a damaged save); otherwise any logged error fails the test.
+var expects_errors := false
 
 const ROOM_SKY := 8
 

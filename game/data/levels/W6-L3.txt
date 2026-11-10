@@ -11,6 +11,7 @@ c = onion_knight
 t = rock_golem
 P = power LEMON_BEAM
 U = pickup egg
+T = pickup treat
 D = decor
 M = platform w=2 dx=9 dy=0 t=3 thin
 V = platform w=2 dx=0 dy=-5 t=2.6 thin
@@ -29,7 +30,7 @@ z = torch every=2.4
  
                                     ############################                                                                                                                                                                      n                                                       ############################
                                         y        y        y                                                                                                              n                                                          =====                                                         y        y        y
-                                                                        o     o                                                                                        ######                    n                                                k                             =====
+                                                                        o     T                                                                                        ######                    n                                                k                             =====
                           o o                                                                                                             o   o   o              ===   ######                   ####                                             ===          ###
                                                                       ##    ##    ##                                                                                   ######             ####  ####                                                          ###         a
  @  1   2     D   P     a    a   B          t          c              ##    ##    ##       C   h     J      A                                                ===       ######   t    z    ####z ####   z         C   h        V                a              L    U  ######          ########        t          c           D      E

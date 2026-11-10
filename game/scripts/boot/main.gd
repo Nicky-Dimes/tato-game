@@ -13,6 +13,8 @@ func _ready() -> void:
 			Game.debug_column = arg.substr(5).to_int()
 		elif arg == "--test":
 			Game.headless_test = true
+		elif arg == "--fps":
+			Game.show_stats = true
 	# web builds can use ?level=W1-L1 for quick checks
 	if OS.has_feature("web"):
 		var q: Variant = JavaScriptBridge.eval("new URLSearchParams(window.location.search).get('level') || ''", true)
@@ -21,8 +23,22 @@ func _ready() -> void:
 		var at: Variant = JavaScriptBridge.eval("new URLSearchParams(window.location.search).get('at') || ''", true)
 		if typeof(at) == TYPE_STRING and (at as String).is_valid_int():
 			Game.debug_column = (at as String).to_int()
+	var map := ""
+	if OS.has_feature("web"):
+		if str(JavaScriptBridge.eval("new URLSearchParams(window.location.search).get('fps') || ''", true)) != "":
+			Game.show_stats = true
+		var m: Variant = JavaScriptBridge.eval("new URLSearchParams(window.location.search).get('map') || ''", true)
+		if typeof(m) == TYPE_STRING:
+			map = m
 	await get_tree().process_frame
-	if level != "":
+	if map != "":
+		# ?map=W3 : look at a world's stage list (throwaway save, everything open)
+		GameState.use_temp_profile()
+		for id in LevelDB.all_stage_ids():
+			if LevelDB.world_index(id) < LevelDB.world_index(map + "-L1") or id == map + "-L1":
+				GameState.mark_cleared(id, {"notes_found": 2, "notes_total": 3})
+		Game.goto_world_map(map)
+	elif level != "":
 		GameState.use_temp_profile()
 		Game.start_level(level)
 	else:

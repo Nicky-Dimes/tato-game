@@ -42,12 +42,15 @@ func test_every_item_on_the_boards_is_used() -> void:
 	var powers := {}
 	var types := {}
 	var bosses := {}
+	var treat_worlds := {}
 	for id in LevelDB.all_stage_ids():
 		var d := LevelData.parse(LevelDB.load_text(id), id)
 		for e in d.entities:
 			types[e["type"]] = true
 			if e["type"] == "pickup":
 				pickups[str((e["args"] as Array)[0])] = true
+				if str((e["args"] as Array)[0]) == "treat":
+					treat_worlds[str(LevelDB.world_of(id).get("theme", ""))] = true
 			elif e["type"] == "power":
 				powers[str((e["args"] as Array)[0])] = true
 			elif e["type"] == "boss":
@@ -56,6 +59,9 @@ func test_every_item_on_the_boards_is_used() -> void:
 				creatures[e["type"]] = true
 	for p: String in PICKUPS:
 		check(pickups.has(p), "level pickup '%s' is placed in a stage" % p)
+	for theme: String in WorldKit.TREAT_NAMES.keys():
+		check(treat_worlds.has(theme), "the %s world's own treat (%s) is placed in its stages" % [theme, WorldKit.TREAT_NAMES[theme]])
+		check(Art.has(WorldKit.art(theme, "treat")), "drawing for the %s treat" % theme)
 	for kind: String in EnemyData.kinds():
 		check(creatures.has(kind), "creature '%s' appears in a stage" % kind)
 	for id2 in FoodDB.FOOD_IDS:

@@ -14,7 +14,7 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-from cutter import cut_panel, cut_all, trim_thin, strip_white, crop, save, contact_sheet, ROOT  # noqa: E402
+from cutter import cut_panel, cut_all, trim_thin, strip_white, keep_main, strip_lines, split_parts, crop, save, contact_sheet, ROOT  # noqa: E402
 from pngio import write_png  # noqa: E402
 
 OUT = os.path.join(ROOT, "game", "assets", "sprites")
@@ -169,6 +169,11 @@ def main():
                 print("bosses    %-18s %3dx%-3d" % (name, cut["w"], cut["h"]))
 
     if want("cards"):
+        # the game's logo, from the top of the direction board
+        logo = cut_panel(D, (364, 0, 606, 92), 1, "grad", merge=40, pills=True)
+        if logo:
+            save(logo[0], os.path.join(ROOT, "game", "assets", "ui", "logo.png"))
+            print("ui        %-18s %3dx%-3d" % ("logo", logo[0]["w"], logo[0]["h"]))
         for group, name, sheet_name, rect in RECTS:
             save_rect(sheet_name, rect, os.path.join(OUT, group, name + ".png"))
             print("cards     %-18s" % name)
@@ -179,10 +184,15 @@ def main():
             for row, rect in WORLD_ROWS:
                 r = (rect[0] + ox, rect[1] + oy, rect[2] + ox, rect[3] + oy)
                 cuts = cut_all(W, r, "flat", min_size=80, gap=1, thr=20, shadows=False)
-                for i, cut in enumerate(cuts):
+                cleaned = []
+                for cut in cuts:
                     if row in ("sign", "flag", "bowl", "gem", "hazard"):
-                        cut = strip_white(cut)
-                    cut = trim_thin(cut, 4)
+                        cut = strip_white(cut, 226)
+                    cut = keep_main(strip_lines(trim_thin(cut, 4)))
+                    # the little treats sit close together: one picture each
+                    cleaned.extend(split_parts(cut) if row == "gem" else [cut])
+                cuts = cleaned
+                for i, cut in enumerate(cuts):
                     save(cut, os.path.join(OUT, "world", "%s_%s%d.png" % (world, row, i)))
                     groups.setdefault("world", []).append(cut)
                 counts.append("%s=%d" % (row, len(cuts)))

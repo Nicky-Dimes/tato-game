@@ -46,6 +46,7 @@ func test_round_trip() -> void:
 
 
 func test_backup_recovers_a_damaged_save() -> void:
+	expects_errors = true      # the damaged file logs a JSON error on purpose
 	var p := SaveService.new_profile(SLOT)
 	(p["flavor_pages"] as Array).append("W1")
 	SaveService.save_slot(SLOT, p)

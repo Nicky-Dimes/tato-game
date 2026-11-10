@@ -13,6 +13,7 @@ r = ice_puffin
 P = power FROSTBERRY
 R = power FROSTBERRY
 U = pickup magnet
+T = pickup treat
 D = decor
 M = platform w=2 dx=9 dy=0 t=3 thin
 V = platform w=2 dx=0 dy=-5 t=2.6 thin
@@ -28,7 +29,7 @@ z = icicle
  
                                                                                                                                                                                                                               n
                                                                                                 ##########################                                       n                                                          =====
-                                                                      o     o                      z    z    z    z                                            ######                   n                                                 k                             =====
+                                                                      o     T                      z    z    z    z                                            ######                   n                                                 k                             =====
                           o o               o o o                                                                                 o   o   o              ===   ######                                                                    ===          ###                                     o o o
                                                                     ##    ##    ##                                                                             ######                                                                                 ###         a
  @  1   2     D   P     a    a   B      b            a              ##    ##    ##       C   h       a        r                                      ===       ######   t    R                    a      C   h        V                a              L    U  ######          ########    b            a           D      E

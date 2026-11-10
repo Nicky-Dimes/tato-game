@@ -27,10 +27,18 @@ func setup(follow: Node2D, size: Vector2) -> void:
 	make_current()
 
 
+## The view is about 16 tiles wide (like the mock screen on the art board:
+## Tato and the creatures are big and easy to see on a phone), but never
+## shorter than 9.25 tiles on wide phones, so ledges overhead stay in view.
+const VIEW_TILES_WIDE := 16.0
+const MIN_TILES_HIGH := 9.25
+
+
 func _fit_zoom() -> void:
-	# Never show beyond a small stage: zoom in until the stage fills the view.
 	var view := get_viewport_rect().size
-	var z := maxf(1.0, maxf(view.x / maxf(level_size.x, 1.0), view.y / maxf(level_size.y, 1.0)))
+	var z := clampf(view.x / (VIEW_TILES_WIDE * Layers.TILE), 1.0, maxf(view.y / (MIN_TILES_HIGH * Layers.TILE), 1.0))
+	# Never show beyond a small stage: zoom in until the stage fills the view.
+	z = maxf(z, maxf(view.x / maxf(level_size.x, 1.0), view.y / maxf(level_size.y, 1.0)))
 	_zoom_target = z
 	zoom = Vector2(z, z)
 

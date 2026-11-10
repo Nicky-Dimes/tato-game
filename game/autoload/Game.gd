@@ -22,6 +22,11 @@ var headless_test := false
 ## Debug: start a stage this many columns in (set by ?at= / --at=).
 var debug_column := -1
 
+## Debug: show frames per second and drawing numbers (?fps=1 / --fps).
+var show_stats := false
+var _stats_label: Label
+var _stats_clock := 0.0
+var _first_scene := true
 var _fade_layer: CanvasLayer
 var _fade_rect: ColorRect
 
@@ -38,6 +43,36 @@ func _ready() -> void:
 	_fade_layer.add_child(_fade_rect)
 
 
+func _process(delta: float) -> void:
+	if not show_stats:
+		return
+	_stats_clock -= delta
+	if _stats_clock > 0.0:
+		return
+	_stats_clock = 0.5
+	if _stats_label == null:
+		_stats_label = Label.new()
+		_stats_label.position = Vector2(12, 96)
+		_stats_label.add_theme_font_size_override("font_size", 18)
+		_stats_label.add_theme_color_override("font_color", Color.WHITE)
+		_stats_label.add_theme_color_override("font_outline_color", Color.BLACK)
+		_stats_label.add_theme_constant_override("outline_size", 6)
+		_stats_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_fade_layer.add_child(_stats_label)
+	var fps := Engine.get_frames_per_second()
+	var draws := int(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME))
+	var objects := int(Performance.get_monitor(Performance.RENDER_TOTAL_OBJECTS_IN_FRAME))
+	var nodes := int(Performance.get_monitor(Performance.OBJECT_NODE_COUNT))
+	var frame_ms := Performance.get_monitor(Performance.TIME_PROCESS) * 1000.0
+	var physics_ms := Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS) * 1000.0
+	var mem := Performance.get_monitor(Performance.MEMORY_STATIC) / 1048576.0
+	var vram := Performance.get_monitor(Performance.RENDER_TEXTURE_MEM_USED) / 1048576.0
+	var size := get_viewport().get_visible_rect().size
+	_stats_label.text = "%d fps  %d draws  %d nodes\nframe %.1f ms  physics %.1f ms\nmem %.0f MB  textures %.0f MB" % [fps, draws, nodes, frame_ms, physics_ms, mem, vram]
+	if OS.has_feature("web"):
+		JavaScriptBridge.eval("window.tatoStats={fps:%d,draws:%d,objects:%d,nodes:%d,frameMs:%.2f,physicsMs:%.2f,memMB:%.1f,texMB:%.1f,view:[%d,%d]}" % [fps, draws, objects, nodes, frame_ms, physics_ms, mem, vram, int(size.x), int(size.y)], true)
+
+
 func goto(path: String, args: Dictionary = {}) -> void:
 	if is_transitioning:
 		return
@@ -45,7 +80,12 @@ func goto(path: String, args: Dictionary = {}) -> void:
 	scene_args = args
 	scene_changing.emit(path)
 	var quick := headless_test or DisplayServer.get_name() == "headless"
-	if not quick:
+	var first := _first_scene
+	_first_scene = false
+	if first:
+		# the loading page is still covering the game: no fade needed
+		_fade_rect.color.a = 0.0
+	elif not quick:
 		_fade_rect.mouse_filter = Control.MOUSE_FILTER_STOP
 		var t := create_tween()
 		t.tween_property(_fade_rect, "color:a", 1.0, 0.22)
@@ -57,12 +97,21 @@ func goto(path: String, args: Dictionary = {}) -> void:
 	if err != OK:
 		push_error("Could not open scene %s (%s)" % [path, error_string(err)])
 	await get_tree().process_frame
-	if not quick:
+	if first:
+		await get_tree().process_frame
+		_tell_page_ready()
+	elif not quick:
 		var t2 := create_tween()
 		t2.tween_property(_fade_rect, "color:a", 0.0, 0.26)
 		await t2.finished
 		_fade_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	is_transitioning = false
+
+
+## Web: lets the loading page (web/shell.html) know the first screen is drawn.
+func _tell_page_ready() -> void:
+	if OS.has_feature("web"):
+		JavaScriptBridge.eval("window.tatoReady && window.tatoReady()", true)
 
 
 func goto_title() -> void:

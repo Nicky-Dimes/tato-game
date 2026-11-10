@@ -12,6 +12,7 @@ c = crab_snipper
 t = turtle_tank
 P = power POPCORN
 U = pickup gem
+T = pickup treat
 D = decor
 V = platform w=2 dx=0 dy=-5 t=2.6 thin
 1 = sign text=key
@@ -29,7 +30,7 @@ z = drip every=2.2
  
                                                   n
                                                 =====        o        o        o                                                                                 n        ####################                         o      o
-                                                                                            o     o                                                            ######       z     z     z                                                     k                             =====
+                                                                                            o     T                                                            ######       z     z     z                                                     k                             =====
                           o o                              y        y                                                        o o        o o              ===   ######                                                                        ===          ###                                    o o        o o
                                                                                           ##    ##    ##                                                       ######                                                ====   ====   ==                     ###         a
  @  1   2     D   P     a    a   B        V                     a         b               ##    ##    ##       C   h                                 ===       ######   t       a      c         n       C   h      ^^^^^^^^^^^^^^^^       a              L    U  ######          ########                               D      E

@@ -461,3 +461,188 @@ def strip_white(cut, level=236):
                     px[nb * 4 + 3] = 0
                     q.append(nb)
     return cut
+
+
+def keep_main(cut, min_frac=0.07, min_fill=0.24):
+    """Drops debris from a cut-out: specks much smaller than the main drawing,
+    hairlines, and hollow frames (bits of a panel border). Then trims."""
+    w, h, px = cut["w"], cut["h"], cut["px"]
+    label = [0] * (w * h)
+    comps = []          # [area, x0, y0, x1, y1]
+    for start in range(w * h):
+        if label[start] or px[start * 4 + 3] <= 110:
+            continue
+        cid = len(comps) + 1
+        label[start] = cid
+        q = deque([start])
+        area, x0, y0, x1, y1 = 0, w, h, -1, -1
+        while q:
+            p = q.popleft()
+            x, y = p % w, p // w
+            area += 1
+            x0, x1, y0, y1 = min(x0, x), max(x1, x), min(y0, y), max(y1, y)
+            for dy in (-1, 0, 1):
+                for dx in (-1, 0, 1):
+                    nx, ny = x + dx, y + dy
+                    if 0 <= nx < w and 0 <= ny < h:
+                        k = ny * w + nx
+                        if not label[k] and px[k * 4 + 3] > 110:
+                            label[k] = cid
+                            q.append(k)
+        comps.append([area, x0, y0, x1, y1])
+    if not comps:
+        return cut
+    # the main drawing: the biggest component that is not a hollow frame
+    def solid(c):
+        bw, bh = c[3] - c[1] + 1, c[4] - c[2] + 1
+        return min(bw, bh) > 5 and c[0] / float(bw * bh) >= min_fill
+    solids = [c for c in comps if solid(c)]
+    if not solids:
+        return cut
+    biggest = max(c[0] for c in solids)
+    keep = set()
+    for i, c in enumerate(comps):
+        if solid(c) and c[0] >= biggest * min_frac:
+            keep.add(i + 1)
+    x0, y0, x1, y1 = w, h, -1, -1
+    for i in range(w * h):
+        x, y = i % w, i // w
+        if label[i] in keep:
+            x0, x1, y0, y1 = min(x0, x), max(x1, x), min(y0, y), max(y1, y)
+        elif label[i]:
+            px[i * 4 + 3] = 0
+        elif px[i * 4 + 3] > 0:
+            # a soft edge pixel: keep it only beside a kept drawing
+            near = False
+            for dy in (-1, 0, 1):
+                for dx in (-1, 0, 1):
+                    nx, ny = x + dx, y + dy
+                    if 0 <= nx < w and 0 <= ny < h and label[ny * w + nx] in keep:
+                        near = True
+            if not near:
+                px[i * 4 + 3] = 0
+    pad = 2
+    x0, y0, x1, y1 = max(0, x0 - pad), max(0, y0 - pad), min(w - 1, x1 + pad), min(h - 1, y1 + pad)
+    nw, nh = x1 - x0 + 1, y1 - y0 + 1
+    out = bytearray(nw * nh * 4)
+    for y in range(nh):
+        s = ((y + y0) * w + x0) * 4
+        out[y * nw * 4:(y + 1) * nw * 4] = px[s:s + nw * 4]
+    return {"w": nw, "h": nh, "px": out, "box": cut.get("box"), "origin": cut.get("origin")}
+
+
+def _framey(r, g, b):
+    """The soft mauve of the boards' panel borders."""
+    return 125 <= r <= 220 and g >= 90 and r - g >= 12 and abs(r - b) <= 36
+
+
+def strip_lines(cut, min_len=20, max_thick=3):
+    """Clears long, straight, hair-thin mauve lines (pieces of a panel border
+    that came along with a drawing). Thick or differently coloured straight
+    edges (blocks, poles, planks) are left alone."""
+    w, h, px = cut["w"], cut["h"], cut["px"]
+
+    def solid(x, y):
+        return 0 <= x < w and 0 <= y < h and px[(y * w + x) * 4 + 3] > 60
+
+    def thick(x, y, dx, dy):
+        n = 1
+        k = 1
+        while solid(x + dx * k, y + dy * k):
+            n += 1
+            k += 1
+        k = 1
+        while solid(x - dx * k, y - dy * k):
+            n += 1
+            k += 1
+        return n
+
+    doomed = set()
+    for horizontal in (True, False):
+        outer, inner = (h, w) if horizontal else (w, h)
+        for o in range(outer):
+            run = []
+            for i in range(inner + 1):
+                x, y = (i, o) if horizontal else (o, i)
+                ok = False
+                if i < inner and solid(x, y):
+                    r, g, b = px[(y * w + x) * 4], px[(y * w + x) * 4 + 1], px[(y * w + x) * 4 + 2]
+                    t = thick(x, y, 0, 1) if horizontal else thick(x, y, 1, 0)
+                    ok = t <= max_thick and _framey(r, g, b)
+                if ok:
+                    run.append((x, y))
+                else:
+                    if len(run) >= min_len:
+                        for (rx, ry) in run:
+                            for k in range(-max_thick, max_thick + 1):
+                                nx, ny = (rx, ry + k) if horizontal else (rx + k, ry)
+                                if solid(nx, ny) or (0 <= nx < w and 0 <= ny < h):
+                                    # only the thin line itself: stop at gaps
+                                    pass
+                            doomed.add((rx, ry))
+                    run = []
+    # take the whole thickness of each doomed line pixel
+    extra = set()
+    for (x, y) in doomed:
+        for dx, dy in ((0, 1), (0, -1), (1, 0), (-1, 0)):
+            nx, ny = x + dx, y + dy
+            if 0 <= nx < w and 0 <= ny < h and px[(ny * w + nx) * 4 + 3] > 0:
+                r, g, b = px[(ny * w + nx) * 4], px[(ny * w + nx) * 4 + 1], px[(ny * w + nx) * 4 + 2]
+                if px[(ny * w + nx) * 4 + 3] <= 200 or _framey(r, g, b):
+                    extra.add((nx, ny))
+    for (x, y) in doomed | extra:
+        px[(y * w + x) * 4 + 3] = 0
+    return cut
+
+
+def split_parts(cut, min_frac=0.07):
+    """Splits a cut-out that holds several separate drawings (a row of small
+    treats that sat close together) into one cut-out each, left to right."""
+    w, h, px = cut["w"], cut["h"], cut["px"]
+    label = [0] * (w * h)
+    comps = []
+    for start in range(w * h):
+        if label[start] or px[start * 4 + 3] <= 110:
+            continue
+        cid = len(comps) + 1
+        label[start] = cid
+        q = deque([start])
+        area, x0, y0, x1, y1 = 0, w, h, -1, -1
+        while q:
+            p = q.popleft()
+            x, y = p % w, p // w
+            area += 1
+            x0, x1, y0, y1 = min(x0, x), max(x1, x), min(y0, y), max(y1, y)
+            for dy in (-1, 0, 1):
+                for dx in (-1, 0, 1):
+                    nx, ny = x + dx, y + dy
+                    if 0 <= nx < w and 0 <= ny < h:
+                        k = ny * w + nx
+                        if not label[k] and px[k * 4 + 3] > 110:
+                            label[k] = cid
+                            q.append(k)
+        comps.append([area, x0, y0, x1, y1, cid])
+    if len(comps) < 2:
+        return [cut]
+    biggest = max(c[0] for c in comps)
+    parts = []
+    for area, x0, y0, x1, y1, cid in sorted([c for c in comps if c[0] >= biggest * min_frac], key=lambda c: c[1]):
+        pad = 2
+        bx0, by0, bx1, by1 = max(0, x0 - pad), max(0, y0 - pad), min(w - 1, x1 + pad), min(h - 1, y1 + pad)
+        nw, nh = bx1 - bx0 + 1, by1 - by0 + 1
+        out = bytearray(nw * nh * 4)
+        for y in range(by0, by1 + 1):
+            for x in range(bx0, bx1 + 1):
+                i = y * w + x
+                mine = label[i] == cid
+                if not mine and label[i] == 0 and px[i * 4 + 3] > 0:
+                    for dy in (-1, 0, 1):
+                        for dx in (-1, 0, 1):
+                            nx, ny = x + dx, y + dy
+                            if 0 <= nx < w and 0 <= ny < h and label[ny * w + nx] == cid:
+                                mine = True
+                if mine:
+                    t = ((y - by0) * nw + (x - bx0)) * 4
+                    out[t:t + 4] = px[i * 4:i * 4 + 4]
+        parts.append({"w": nw, "h": nh, "px": out, "box": cut.get("box"), "origin": cut.get("origin")})
+    return parts

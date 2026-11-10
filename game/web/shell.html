@@ -220,17 +220,85 @@ const engine = new Engine(GODOT_CONFIG);
 		displayFailureNotice('This browser is missing: ' + missing.join(', ') + '.');
 		return;
 	}
-	engine.startGame({
-		'onProgress': function (current, total) {
-			if (current > 0 && total > 0) {
-				statusProgress.value = current;
-				statusProgress.max = total;
-			} else {
-				statusProgress.removeAttribute('value');
-				statusProgress.removeAttribute('max');
+	// The game is kept on the device so it opens quickly and works offline.
+	// Before starting, ask whether a newer version has been published; if so
+	// switch to it now (the page reloads itself) instead of one visit later.
+	function checkForUpdate() {
+		if (!('serviceWorker' in navigator)) {
+			return Promise.resolve();
+		}
+		return navigator.serviceWorker.getRegistration().then(function (reg) {
+			if (!reg) {
+				return undefined;
 			}
-		},
-	}).then(hideStatus, displayFailureNotice);
+			return new Promise(function (resolve) {
+				let settled = false;
+				function carryOn() {
+					if (!settled) {
+						settled = true;
+						resolve();
+					}
+				}
+				function switchTo(worker) {
+					statusTitle.textContent = 'Getting the newest version...';
+					worker.postMessage('update');
+					setTimeout(carryOn, 8000); // the reload normally happens first
+				}
+				function watch(worker) {
+					if (!worker) {
+						return;
+					}
+					worker.addEventListener('statechange', function () {
+						if (worker.state === 'installed') {
+							switchTo(worker);
+						} else if (worker.state === 'redundant') {
+							carryOn();
+						}
+					});
+				}
+				const quick = setTimeout(carryOn, 3000); // offline or slow: just play
+				if (reg.waiting) {
+					clearTimeout(quick);
+					switchTo(reg.waiting);
+					return;
+				}
+				reg.addEventListener('updatefound', function () {
+					clearTimeout(quick);
+					setTimeout(carryOn, 20000);
+					watch(reg.installing);
+				});
+				reg.update().then(function () {
+					if (!reg.installing && !reg.waiting) {
+						clearTimeout(quick);
+						carryOn();
+					}
+				}).catch(function () {
+					clearTimeout(quick);
+					carryOn();
+				});
+			});
+		}).catch(function () { return undefined; });
+	}
+
+	window.tatoReady = hideStatus;
+	checkForUpdate().then(function () {
+		return engine.startGame({
+			'onProgress': function (current, total) {
+				if (current > 0 && total > 0) {
+					statusProgress.value = current;
+					statusProgress.max = total;
+				} else {
+					statusProgress.removeAttribute('value');
+					statusProgress.removeAttribute('max');
+				}
+			},
+		});
+	}).then(function () {
+		// The game calls window.tatoReady() once its first screen is drawn;
+		// keep the loading picture up until then (or 12 s at most).
+		statusTitle.textContent = 'Almost ready...';
+		setTimeout(hideStatus, 12000);
+	}, displayFailureNotice);
 }());
 		</script>
 	</body>

@@ -11,6 +11,7 @@ t = turtle_tank
 r = carrot_archer
 P = power WATERMELON
 U = pickup leaf
+T = pickup treat
 D = decor
 M = platform w=2 dx=9 dy=0 t=3 thin
 V = platform w=2 dx=0 dy=-5 t=2.6 thin
@@ -28,7 +29,7 @@ m = mole_digger
  
                                           o o   n    o o                                             g      g      g                                                                    n
                                          ====       =====                                                                                                        n                    =====                         y
-                                                                      o     o                                                                                  ######                                                                   k                             =====                  o o
+                                                                      o     T                                                                                  ######                                                                   k                             =====                  o o
                           o o         ====              ====                                                                      o   o   o              ===   ######                                           ====    ====           ===          ###
                                                                     ##    ##    ##                                                                             ######                                                                               ###         a                           =====
  @  1   2     D   P     a    a   B          m        a              ##    ##    ##       C   h     a           m                                     ===       ######   t       V                C   h      a                 r      a              L    U  ######          ########                         D      E

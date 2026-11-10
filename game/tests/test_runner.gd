@@ -10,6 +10,28 @@ var _failed := 0
 var _report: Array[String] = []
 var _limit_seconds := 1500.0        # real seconds; --timeout=<seconds> changes it
 var _deadline_ms := 0
+var _errors := ErrorCatcher.new()
+
+
+## Collects every script error and engine error printed while tests run, so
+## a test fails if the game logs one (a wrong dictionary key, a null call...).
+class ErrorCatcher extends Logger:
+	var seen: Array[String] = []
+	var _lock := Mutex.new()
+
+	func _log_error(function: String, file: String, line: int, code: String, rationale: String, _editor_notify: bool, error_type: int, _script_backtraces: Array[ScriptBacktrace]) -> void:
+		if error_type == ERROR_TYPE_WARNING:
+			return
+		_lock.lock()
+		seen.append("%s  (%s:%d in %s)" % [rationale if rationale != "" else code, file.get_file(), line, function])
+		_lock.unlock()
+
+	func take() -> Array[String]:
+		_lock.lock()
+		var out := seen.duplicate()
+		seen.clear()
+		_lock.unlock()
+		return out
 
 
 ## Safety net measured in real time (tests may run with --fixed-fps, where
@@ -26,6 +48,7 @@ func _process(_delta: float) -> void:
 
 func _ready() -> void:
 	Game.headless_test = true
+	OS.add_logger(_errors)
 	var only := ""
 	var group := ""
 	for arg in OS.get_cmdline_user_args():
@@ -77,12 +100,20 @@ func _run_file(path: String) -> void:
 		var tc: TestCase = script.new()
 		tc.runner = self
 		add_child(tc)
+		_errors.take()
 		await tc.before_each()
 		await tc.call(mname)
 		await tc.after_each()
 		tc.release_all()
 		Engine.time_scale = 1.0
 		get_tree().paused = false
+		Game.headless_test = true
+		var logged := _errors.take()
+		if not tc.expects_errors:
+			for i in mini(logged.size(), 6):
+				tc.failures.append("logged an error: " + logged[i])
+			if logged.size() > 6:
+				tc.failures.append("... and %d more errors" % (logged.size() - 6))
 		var label := "%s :: %s" % [path.get_file().get_basename(), mname]
 		if tc.failures.is_empty():
 			_passed += 1

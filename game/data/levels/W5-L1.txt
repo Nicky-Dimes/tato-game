@@ -10,6 +10,7 @@ a = fire_slime
 b = pepper_goblin
 P = power GARLIC_DASH
 p = pickup leaf
+T = pickup treat
 D = decor
 x = spiky
 1 = sign text=wind
@@ -24,8 +25,8 @@ g = wind w=12 h=6 dir=1 power=0.9
                                                                                                                                                                 n
                                                                                                                                                               =====
                                                                                                   o o      o o
-                                              o  o  o             ?%?    o o                                                          ooo                                                                           o  o  o            oooooooo  n
-                          o o                               n                                  =====    =====    ====               ######                                               o       o                                    ==============    ########                   ooo
+                                              o  o  o             ?%?    o o                                                          oTo                                                                           o  o  o            oooooooo  n
+                          o o                               n                                  =====    =====    ====               ######                                               o       o                                    ==============    ########                   oTo
                                                                                                                                 ##########                                                                                                              #      #
  @  1   2     D   P     a    a   B                                   a      p      C   h                                    ##############   a      a    x          x        C   h     a      b                                          a     b        #  *   B      a          D    a      D     D      E
 ##########################################g           ########################################                      ######################################################################  ####  ##############g           ####################################################################################

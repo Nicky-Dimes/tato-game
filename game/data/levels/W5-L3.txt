@@ -12,6 +12,7 @@ P = power GARLIC_DASH
 R = power BUBBLEBERRY
 j = pickup gem
 U = pickup candy
+T = pickup treat
 D = decor
 V = platform w=2 dx=0 dy=-5 t=2.6 thin
 1 = sign text=key
@@ -27,7 +28,7 @@ K = cracked h=2
  
                                                                                                                                             n
                                                                                                         o o      o o                      =====                  n                                                                                                                                o o      o o
-                                              o  o  o                 o     o                                                                                  ######                                                   o  o  o               k                             =====
+                                              o  o  o                 o     T                                                                                  ######                                                   o  o  o               k                             =====
                           o o                                    n                                   =====    =====    ====                              ===   ######                   ####                                                 ===          ###                                  =====    =====    ====
                                                                     ##    ##    ##                                                                             ######                   ####                                                              ###         a
  @  1   2     D   P     a    a   B                                  ##    ##    ##       C   h                                      V                ===       ######   t    R          K    j   a     C   h                               a              L    U  ######          ########                                 D      E

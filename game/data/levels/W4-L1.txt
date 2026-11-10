@@ -12,6 +12,7 @@ r = ice_puffin
 P = power FROSTBERRY
 R = power FROSTBERRY
 p = pickup crystal
+T = pickup treat
 D = decor
 1 = sign text=ice
 2 = sign text=power
@@ -25,8 +26,8 @@ z = icicle
  
  
                                                                                                                                               ##########################
-                                                                  ?%?    o o                            n                           ooo          z    z    z    z                          o o                                       oooooooo  n
-                          o o               o o o           n                                                                     ######                                                                        o o o               ==============    ########                   ooo
+                                                                  ?%?    o o                            n                           oTo          z    z    z    z                          o o                                       oooooooo  n
+                          o o               o o o           n                                                                     ######                                                                        o o o               ==============    ########                   oTo
                                                                                                                               ##########                                                  =====                                                       #      #
  @  1   2     D   P     a    a   B      b            a               a      p      C   h     R                    a       ##############   a       a        r              C   h                            b            a             a     b        #  *   B      a          D    a      D     D      E
 ########################################iiiiiiii  iiiiiiii######################################~~~~~~~~~~~~~~~~########################################################################         ###########iiiiiiii  iiiiiiii################################################################################

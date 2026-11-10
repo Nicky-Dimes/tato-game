@@ -8,25 +8,25 @@ const KITS := {
 		"block": "tile0", "block2": "tile1", "plat": "tile2", "rock": "tile3",
 		"spiky": "hazard0", "spikes": "hazard1", "roller": "hazard2",
 		"decor": ["prop0", "prop1", "prop2", "prop4", "prop5"],
-		"flag": "flag0", "sign": "sign0", "bowl": "bowl0", "treat": "gem1",
+		"flag": "flag0", "sign": "sign0", "bowl": "bowl0",
 	},
 	"orchard": {
 		"block": "tile0", "block2": "tile1", "plat": "tile2", "rock": "tile3",
 		"faller": "hazard0", "spiky": "hazard1", "hive": "hazard2",
 		"decor": ["prop0", "prop1", "prop2", "prop3", "tile3"],
-		"flag": "flag0", "sign": "sign0", "bowl": "bowl0", "treat": "gem0",
+		"flag": "flag0", "sign": "sign0", "bowl": "bowl0", "treat": "gem1",
 	},
 	"candy": {
 		"block": "tile0", "block2": "tile1", "plat": "tile2",
 		"spikes": "hazard0", "saw": "hazard1", "drip": "hazard2",
 		"decor": ["prop0", "prop1", "prop2", "prop3", "prop4"],
-		"flag": "flag0", "sign": "sign0", "bowl": "bowl0", "treat": "gem0",
+		"flag": "flag0", "sign": "sign0", "bowl": "bowl0", "treat": "gem1",
 	},
 	"icy": {
 		"block": "tile0", "block2": "tile1", "plat": "tile2", "rock": "tile3",
 		"icicle": "hazard0", "spiky": "hazard1", "spikes": "hazard2",
 		"decor": ["prop0", "prop1", "prop2", "prop3"],
-		"flag": "flag0", "sign": "sign0", "bowl": "bowl0", "treat": "gem0",
+		"flag": "flag0", "sign": "sign0", "bowl": "bowl0", "treat": "gem1",
 	},
 	"windy": {
 		"block": "tile0", "block2": "tile1", "plat": "tile3", "bridge": "tile2",
@@ -41,6 +41,18 @@ const KITS := {
 		"flag": "flag0", "sign": "sign0", "bowl": "bowl0", "treat": "gem1",
 	},
 }
+
+
+## Each world's own little treat from the world board (worth five coins).
+## Grassland's row on the board shows coins and a star, which every world has.
+const TREAT_NAMES := {
+	"orchard": "Shiny apple", "candy": "Gummy bear", "icy": "Snowflake",
+	"windy": "Lucky leaf", "castle": "Golden crown",
+}
+
+
+static func has_treat(theme: String) -> bool:
+	return KITS.has(theme) and (KITS[theme] as Dictionary).has("treat")
 
 
 static func kit(theme: String) -> Dictionary:

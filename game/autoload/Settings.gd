@@ -163,6 +163,11 @@ func apply_all() -> void:
 
 func _apply(key: String) -> void:
 	match key:
+		"quality":
+			# The web page reads this before the game starts, to choose how
+			# sharp to draw (see web/shell.html). It applies on the next load.
+			if OS.has_feature("web"):
+				JavaScriptBridge.eval("try{localStorage.setItem('tato_quality','%s')}catch(e){}" % str(get_value("quality")), true)
 		"master_volume":
 			_set_bus("Master", num(key))
 		"music_volume":
