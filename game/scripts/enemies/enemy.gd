@@ -32,6 +32,8 @@ var _ice: StaticBody2D
 var _art_faces := 1.0
 var _base_scale := 0.5
 var _spawned := false
+const SLEEP_DISTANCE := 1500.0
+var _hit_dir := 0.0
 var _visual_time := 0.0
 var _visual_squash := 1.0
 var _visual_recoil := 0.0
@@ -155,6 +157,7 @@ func take_hit(damage: int, info: Dictionary) -> bool:
 		if is_on_floor():
 			velocity.y = -150.0
 	_on_hit(info)
+	_hit_dir = signf((info.get("dir", Vector2.ZERO) as Vector2).x)
 	if hp <= 0:
 		# a bubbled creature floats off before it pops
 		if bubble_left > 0.0:
@@ -162,7 +165,19 @@ func take_hit(damage: int, info: Dictionary) -> bool:
 		defeat()
 	else:
 		AudioService.play_varied("enemy_hit", -5.0)
+		_hit_feedback(false)
 	return true
+
+
+## Sparks, a tiny pause and a shake so every hit reads clearly.
+func _hit_feedback(final: bool) -> void:
+	if level == null:
+		return
+	var at := global_position + Vector2(0, -height * 0.55)
+	Fx.sparkle(level, at, Color(1.0, 0.97, 0.7), 7 if final else 4)
+	Fx.pop_ring(level, at, Color(1, 1, 1, 0.9), height * (0.9 if final else 0.55))
+	level.shake(5.0 if final else 2.5)
+	level.hit_pause(0.07 if final else 0.04)
 
 
 ## Onion Knights (and friends) turn shots from the front aside.
@@ -206,10 +221,19 @@ func defeat() -> void:
 	if level != null:
 		level.drop_coins(global_position + Vector2(0, -height * 0.5), int(stats.get("coins", 1)))
 		level.on_enemy_defeated(self)
+	_hit_feedback(true)
+	# knocked up and away, spinning, then gone
+	var away := _hit_dir if _hit_dir != 0.0 else -facing
+	var from := sprite.position
 	var t := create_tween()
-	t.tween_property(sprite, "scale", Vector2(_base_scale * 1.3, 0.02), 0.14)
-	t.parallel().tween_property(sprite, "modulate:a", 0.0, 0.14)
-	t.tween_callback(func() -> void: visible = false)
+	t.set_parallel(true)
+	t.tween_property(sprite, "position:x", from.x + away * 90.0, 0.42)
+	t.tween_property(sprite, "position:y", from.y - 70.0, 0.18).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	t.tween_property(sprite, "position:y", from.y + 40.0, 0.24).set_delay(0.18).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	if not Settings.flag("reduced_motion"):
+		t.tween_property(sprite, "rotation", away * TAU * 0.75, 0.42)
+	t.tween_property(sprite, "modulate:a", 0.0, 0.16).set_delay(0.26)
+	t.chain().tween_callback(func() -> void: visible = false)
 
 
 # ------------------------------------------------------------------- frame --
@@ -220,6 +244,11 @@ func _physics_process(delta: float) -> void:
 	if not _spawned:
 		_spawned = true
 		GameState.meet_enemy(kind) if false else null
+	# Far-away creatures rest (keeps older phones and tablets smooth); they
+	# wake as Tato gets within about a screen and a half.
+	if level != null and level.player != null and absf(level.player.global_position.x - global_position.x) > SLEEP_DISTANCE \
+			and frozen_left <= 0.0 and bubble_left <= 0.0 and flash_left <= 0.0:
+		return
 	var d := delta * clock()
 	_visual_time += d
 	_visual_recoil = move_toward(_visual_recoil, 0.0, 5.5 * delta)

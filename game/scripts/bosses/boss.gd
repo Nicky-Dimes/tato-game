@@ -139,6 +139,8 @@ func take_hit(damage: int, hit: Dictionary) -> bool:
 		AudioService.play_varied("enemy_hit", -3.0)
 		if level.hud != null:
 			level.hud.set_boss_health(float(hp) / float(max_hp))
+		level.shake(3.0)
+		level.hit_pause(0.045)
 		Fx.burst(level, global_position + Vector2(0, -height * 0.5), "sparkle", Color(1, 1, 0.6), 4, {"spread": 50.0, "life": 0.3, "size": 7.0})
 	else:
 		AudioService.play_varied("clink", -6.0)

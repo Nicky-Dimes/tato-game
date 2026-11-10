@@ -13,6 +13,16 @@ Plays in a browser (including iPad and iPhone), and on Windows, macOS and Linux.
 > for the direction, [`PROJECT_ARCHITECTURE.md`](PROJECT_ARCHITECTURE.md) for how the code
 > works, and [`CHATGPT_HANDOFF.md`](CHATGPT_HANDOFF.md) for how to change it safely.
 
+## Screenshots
+
+Real captures from the desktop build (`-- --shot=`), current art.
+
+| | |
+|---|---|
+| ![Title screen](docs/screenshots/title.png) | ![Grassland: a honk sends a slime flying](docs/screenshots/grassland_hit.png) |
+| ![Candy Carnival](docs/screenshots/candy_carnival.png) | ![Icy Pond](docs/screenshots/icy_pond.png) |
+| ![Boss: Mega Mushroot](docs/screenshots/boss_mega_mushroot.png) | |
+
 ## What is in the game
 
 - 6 worlds x (3 stages + bonus stage + boss) = **30 stages**, plus the Home Nest and a trial room

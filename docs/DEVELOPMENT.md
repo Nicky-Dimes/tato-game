@@ -16,6 +16,12 @@ godot --path game -- --level=W1-L1 --at=120   # ... starting 120 columns in
 
 Run `--import` again after adding a picture or a script that declares `class_name`.
 
+Screenshots from the real game window (it quits by itself afterwards):
+
+```bash
+godot --path game -- --level=W3-L1 --at=60 --shot=/tmp/shot_%d.png --shot-after=150 --shot-count=4 --shot-every=8 --press=move_right,attack
+```
+
 ## Checks and tests
 
 ```bash

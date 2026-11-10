@@ -12,7 +12,7 @@ config_version=5
 
 config/name="TATO!"
 config/description="A Little Goose With a Big Appetite"
-config/version="0.1.0"
+config/version="0.2.0"
 run/main_scene="res://scenes/boot/Main.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 boot_splash/bg_color=Color(0.99, 0.95, 0.88, 1)
@@ -83,7 +83,7 @@ common/max_physics_steps_per_frame=4
 
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
-textures/vram_compression/import_etc2_astc=false
+textures/vram_compression/import_etc2_astc=true
 environment/defaults/default_clear_color=Color(0.56, 0.8, 0.95, 1)
 textures/canvas_textures/default_texture_filter=1
 2d/snap/snap_2d_transforms_to_pixel=false

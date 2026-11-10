@@ -208,6 +208,31 @@ func shake(amount: float) -> void:
 		camera.shake(amount)
 
 
+var _hit_pause_until := 0
+
+## A blink of stillness when a hit lands, so attacks feel solid. Real time,
+## so it is the same length whatever else is going on. Off for Reduced Motion.
+func hit_pause(seconds: float) -> void:
+	if Game.headless_test or DisplayServer.get_name() == "headless" or Settings.flag("reduced_motion") or finished:
+		return
+	var until := Time.get_ticks_msec() + int(seconds * 1000.0)
+	if until <= _hit_pause_until:
+		return
+	var already := _hit_pause_until > Time.get_ticks_msec()
+	_hit_pause_until = until
+	if already:
+		return
+	Engine.time_scale = 0.05
+	while Time.get_ticks_msec() < _hit_pause_until:
+		await get_tree().process_frame
+		if not is_inside_tree():
+			Engine.time_scale = 1.0
+			return
+	if not get_tree().paused:
+		Engine.time_scale = 1.0
+	_hit_pause_until = 0
+
+
 func cell_at(point: Vector2) -> Vector2i:
 	return Vector2i(floori(point.x / TILE), floori(point.y / TILE))
 

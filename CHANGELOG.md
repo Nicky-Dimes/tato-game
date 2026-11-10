@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.2.0 — 2026-11-11
+
+- Overhaul v1 merged into `main`.
+- Hits feel solid: a blink of hit-pause, a small shake, sparks and a ring on every hit;
+  defeated creatures are knocked up and away spinning. Bosses shake and pause on hits.
+  Hit-pause and spin are off with Reduced Motion.
+- Creatures more than about a screen and a half away rest until Tato comes near
+  (less work for older phones and tablets).
+- One more checkpoint bell in every non-boss stage (main stages now have three, bonus
+  stages two). Candy treat added to the one stage that lacked it.
+- macOS, Windows and Linux exports now build (`tools/build.sh all`); the macOS app was
+  launched and ran a stage. Windows and Linux files were built but not run.
+- README screenshots.
+
 ## Overhaul v1 merged — 2026-11-11 (branch `overhaul-v1`)
 
 ChatGPT's `TATO_PRODUCTION_OVERHAUL_V1.zip` brought in as received, then checked in Godot

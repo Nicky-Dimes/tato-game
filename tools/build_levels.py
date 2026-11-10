@@ -126,7 +126,7 @@ C["steps"] = rows("""
 """ % (G(24), G(24), G(24)))
 
 C["pit_small"] = rows("""
-       ooo
+       oTo
 
     a          D
 #######   ########
@@ -617,63 +617,63 @@ STAGE_NAMES = {}
 # stage id -> (chunk list, tips, hints)
 STAGES = {
     # ------------------------------ World 1: Grassland
-    "W1-L1": (["start", "flat_coins", "qblocks", "steps", "bowl_p", "cp", "pit_small", "tower", "hill", "w1_shrooms", "cp", "high_road", "star_b", "flat_coins", "end"],
+    "W1-L1": (["start", "flat_coins", "qblocks", "steps", "bowl_p", "cp", "pit_small", "tower", "hill", "w1_shrooms", "cp", "high_road", "cp", "star_b", "flat_coins", "end"],
               ("move", "honk"), "Jump on the slimes or honk at them. | The first food bowl gives you Fire Shot. | Smash the crate by the little stone room to find the Star."),
-    "W1-L2": (["start", "qblocks", "w1_shrooms", "bowl_q", "cp", "pit_plat", "spring_up", "w1_logs", "water", "cp", "tower", "w1_bushes", "star_a", "pit_small", "end"],
+    "W1-L2": (["start", "qblocks", "w1_shrooms", "bowl_q", "cp", "pit_plat", "spring_up", "w1_logs", "water", "cp", "tower", "w1_bushes", "cp", "star_a", "pit_small", "end"],
               ("flap", "spring"), "Bounce on the mushrooms to cross the gap. | Hold jump on a spring to go really high. | The Star floats above the highest platforms."),
-    "W1-L3": (["start", "bowl_p", "w1_logs", "pit_double", "cp", "w1_bushes", "crate_wall", "moving_plat", "lift", "cp", "gauntlet", "climb", "star_c", "w1_shrooms", "end"],
+    "W1-L3": (["start", "bowl_p", "w1_logs", "pit_double", "cp", "w1_bushes", "crate_wall", "moving_plat", "lift", "cp", "gauntlet", "climb", "cp", "star_c", "w1_shrooms", "end"],
               ("stomp", "notes"), "Hedgehogs are too prickly to jump on: use an attack. | Ride the moving platform across the big gap. | Look down in the dip for the Star."),
-    "W1-X": (["start", "bowl_r", "coin_run", "boost", "w1_shrooms", "coin_run", "cp", "flyers", "high_road", "spring_up", "tower", "star_a", "coin_run", "end"],
+    "W1-X": (["start", "bowl_r", "coin_run", "boost", "w1_shrooms", "coin_run", "cp", "flyers", "high_road", "spring_up", "tower", "cp", "star_a", "coin_run", "end"],
              ("qblock", "hearts"), "This stage is all about coins. | 100 coins refill Tato's hearts. | Bees dip down at you: bop them from below."),
     "W1-B": (["arena"], ("boss", "power"), "Wait for the warning flash, then dodge. | Jump over the little shock waves. | Attack while Mega Mushroot is resting."),
     # ------------------------------ World 2: Orchard
-    "W2-L1": (["start", "bowl_p", "w2_apples", "qblocks", "pit_small", "cp", "w2_branches", "steps", "water", "cp", "w2_hive", "high_road", "star_b", "flat_coins", "end"],
+    "W2-L1": (["start", "bowl_p", "w2_apples", "qblocks", "pit_small", "cp", "w2_branches", "steps", "water", "cp", "w2_hive", "high_road", "cp", "star_b", "flat_coins", "end"],
               ("apples", "power"), "Apples wobble before they fall. | Watermelon throws three slices at once. | Smash the crate by the stone room for the Star."),
-    "W2-L2": (["start", "bowl_q", "w2_apples", "tunnel", "cp", "pit_double", "w2_hive", "crate_wall", "spring_up", "cp", "w2_branches", "gauntlet", "star_a", "hill", "end"],
+    "W2-L2": (["start", "bowl_q", "w2_apples", "tunnel", "cp", "pit_double", "w2_hive", "crate_wall", "spring_up", "cp", "w2_branches", "gauntlet", "cp", "star_a", "hill", "end"],
               ("swap", "stomp"), "Moles only pop up when you are near: hit them then. | Honey glues a creature to the spot. | A new bowl swaps your power with a Flavor Burst."),
-    "W2-L3": (["start", "bowl_p", "w2_branches", "pillars", "cp", "w2_apples", "moving_plat", "climb", "lift", "cp", "w2_hive", "key_gate", "star_c", "pit_plat", "end"],
+    "W2-L3": (["start", "bowl_p", "w2_branches", "pillars", "cp", "w2_apples", "moving_plat", "climb", "lift", "cp", "w2_hive", "key_gate", "cp", "star_c", "pit_plat", "end"],
               ("key", "notes"), "Find the key on the little platform, then walk into the lock. | Turtles hide in their shells after a hit. | Check the dip for the Star."),
-    "W2-X": (["start", "bowl_r", "boost", "flyers", "coin_run", "w2_hive", "cp", "flyers", "pillars", "coin_run", "w2_branches", "star_a", "flyers", "end"],
+    "W2-X": (["start", "bowl_r", "boost", "flyers", "coin_run", "w2_hive", "cp", "flyers", "pillars", "coin_run", "w2_branches", "cp", "star_a", "flyers", "end"],
              ("flap", "hearts"), "A whole stage of things that fly. | Popcorn-style arcs are great here, but any power works. | Keep moving!"),
     "W2-B": (["arena"], ("boss", "power"), "Gigantapple charges straight across: jump it. | Seeds come in threes. | Attack while it catches its breath."),
     # ------------------------------ World 3: Candy Carnival
-    "W3-L1": (["start", "bowl_p", "w3_belts", "qblocks", "cp", "w3_saw", "pit_plat", "tower", "cp", "w3_drips", "steps", "high_road", "star_b", "flat_coins", "end"],
+    "W3-L1": (["start", "bowl_p", "w3_belts", "qblocks", "cp", "w3_saw", "pit_plat", "tower", "cp", "w3_drips", "steps", "high_road", "cp", "star_b", "flat_coins", "end"],
               ("conveyor", "power"), "Candy belts carry you along. | Popcorn pops up and over: good for things above. | Watch the pink goo dripping from the ceiling."),
-    "W3-L2": (["start", "bowl_q", "w3_belts", "w3_saw", "cp", "crate_wall", "w3_belts", "spring_up", "moving_plat", "cp", "w3_drips", "gauntlet", "star_a", "pit_small", "end"],
+    "W3-L2": (["start", "bowl_q", "w3_belts", "w3_saw", "cp", "crate_wall", "w3_belts", "spring_up", "moving_plat", "cp", "w3_drips", "gauntlet", "cp", "star_a", "pit_small", "end"],
               ("swap", "notes"), "The Noodle Whip reaches a long way and grabs coins. | Jump when the peppermint slides away. | The Star is up high."),
-    "W3-L3": (["start", "bowl_p", "lift", "w3_saw", "pillars", "cp", "w3_belts", "climb", "w3_drips", "cp", "spike_hop", "key_gate", "star_c", "w3_belts", "end"],
+    "W3-L3": (["start", "bowl_p", "lift", "w3_saw", "pillars", "cp", "w3_belts", "climb", "w3_drips", "cp", "spike_hop", "key_gate", "cp", "star_c", "w3_belts", "end"],
               ("key", "drop"), "A long climb. Flap to make the far jumps. | Shock Slimes zap now and then: keep your distance. | Look in the dip for the Star."),
-    "W3-X": (["start", "bowl_r", "boost", "flyers", "w3_belts", "coin_run", "cp", "flyers", "spring_up", "coin_run", "w3_saw", "star_a", "flyers", "end"],
+    "W3-X": (["start", "bowl_r", "boost", "flyers", "w3_belts", "coin_run", "cp", "flyers", "spring_up", "coin_run", "w3_saw", "cp", "star_a", "flyers", "end"],
              ("flap", "hearts"), "Pop the Balloon Jellies' balloons and they fall. | Lots of coins up in the air. | Keep bouncing!"),
     "W3-B": (["arena"], ("boss", "power"), "Candy rains from above: keep moving. | Jump the sugar waves. | Attack while the King rests."),
     # ------------------------------ World 4: Icy Pond
-    "W4-L1": (["start", "bowl_p", "w4_ice", "qblocks", "cp", "w4_pond", "steps", "w4_icicles", "cp", "pit_plat", "w4_ice", "high_road", "star_b", "flat_coins", "end"],
+    "W4-L1": (["start", "bowl_p", "w4_ice", "qblocks", "cp", "w4_pond", "steps", "w4_icicles", "cp", "pit_plat", "w4_ice", "high_road", "cp", "star_b", "flat_coins", "end"],
               ("ice", "power"), "Ice is slippery: slow down before a ledge. | Freeze Shot turns a creature into a block you can stand on. | It also freezes the pond."),
-    "W4-L2": (["start", "bowl_q", "w4_icicles", "tunnel", "cp", "w4_ice", "crate_wall", "w4_pond", "spring_up", "cp", "w4_icicles", "gauntlet", "star_a", "hill", "end"],
+    "W4-L2": (["start", "bowl_q", "w4_icicles", "tunnel", "cp", "w4_ice", "crate_wall", "w4_pond", "spring_up", "cp", "w4_icicles", "gauntlet", "cp", "star_a", "hill", "end"],
               ("swap", "slide"), "Icicles wobble, then drop. | The Cocoa Shield bounces snowballs back. | Ghosts only move when you look away."),
-    "W4-L3": (["start", "bowl_p", "w4_ice", "pillars", "cp", "w4_icicles", "moving_plat", "climb", "w4_pond", "cp", "lift", "key_gate", "star_c", "w4_ice", "end"],
+    "W4-L3": (["start", "bowl_p", "w4_ice", "pillars", "cp", "w4_icicles", "moving_plat", "climb", "w4_pond", "cp", "lift", "key_gate", "cp", "star_c", "w4_ice", "end"],
               ("key", "swim"), "A slippery climb. | Freeze the pond and walk across. | The Star is in the dip."),
-    "W4-X": (["start", "bowl_r", "boost", "w4_ice", "coin_run", "w4_ice", "cp", "flyers", "w4_pond", "coin_run", "w4_icicles", "star_a", "w4_ice", "end"],
+    "W4-X": (["start", "bowl_r", "boost", "w4_ice", "coin_run", "w4_ice", "cp", "flyers", "w4_pond", "coin_run", "w4_icicles", "cp", "star_a", "w4_ice", "end"],
              ("slide", "hearts"), "Hold down while running to belly-slide across the ice. | Lots of coins. | Whee!"),
     "W4-B": (["arena"], ("boss", "power"), "Jump over the Ice Beam. | A red mark shows where spikes will pop up. | Attack while the Puffin Lord rests."),
     # ------------------------------ World 5: Windy Mill
-    "W5-L1": (["start", "bowl_p", "w5_gust", "qblocks", "cp", "w5_bridges", "steps", "w5_updraft", "cp", "pit_double", "w5_gust", "high_road", "star_b", "flat_coins", "end"],
+    "W5-L1": (["start", "bowl_p", "w5_gust", "qblocks", "cp", "w5_bridges", "steps", "w5_updraft", "cp", "pit_double", "w5_gust", "high_road", "cp", "star_b", "flat_coins", "end"],
               ("wind", "power"), "Gusts carry Tato over the gap: jump in and glide. | Garlic Dash zooms through creatures. | Fire Slimes are too hot to jump on."),
-    "W5-L2": (["start", "bowl_q", "w5_bridges", "tunnel", "cp", "w5_gust", "crate_wall", "moving_plat", "spring_up", "cp", "w5_updraft", "gauntlet", "star_a", "hill", "end"],
+    "W5-L2": (["start", "bowl_q", "w5_bridges", "tunnel", "cp", "w5_gust", "crate_wall", "moving_plat", "spring_up", "cp", "w5_updraft", "gauntlet", "cp", "star_a", "hill", "end"],
               ("swap", "flap"), "Thunder Corn's bolt jumps between creatures. | Onion Knights block shots from the front. | Hit them from behind or jump on them."),
-    "W5-L3": (["start", "bowl_p", "w5_gust", "pillars", "cp", "w5_bridges", "lift", "climb", "cracked", "cp", "w5_gust", "key_gate", "star_c", "w5_bridges", "end"],
+    "W5-L3": (["start", "bowl_p", "w5_gust", "pillars", "cp", "w5_bridges", "lift", "climb", "cracked", "cp", "w5_gust", "key_gate", "cp", "star_c", "w5_bridges", "end"],
               ("key", "notes"), "Cracked walls break with a Garlic Dash. | Flap across the plank bridges. | The Star is in the dip."),
-    "W5-X": (["start", "bowl_r", "boost", "w5_gust", "coin_run", "w5_bridges", "cp", "flyers", "w5_gust", "coin_run", "w5_updraft", "star_a", "w5_gust", "end"],
+    "W5-X": (["start", "bowl_r", "boost", "w5_gust", "coin_run", "w5_bridges", "cp", "flyers", "w5_gust", "coin_run", "w5_updraft", "cp", "star_a", "w5_gust", "end"],
              ("wind", "hearts"), "Ride the wind from one end to the other. | Glide with jump held. | Coins everywhere!"),
     "W5-B": (["arena"], ("boss", "power"), "The Turtle hovers: jump or shoot upward. | Its propeller pushes you: run against the wind. | Attack when it dips down to rest."),
     # ------------------------------ World 6: Castle Feast
-    "W6-L1": (["start", "bowl_p", "w6_torches", "qblocks", "cp", "w6_bridge", "steps", "w6_maces", "cp", "pit_plat", "w6_torches", "high_road", "star_b", "flat_coins", "end"],
+    "W6-L1": (["start", "bowl_p", "w6_torches", "qblocks", "cp", "w6_bridge", "steps", "w6_maces", "cp", "pit_plat", "w6_torches", "high_road", "cp", "star_b", "flat_coins", "end"],
               ("bridge", "power"), "Step on the button to lower the drawbridge. | Lemon Beam goes through everything in a line. | Torches flare on a rhythm."),
-    "W6-L2": (["start", "bowl_q", "w6_maces", "tunnel", "cp", "cracked", "w6_bridge", "crate_wall", "spring_up", "cp", "w6_torches", "gauntlet", "star_a", "hill", "end"],
+    "W6-L2": (["start", "bowl_q", "w6_maces", "tunnel", "cp", "cracked", "w6_bridge", "crate_wall", "spring_up", "cp", "w6_torches", "gauntlet", "cp", "star_a", "hill", "end"],
               ("swap", "button"), "Tomato Bomb breaks cracked walls. | Walk under a mace as it swings away. | Rock Golems take a lot of hits."),
-    "W6-L3": (["start", "bowl_p", "w6_maces", "pillars", "cp", "w6_bridge", "moving_plat", "climb", "w6_torches", "cp", "lift", "key_gate", "star_c", "w6_maces", "end"],
+    "W6-L3": (["start", "bowl_p", "w6_maces", "pillars", "cp", "w6_bridge", "moving_plat", "climb", "w6_torches", "cp", "lift", "key_gate", "cp", "star_c", "w6_maces", "end"],
               ("key", "notes"), "The longest climb in the castle. | Use what you have learned. | The Star is in the dip."),
-    "W6-X": (["start", "bowl_r", "boost", "gauntlet", "w6_maces", "coin_run", "cp", "flyers", "cracked", "w6_torches", "spike_hop", "star_a", "gauntlet", "end"],
+    "W6-X": (["start", "bowl_r", "boost", "gauntlet", "w6_maces", "coin_run", "cp", "flyers", "cracked", "w6_torches", "spike_hop", "cp", "star_a", "gauntlet", "end"],
              ("hearts", "power"), "A bit of everything. | Take it one room at a time. | You can do it!"),
     "W6-B": (["arena"], ("boss", "power"), "Food Bombs splat in a ring: step away. | Jump the cake waves. | Helpers march in halfway: bop them first."),
 }
