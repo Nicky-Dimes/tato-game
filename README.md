@@ -7,12 +7,14 @@ brings home the six Flavor Pages of the Great Recipe Book.
 **Three buttons: move, jump, attack. One power at a time. Five hearts. No lives.**
 Plays in a browser (including iPad and iPhone), and on Windows, macOS and Linux.
 
-> **Status (2026-11-10): development is paused for an art, animation and gameplay
-> overhaul.** Read [`DEVELOPMENT_STATUS.md`](DEVELOPMENT_STATUS.md) for what is built,
-> tested and still weak, [`UPDATED_GAMEPLAY_REQUIREMENTS.md`](UPDATED_GAMEPLAY_REQUIREMENTS.md)
-> for the direction, [`GODOT_SETUP_FOR_CHATGPT.md`](GODOT_SETUP_FOR_CHATGPT.md) for the exact engine and
-> the one-command check, [`PROJECT_ARCHITECTURE.md`](PROJECT_ARCHITECTURE.md) for how the code
-> works, and [`CHATGPT_HANDOFF.md`](CHATGPT_HANDOFF.md) for how to change it safely.
+**Play in your browser:** https://nicky-dimes.github.io/tato-game/
+(works on iPad and iPhone in Safari; hold the device sideways; the first load is about 100 MB).
+
+> **Status: version 0.4.0, a playable work in progress.** All six worlds, 30 stages and
+> six bosses can be played from start to finish. Art, animation and stage pacing are
+> still being improved, and it has not yet been tuned on older phones and tablets.
+> [`DEVELOPMENT_STATUS.md`](DEVELOPMENT_STATUS.md) and [`CHANGELOG.md`](CHANGELOG.md) say
+> what is built and tested. How the site is published: [`docs/PUBLISHING.md`](docs/PUBLISHING.md).
 
 ## Screenshots
 

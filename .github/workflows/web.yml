@@ -3,8 +3,9 @@ name: Web build and GitHub Pages
 # Builds the browser version and publishes it with GitHub Pages.
 # One-time setup in the repository: Settings > Pages > Source = "GitHub Actions".
 on:
-  push:
-    branches: [main]
+  # Manual only. The play-online site is published from the `gh-pages` branch, which
+  # holds the web build made and checked on the development Mac (docs/PUBLISHING.md).
+  # Run this by hand only after switching Settings > Pages > Source to "GitHub Actions".
   workflow_dispatch:
 
 env:
