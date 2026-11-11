@@ -5,6 +5,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 bash tools/no_sync_duplicates.sh
 test -s build/web/index.html || { echo "build/web is missing: run tools/build.sh web first"; exit 1; }
+if ls build/web | grep -q -E ' [23](\.|$)'; then echo "build/web holds cloud-sync duplicates (name 2.ext); remove them first"; exit 1; fi
 touch build/web/.nojekyll
 version="$(grep -m1 '^config/version=' game/project.godot | cut -d'"' -f2)"
 source_commit="$(git rev-parse --short HEAD)"
