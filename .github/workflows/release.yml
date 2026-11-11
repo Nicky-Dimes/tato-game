@@ -22,19 +22,18 @@ jobs:
 
       - name: Install Godot and export templates
         run: |
-          curl -sSL -o godot.zip "https://github.com/godotengine/godot/releases/download/${GODOT_RELEASE}/Godot_v${GODOT_RELEASE}_linux.x86_64.zip"
+          curl -fL --retry 3 -o godot.zip "https://github.com/godotengine/godot-builds/releases/download/${GODOT_RELEASE}/Godot_v${GODOT_RELEASE}_linux.x86_64.zip"
           unzip -q godot.zip
           sudo mv "Godot_v${GODOT_RELEASE}_linux.x86_64" /usr/local/bin/godot
-          curl -sSL -o templates.tpz "https://github.com/godotengine/godot/releases/download/${GODOT_RELEASE}/Godot_v${GODOT_RELEASE}_export_templates.tpz"
+          curl -fL --retry 3 -o templates.tpz "https://github.com/godotengine/godot-builds/releases/download/${GODOT_RELEASE}/Godot_v${GODOT_RELEASE}_export_templates.tpz"
           mkdir -p "$HOME/.local/share/godot/export_templates/${TEMPLATE_DIR}"
           unzip -q -j templates.tpz -d "$HOME/.local/share/godot/export_templates/${TEMPLATE_DIR}"
           rm templates.tpz godot.zip
 
-      - name: Tests
-        run: |
-          godot --headless --path game --import
-          godot --headless --fixed-fps 60 --path game res://tests/TestRunner.tscn -- --group=unit
-          godot --headless --fixed-fps 60 --path game res://tests/TestRunner.tscn -- --group=integration
+      - name: Full project checks
+        env:
+          TATO_QA_DIR: qa/build
+        run: bash tools/check.sh
 
       - name: Export everything
         run: tools/build.sh all

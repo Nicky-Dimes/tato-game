@@ -1,45 +1,52 @@
 #!/usr/bin/env bash
-# One command that says whether the project is healthy.
-#   tools/check.sh            import, load every file, run all tests
-#   tools/check.sh quick      import, load every file, unit tests only
-# Needs Godot 4.7.2. Uses `godot` on the PATH, or set GODOT=/path/to/the/godot/binary.
-# Exit code 0 means everything passed.
+# Reproducible checks with isolated saves, exact engine validation and retained logs.
+# Usage: tools/check.sh [all|quick|unit|integration|smoke]
 set -uo pipefail
 cd "$(dirname "$0")/.."
-GODOT="${GODOT:-godot}"
 mode="${1:-all}"
-log="$(mktemp -d)"
-fail=0
-
-echo "Godot: $("$GODOT" --version 2>/dev/null || echo 'NOT FOUND (set GODOT=/path/to/godot)')"
-
-echo "1/3 import (builds game/.godot from nothing if it is missing)"
-"$GODOT" --headless --path game --import > "$log/import.log" 2>&1
-code=$?
-problems=$(grep -c -E "^(ERROR|SCRIPT ERROR|WARNING)" "$log/import.log" || true)
-echo "    exit $code, $problems error/warning lines"
-[ "$code" -ne 0 ] && fail=1
-[ "$problems" -ne 0 ] && { grep -E -A3 "^(ERROR|SCRIPT ERROR|WARNING)" "$log/import.log" | head -40; }
-
-echo "2/3 every script, scene and resource loads"
-"$GODOT" --headless --path game res://tools/CheckScripts.tscn > "$log/check.log" 2>&1
-code=$?
-grep -E "checked [0-9]+ files" "$log/check.log" | sed 's/^/    /'
-if [ "$code" -ne 0 ] || ! grep -q "0 problem(s)" "$log/check.log"; then
-  fail=1
-  grep -v "^$" "$log/check.log" | tail -40
-fi
-
-echo "3/3 tests"
-if [ "$mode" = "quick" ]; then
-  "$GODOT" --headless --fixed-fps 60 --path game res://tests/TestRunner.tscn -- --group=unit > "$log/tests.log" 2>&1
-else
-  "$GODOT" --headless --fixed-fps 60 --path game res://tests/TestRunner.tscn > "$log/tests.log" 2>&1
-fi
-code=$?
-grep -E "^FAIL|^        - |^TESTS" "$log/tests.log" | sed 's/^/    /'
-[ "$code" -ne 0 ] && fail=1
-
-echo
-if [ "$fail" -eq 0 ]; then echo "RESULT: all checks passed"; else echo "RESULT: something failed (full logs in $log)"; fi
-exit "$fail"
+case "$mode" in all|quick|unit|integration|smoke) ;; *) echo "Unknown check mode: $mode" >&2; exit 2;; esac
+GODOT="${GODOT:-godot}"
+version=$("$GODOT" --version 2>/dev/null) || { echo 'Godot missing; set GODOT=/path/to/Godot_v4.7.2-stable_linux.x86_64' >&2; exit 2; }
+case "$version" in 4.7.2.stable.*) ;; *) echo "Requires Godot 4.7.2 stable; found $version" >&2; exit 2;; esac
+log="${TATO_QA_DIR:-$(mktemp -d "${TMPDIR:-/tmp}/tato-qa.XXXXXX")}"
+mkdir -p "$log"
+log=$(cd "$log" && pwd)
+# Never touch a developer's actual game saves/settings during tests.
+export XDG_DATA_HOME="$log/runtime/data"
+export XDG_CONFIG_HOME="$log/runtime/config"
+export XDG_CACHE_HOME="$log/runtime/cache"
+mkdir -p "$XDG_DATA_HOME" "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME"
+failed=0
+run_engine() {
+  if command -v timeout >/dev/null; then timeout "${TATO_CHECK_TIMEOUT:-240}" "$GODOT" "$@";
+  else "$GODOT" "$@"; fi
+}
+step() {
+  local name="$1"; shift
+  echo "$name"
+  if run_engine --headless --audio-driver Dummy --path game "$@" > "$log/$name.log" 2>&1; then :
+  else echo "  Command failed; see $log/$name.log"; failed=1; fi
+  if grep -qE '^SCRIPT ERROR:|Parse Error:' "$log/$name.log"; then
+    echo '  Unexpected script error'; failed=1
+  fi
+}
+echo "Godot: $version"
+if ! python3 tools/validate_art.py > "$log/art.log" 2>&1; then failed=1; fi
+cat "$log/art.log"
+echo "Logs: $log"
+step import --import
+if grep -q '^ERROR:' "$log/import.log"; then failed=1; fi
+step resources res://tools/CheckScripts.tscn
+grep -E 'checked [0-9]+ files' "$log/resources.log" || true
+grep -q '0 problem(s)' "$log/resources.log" || failed=1
+args=()
+case "$mode" in quick|unit) args=(-- --group=unit);; integration|smoke) args=(-- "--group=$mode");; esac
+# ${args[@]+...}: an empty array is "unbound" under set -u in the bash 3.2 that macOS ships
+step tests --fixed-fps 60 res://tests/TestRunner.tscn ${args[@]+"${args[@]}"}
+grep -E '^FAIL|^        - |^TESTS' "$log/tests.log" || true
+# A zero exit code without the final test marker is never a passing run.
+grep -qE '^TESTS: [0-9]+ passed, 0 failed' "$log/tests.log" || failed=1
+if [ "$failed" -eq 0 ]; then echo 'RESULT: all checks passed';
+else echo 'RESULT: checks failed'; tail -35 "$log/import.log" "$log/resources.log" "$log/tests.log"; fi
+echo "Full logs retained: $log"
+exit "$failed"

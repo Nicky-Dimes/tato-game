@@ -100,3 +100,11 @@ func reset_puzzle() -> void:
 	if not dead:
 		_anchor = home
 		_swoop = 0.0
+
+
+func anticipating() -> bool:
+	return (str(stat("pattern")) == "swoop" and (_swoop > 0.0 or (_cool > 0.0 and _cool < 0.3))) or super.anticipating()
+
+
+func attacking() -> bool:
+	return _swoop > 0.0 or super.attacking()

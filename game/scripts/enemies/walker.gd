@@ -10,6 +10,7 @@ var _rest := 0.0
 var _shell := 0.0
 var _special := 2.0
 var _warn := 0.0
+var _rush_warning := 0.0
 
 
 func _configure() -> void:
@@ -68,9 +69,14 @@ func _behave(delta: float) -> void:
 				sprite.rotation = 0.0
 			elif stat("roll") != null and not Settings.flag("reduced_motion"):
 				sprite.rotation += facing * 14.0 * delta
+		elif _rush_warning > 0.0:
+			_rush_warning = maxf(0.0, _rush_warning - delta)
+			speed = 0.0
+			if _rush_warning <= 0.0:
+				_burst = 0.75
 		elif sees and (stat("lunge") != null or stat("roll") != null) and on_floor:
 			facing = signf(d.x) if d.x != 0.0 else facing
-			_burst = 0.75
+			_rush_warning = 0.28
 			AudioService.play_varied("enemy_rush", -8.0)
 		elif bool(stat("scuttle", false)) and on_floor:
 			_burst = 0.5
@@ -113,3 +119,11 @@ func _specials(delta: float, d: Vector2) -> void:
 	if _special <= 0.0 and d.length() < 260.0:
 		_special = float(stat("pound", stat("zap", 2.5)))
 		_warn = 0.55
+
+
+func anticipating() -> bool:
+	return _warn > 0.0 or _rush_warning > 0.0 or _burst > 0.0 or super.anticipating()
+
+
+func attacking() -> bool:
+	return _burst > 0.0 or super.attacking()

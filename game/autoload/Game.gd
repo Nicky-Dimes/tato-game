@@ -71,6 +71,12 @@ func _process(delta: float) -> void:
 	_stats_label.text = "%d fps  %d draws  %d nodes\nframe %.1f ms  physics %.1f ms\nmem %.0f MB  textures %.0f MB" % [fps, draws, nodes, frame_ms, physics_ms, mem, vram]
 	if OS.has_feature("web"):
 		JavaScriptBridge.eval("window.tatoStats={fps:%d,draws:%d,objects:%d,nodes:%d,frameMs:%.2f,physicsMs:%.2f,memMB:%.1f,texMB:%.1f,view:[%d,%d]}" % [fps, draws, objects, nodes, frame_ms, physics_ms, mem, vram, int(size.x), int(size.y)], true)
+		var scene := get_tree().current_scene
+		var debug := {"paused": get_tree().paused, "scene": scene.scene_file_path if scene != null else "", "x": -1.0, "hearts": GameState.hearts, "power": ""}
+		if scene is Level and scene.player != null:
+			debug["x"] = scene.player.position.x
+			debug["power"] = str(scene.player.power.power)
+		JavaScriptBridge.eval("window.tatoDebug=" + JSON.stringify(debug), true)
 
 
 func goto(path: String, args: Dictionary = {}) -> void:
@@ -176,3 +182,30 @@ func quit_game() -> void:
 	GameState.save()
 	Settings.save_settings()
 	get_tree().quit()
+
+
+## Capture/debug options apply from an autoload, which survives the boot scene.
+func configure_debug_stage(power: String, panel: String, scale_proof: bool = false) -> void:
+	while is_transitioning:
+		await get_tree().process_frame
+	var stage := get_tree().current_scene as Level
+	if stage == null:
+		return
+	if power != "" and FoodDB.food(StringName(power)) != null:
+		stage.player.power.pick_up(StringName(power))
+	if scale_proof:
+		stage.hud._banner.visible = false
+		var cell := stage.cell_at(stage.player.position - Vector2(220, 1))
+		var enemy := EntityFactory.create(stage, {"type": "rock_golem", "cell": cell, "args": [], "params": {}}) as Enemy
+		stage.entities.add_child(enemy)
+		enemy.global_position = stage.player.position - Vector2(220, 0)
+		var caption := Label.new()
+		caption.text = "Scale QA: Rock Golem 86px · Tato ~102px · Boss " + str(int(stage.boss.height)) + "px" if stage.boss != null else "Scale QA"
+		caption.position = Vector2(24, 230)
+		caption.add_theme_font_size_override("font_size", 18)
+		caption.add_theme_color_override("font_color", Color.WHITE)
+		caption.add_theme_color_override("font_outline_color", Color("301444"))
+		caption.add_theme_constant_override("outline_size", 4)
+		stage.hud.root.add_child(caption)
+	if panel in ["pause", "journal", "settings", "map"]:
+		stage._pause_menu.open("" if panel == "pause" else panel)

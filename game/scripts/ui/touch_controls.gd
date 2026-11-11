@@ -17,7 +17,6 @@ var _held: Dictionary = {}       # touch index -> action
 var _move_rect := Rect2()
 var _jump_c := Vector2.ZERO
 var _attack_c := Vector2.ZERO
-var _pause_rect := Rect2()
 
 
 func _ready() -> void:
@@ -59,7 +58,6 @@ func _layout() -> void:
 	_move_rect = Rect2(Vector2(34, view.y - 34 - MOVE_SIZE.y * k), MOVE_SIZE * k)
 	_jump_c = Vector2(view.x - 110 * k, view.y - 104 * k)
 	_attack_c = Vector2(view.x - 268 * k, view.y - 96 * k)
-	_pause_rect = Rect2(view.x - 84, 12, 72, 72)
 	_pad.queue_redraw()
 
 
@@ -82,9 +80,6 @@ func _to_pad(screen_pos: Vector2) -> Vector2:
 
 func _press(index: int, pos: Vector2) -> void:
 	if get_tree().paused:
-		return
-	if _pause_rect.has_point(pos):
-		_tap_action("pause")
 		return
 	var k := size_factor()
 	if pos.distance_to(_jump_c) <= JUMP_R * k * 1.2:
@@ -217,9 +212,3 @@ class Pad:
 				var w := font.get_string_size(label, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
 				draw_string_outline(font, tc._attack_c + Vector2(-w * 0.5, fs * 0.36), label, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, 8, plum)
 				draw_string(font, tc._attack_c + Vector2(-w * 0.5, fs * 0.36), label, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color.WHITE)
-		# --- pause
-		var pr := tc._pause_rect
-		draw_circle(pr.get_center(), 34.0, Color(plum.r, plum.g, plum.b, 0.55))
-		draw_circle(pr.get_center(), 28.0, Color(1, 0.98, 0.94, 0.9))
-		draw_rect(Rect2(pr.get_center() + Vector2(-11, -12), Vector2(8, 24)), plum)
-		draw_rect(Rect2(pr.get_center() + Vector2(3, -12), Vector2(8, 24)), plum)

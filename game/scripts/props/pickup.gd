@@ -132,7 +132,9 @@ func grab(player: Tato) -> void:
 			Fx.float_text(level, at + Vector2(0, -40), "Key!", UITheme.YELLOW)
 		"pickup":
 			_use(what, player, at)
-	Fx.sparkle(level, at, Color(1, 0.92, 0.45), 4)
+	Fx.sparkle(level, at, Color(1, 0.92, 0.45), 6)
+	if kind in ["heart", "extraheal", "star", "note", "key"]:
+		Fx.pop_ring(level, at, Color(1, 0.85, 0.55, 0.85), 34.0)
 	queue_free()
 
 

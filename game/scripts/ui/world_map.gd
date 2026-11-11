@@ -26,7 +26,7 @@ func _build() -> void:
 	var w: Dictionary = LevelDB.WORLDS[_world_index]
 	var wid: String = w["id"]
 	var bg := TextureRect.new()
-	bg.texture = Art.tex("cards/scene_%s" % str(w["theme"]))
+	bg.texture = ProductionArt.landscape(str(w["theme"]), "far")
 	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	bg.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
@@ -62,7 +62,7 @@ func _build() -> void:
 		var open := GameState.is_unlocked(stage_id) and LevelDB.has_level(stage_id)
 		var kind := LevelDB.stage_kind(stage_id)
 		var card := UITheme.panel(UITheme.CREAM if open else Color("d9cfe0"))
-		card.custom_minimum_size = Vector2(214, 300)
+		card.custom_minimum_size = Vector2(204, 300)
 		card.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		var col := VBoxContainer.new()
 		col.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -83,7 +83,7 @@ func _build() -> void:
 		var nl := UITheme.label(LevelDB.stage_name(stage_id) if open else "? ? ?", 22, UITheme.PLUM, true)
 		nl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		nl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		nl.custom_minimum_size = Vector2(190, 0)
+		nl.custom_minimum_size = Vector2(170, 0)
 		col.add_child(nl)
 		var stars := HBoxContainer.new()
 		stars.alignment = BoxContainer.ALIGNMENT_CENTER

@@ -46,7 +46,7 @@ func setup(lv: Level, e: Dictionary) -> void:
 	stats = EnemyData.STATS.get(kind, {})
 	hp = int(stats.get("hp", 1))
 	height = float(stats.get("h", 56.0))
-	_art_faces = float(stats.get("faces", 1))
+	_art_faces = 1.0 # All production cels face right.
 	position = LevelData.cell_floor(e.get("cell", Vector2i.ZERO))
 	home = position
 	collision_layer = Layers.ENEMY
@@ -64,7 +64,8 @@ func setup(lv: Level, e: Dictionary) -> void:
 func _build() -> void:
 	sprite = Art.standing("enemies/" + kind)
 	if sprite.texture != null:
-		_base_scale = height / float(sprite.texture.get_height())
+		_base_scale = height / float(sprite.texture.get_meta("body_height"))
+		sprite.offset = -Vector2(sprite.texture.get_meta("anchor"))
 	sprite.scale = Vector2(_base_scale, _base_scale)
 	add_child(sprite)
 	var w := height * 0.72
@@ -328,16 +329,36 @@ func _bump(player: Tato) -> void:
 	player.hurt(global_position)
 
 
+func attacking() -> bool:
+	return stats.has("shot") and shot_timer > float(stats.get("every", 2.2)) - 0.18
+
+
+func anticipating() -> bool:
+	return stats.has("shot") and shot_timer > 0.0 and shot_timer < 0.4
+
+
 func _look() -> void:
 	if sprite == null:
 		return
 	sprite.flip_h = (facing * _art_faces) < 0.0
-	var frame_id := int(_visual_time * (9.0 if absf(velocity.x) > 15.0 else 4.0)) % 4
+	var flying := kind in ["bee_buzzer", "crow_swooper", "ghost_poof", "pie_bat", "balloon_jelly"]
+	var moving_cels := absf(velocity.x) > 15.0 or flying
+	var motion_cels := [1, 4, 2, 5]
+	var frame_id: int = motion_cels[int(_visual_time * 10.0) % 4] if moving_cels else 0
 	if frozen_left > 0.0 or Settings.flag("reduced_motion"):
 		frame_id = 0
-	var animation_tex := Art.tex("enemies/anim/%s_%d" % [kind, frame_id])
+	if not is_busy() and attacking():
+		frame_id = 6
+	elif not is_busy() and anticipating():
+		frame_id = 3 # Keep gameplay tells visible even with Reduced Motion.
+	if flash_left > 0.0 and frozen_left <= 0.0:
+		frame_id = 7
+	var animation_tex := ProductionArt.enemy_frame(kind, frame_id)
 	if animation_tex != null:
 		sprite.texture = animation_tex
+		sprite.material = animation_tex.get_meta("silhouette_material") if animation_tex.has_meta("silhouette_material") else null
+		_base_scale = height / float(animation_tex.get_meta("body_height"))
+		sprite.offset = -Vector2(animation_tex.get_meta("anchor"))
 	var m := Color.WHITE
 	if frozen_left > 0.0:
 		m = Color(0.6, 0.85, 1.0)

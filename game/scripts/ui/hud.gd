@@ -33,6 +33,12 @@ var _card: PanelContainer
 var _toast_box: VBoxContainer
 var _boss_bar: ProgressBar
 var _boss_name: Label
+var _power_name: Label
+var _power_hint: Label
+var _readiness: ProgressBar
+var _journey: ProgressBar
+var _objective: Label
+var _legend: Label
 var _hint_step := 0
 var _hint_lines: Array = []
 
@@ -60,91 +66,159 @@ func setup(lv: Level) -> void:
 	root.theme = UITheme.theme()
 	add_child(root)
 
-	# Production HUD plates: actual painted assets behind existing functional controls.
-	var health_plate := TextureRect.new()
-	health_plate.texture = Art.tex("ui/hud_left")
-	health_plate.position = Vector2(8, 6)
-	health_plate.size = Vector2(436, 102)
-	health_plate.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	health_plate.stretch_mode = TextureRect.STRETCH_SCALE
-	health_plate.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	root.add_child(health_plate)
-	var counter_plate := TextureRect.new()
-	counter_plate.texture = Art.tex("ui/hud_right")
-	counter_plate.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
-	counter_plate.offset_left = -555.0
-	counter_plate.offset_right = -101.0
-	counter_plate.offset_top = 8.0
-	counter_plate.offset_bottom = 104.0
-	counter_plate.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	counter_plate.stretch_mode = TextureRect.STRETCH_SCALE
-	counter_plate.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	root.add_child(counter_plate)
-
-	# --- top-left: hearts + power badge, boosts underneath
-	var left := VBoxContainer.new()
-	left.position = Vector2(30, 27)
-	left.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	left.add_theme_constant_override("separation", 4)
-	root.add_child(left)
-	var top := HBoxContainer.new()
-	top.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	top.add_theme_constant_override("separation", 4)
-	left.add_child(top)
+	# Container layout preserves readable spacing at every window aspect ratio.
+	var header := HBoxContainer.new()
+	header.name = "GameplayHeader"
+	header.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	header.offset_left = 16
+	header.offset_right = -16
+	header.offset_top = 14
+	header.offset_bottom = 100
+	header.add_theme_constant_override("separation", 12)
+	header.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(header)
+	var health := _plate(header, 284)
+	var health_row := HBoxContainer.new()
+	health_row.add_theme_constant_override("separation", 10)
+	health.add_child(health_row)
+	var portrait := _icon("ui/tato_hud_portrait", 60)
+	health_row.add_child(portrait)
+	var health_info := VBoxContainer.new()
+	health_info.alignment = BoxContainer.ALIGNMENT_CENTER
+	health_row.add_child(health_info)
+	health_info.add_child(UITheme.label("TATO!", 17, UITheme.CREAM, true))
+	var hearts := HBoxContainer.new()
+	hearts.add_theme_constant_override("separation", 2)
+	health_info.add_child(hearts)
 	for i in GameState.MAX_HEARTS:
-		var h := _icon("items/heart", 44.0)
-		top.add_child(h)
-		_hearts.append(h)
-	var gap := Control.new()
-	gap.custom_minimum_size = Vector2(8, 0)
-	top.add_child(gap)
+		var heart := _icon("items/heart", 32)
+		hearts.add_child(heart)
+		_hearts.append(heart)
+	var power := _plate(header, 272)
+	var power_row := HBoxContainer.new()
+	power_row.add_theme_constant_override("separation", 10)
+	power.add_child(power_row)
 	_badge = PowerBadge.new()
-	top.add_child(_badge)
-	_boost_row = HBoxContainer.new()
-	_boost_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_boost_row.add_theme_constant_override("separation", 6)
-	left.add_child(_boost_row)
-	for b: Array in BOOSTS:
-		var bi := BoostIcon.new()
-		bi.texture = Art.tex(b[1])
-		bi.visible = false
-		_boost_row.add_child(bi)
-		_boost_icons[b[0]] = bi
-	var orb := BoostIcon.new()
-	orb.texture = Art.tex("pickups/orb")
-	orb.visible = false
-	_boost_row.add_child(orb)
-	_boost_icons["orb_guard"] = orb
-	var slow := BoostIcon.new()
-	slow.texture = Art.tex("pickups/time")
-	slow.visible = false
-	_boost_row.add_child(slow)
-	_boost_icons["slow"] = slow
-
-	# --- top-right: coins, notes, keys (leaves room for the pause button)
+	_badge.name = "ActivePowerBadge"
+	power_row.add_child(_badge)
+	var power_info := VBoxContainer.new()
+	power_info.alignment = BoxContainer.ALIGNMENT_CENTER
+	power_info.add_theme_constant_override("separation", 2)
+	power_info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	power_row.add_child(power_info)
+	_power_name = UITheme.label("Honk", 23, UITheme.CREAM, true)
+	_power_name.name = "PowerName"
+	power_info.add_child(_power_name)
+	_readiness = ProgressBar.new()
+	_readiness.name = "AttackReadiness"
+	_readiness.custom_minimum_size = Vector2(150, 10)
+	_readiness.max_value = 1.0
+	_readiness.step = 0.001
+	_readiness.show_percentage = false
+	_readiness.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_readiness.add_theme_stylebox_override("background", UITheme.box(Color("211c39"), UITheme.PEACH, 5, 1, false))
+	_readiness.add_theme_stylebox_override("fill", UITheme.box(UITheme.YELLOW, UITheme.ORANGE, 5, 0, false))
+	for style_name in ["background", "fill"]:
+		var style := _readiness.get_theme_stylebox(style_name).duplicate() as StyleBoxFlat
+		style.set_content_margin_all(0)
+		_readiness.add_theme_stylebox_override(style_name, style)
+	power_info.add_child(_readiness)
+	_power_hint = UITheme.label("", 15, UITheme.PEACH)
+	power_info.add_child(_power_hint)
+	var spacer := Control.new()
+	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	header.add_child(spacer)
+	var counts := _plate(header, 264)
 	var right := HBoxContainer.new()
-	right.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
-	right.offset_left = -470.0
-	right.offset_right = -100.0
-	right.offset_top = 29.0
-	right.alignment = BoxContainer.ALIGNMENT_END
-	right.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	right.alignment = BoxContainer.ALIGNMENT_CENTER
 	right.add_theme_constant_override("separation", 8)
-	root.add_child(right)
-	_timer_label = UITheme.outlined_label("", 26)
-	_timer_label.visible = Settings.flag("show_timer") or level.kind == "optional"
-	right.add_child(_timer_label)
-	_key_icon = _icon("items/key", 38.0)
-	right.add_child(_key_icon)
-	_keys = UITheme.outlined_label("0", 28)
-	right.add_child(_keys)
-	right.add_child(_icon("items/treasure_note", 40.0))
-	_notes = UITheme.outlined_label("0/3", 28)
-	right.add_child(_notes)
-	right.add_child(_icon("items/coin", 38.0))
-	_coins = UITheme.outlined_label("0", 28)
-	_coins.custom_minimum_size = Vector2(54, 0)
+	counts.add_child(right)
+	right.add_child(_icon("items/coin", 34))
+	_coins = UITheme.label("0", 28, UITheme.CREAM, true)
+	_coins.custom_minimum_size.x = 42
 	right.add_child(_coins)
+	right.add_child(_icon("items/treasure_note", 34))
+	_notes = UITheme.label("0/3", 25, UITheme.CREAM, true)
+	right.add_child(_notes)
+	_key_icon = _icon("items/key", 26)
+	right.add_child(_key_icon)
+	_keys = UITheme.label("0", 22, UITheme.CREAM, true)
+	right.add_child(_keys)
+	var pause := UITheme.button("II", Vector2(74, 76))
+	pause.name = "PauseButton"
+	pause.tooltip_text = "Pause / " + Controls.prompt("pause")
+	pause.pressed.connect(func() -> void:
+		if not level.finished:
+			level._pause_menu.open())
+	header.add_child(pause)
+
+	var stage := PanelContainer.new()
+	stage.name = "StageProgress"
+	stage.position = Vector2(18, 112)
+	stage.custom_minimum_size = Vector2(300, 0)
+	stage.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	stage.add_theme_stylebox_override("panel", UITheme.box(Color("fff1ce"), Color("a56938"), 16, 2))
+	root.add_child(stage)
+	var stage_info := VBoxContainer.new()
+	stage_info.add_theme_constant_override("separation", 3)
+	stage.add_child(stage_info)
+	var stage_title := UITheme.label(level.level_id + "  ·  " + LevelDB.stage_name(level.level_id), 19, UITheme.PLUM, true)
+	stage_info.add_child(stage_title)
+	_objective = UITheme.label("", 14, UITheme.PLUM_SOFT)
+	stage_info.add_child(_objective)
+	_journey = ProgressBar.new()
+	_journey.max_value = 1.0
+	_journey.step = 0.001
+	_journey.show_percentage = false
+	_journey.custom_minimum_size = Vector2(0, 7)
+	_journey.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	stage_info.add_child(_journey)
+
+	var tools := HBoxContainer.new()
+	tools.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+	tools.offset_left = -286
+	tools.offset_right = -18
+	tools.offset_top = 114
+	tools.add_theme_constant_override("separation", 8)
+	root.add_child(tools)
+	for entry: Array in [["Notebook", "journal"], ["Map", "map"]]:
+		var button := UITheme.small_button(entry[0])
+		button.name = entry[0] + "Button"
+		var section: String = entry[1]
+		button.pressed.connect(func() -> void:
+			if not level.finished:
+				level._pause_menu.open(section))
+		tools.add_child(button)
+	_timer_label = UITheme.outlined_label("", 19)
+	_timer_label.position = Vector2(24, 209)
+	_timer_label.visible = Settings.flag("show_timer") or level.kind == "optional"
+	root.add_child(_timer_label)
+	_boost_row = HBoxContainer.new()
+	_boost_row.position = Vector2(338, 112)
+	_boost_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(_boost_row)
+	for b: Array in BOOSTS:
+		var icon := BoostIcon.new()
+		icon.texture = Art.tex(b[1])
+		icon.visible = false
+		_boost_row.add_child(icon)
+		_boost_icons[b[0]] = icon
+	for entry: Array in [["orb_guard", "pickups/orb"], ["slow", "pickups/time"]]:
+		var icon := BoostIcon.new()
+		icon.texture = Art.tex(entry[1])
+		icon.visible = false
+		_boost_row.add_child(icon)
+		_boost_icons[entry[0]] = icon
+	_legend = UITheme.outlined_label("", 17)
+	_legend.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
+	_legend.offset_left = 22
+	_legend.offset_top = -36
+	_legend.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(_legend)
+	_update_controls()
+	Controls.bindings_changed.connect(_update_controls)
+	Controls.device_changed.connect(func(_device: String) -> void: _update_controls())
 
 	# --- interact prompt (bottom centre)
 	_prompt = PanelContainer.new()
@@ -164,7 +238,7 @@ func setup(lv: Level) -> void:
 	_tip.add_theme_stylebox_override("panel", UITheme.box(UITheme.CREAM, UITheme.PLUM, 22, 4))
 	_tip.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
 	_tip.grow_horizontal = Control.GROW_DIRECTION_BOTH
-	_tip.offset_top = 96.0
+	_tip.offset_top = 204.0
 	_tip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_tip.visible = false
 	_tip_label = UITheme.label("", 24, UITheme.PLUM, true)
@@ -177,7 +251,7 @@ func setup(lv: Level) -> void:
 	_banner = VBoxContainer.new()
 	_banner.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
 	_banner.grow_horizontal = Control.GROW_DIRECTION_BOTH
-	_banner.offset_top = 120.0
+	_banner.offset_top = 214.0
 	_banner.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_banner.modulate.a = 0.0
 	root.add_child(_banner)
@@ -194,7 +268,7 @@ func setup(lv: Level) -> void:
 	_toast_box.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
 	_toast_box.offset_left = -380.0
 	_toast_box.offset_right = -20.0
-	_toast_box.offset_top = 84.0
+	_toast_box.offset_top = 184.0
 	_toast_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(_toast_box)
 
@@ -228,10 +302,10 @@ func setup(lv: Level) -> void:
 	GameState.coins_changed.connect(func(_s: int, _w: int) -> void: refresh_counts())
 	GameState.keys_changed.connect(func(_k: int) -> void: refresh_counts())
 	GameState.toast.connect(show_toast)
-	level.player.power_changed.connect(func(_p: StringName) -> void: _badge.set_power(level.player.power.power))
+	level.player.power_changed.connect(_on_power_changed)
 	level.player.interact_target_changed.connect(_on_target)
 	Controls.device_changed.connect(func(_d: String) -> void: _on_target(level.player.interact_target))
-	_badge.set_power(level.player.power.power)
+	_on_power_changed(level.player.power.power)
 	_on_hearts(GameState.hearts)
 	refresh_counts()
 
@@ -254,6 +328,10 @@ func _process(_delta: float) -> void:
 	if def != null and p.runner.cooldowns.has(def.id):
 		_badge.cooldown = clampf(float(p.runner.cooldowns[def.id]) / maxf(def.cooldown, 0.01), 0.0, 1.0)
 	_badge.queue_redraw()
+	_readiness.value = 1.0 - _badge.cooldown
+	_power_hint.text = "%s  ·  %s" % [Controls.prompt("attack"), "Ready" if _badge.cooldown <= 0 else "Recharging"]
+	_journey.value = clampf(p.position.x / maxf(1.0, level.data.pixel_size().x), 0, 1)
+	_legend.visible = not Controls.using_touch()
 	if _timer_label.visible:
 		_timer_label.text = format_time(level.elapsed)
 
@@ -272,11 +350,32 @@ func _on_hearts(value: int) -> void:
 
 
 func refresh_counts() -> void:
+	_objective.text = "Notes %d/%d  ·  %s" % [level.notes_found, level.notes_total, "Find the Flavor Page" if level.kind == "boss" else "Reach the flag"]
 	_coins.text = str(GameState.stage_coins)
 	_notes.text = "%d/%d" % [level.notes_found, level.notes_total]
 	_keys.text = str(GameState.keys)
 	_keys.visible = GameState.keys > 0
 	_key_icon.visible = GameState.keys > 0
+
+
+func _plate(parent: Node, width: float) -> PanelContainer:
+	var panel := PanelContainer.new()
+	panel.custom_minimum_size = Vector2(width, 80)
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	panel.add_theme_stylebox_override("panel", UITheme.box(Color("343052"), Color("ffdc83"), 23, 3))
+	parent.add_child(panel)
+	return panel
+
+
+func _on_power_changed(id: StringName) -> void:
+	_badge.set_power(id)
+	var definition := level.player.power.definition()
+	_power_name.text = definition.ability_name if definition != null else "Honk"
+	_power_name.tooltip_text = definition.description if definition != null else "A friendly honk that bops nearby creatures. Collect food for a new attack."
+
+
+func _update_controls() -> void:
+	_legend.text = "%s / %s  Move     %s  Jump / flap     %s  Attack     %s  Pause" % [Controls.prompt("move_left"), Controls.prompt("move_right"), Controls.prompt("jump"), Controls.prompt("attack"), Controls.prompt("pause")]
 
 
 func on_boost() -> void:
@@ -293,6 +392,7 @@ func _on_target(target: Node) -> void:
 
 
 func show_tip(owner_obj: Object, text: String) -> void:
+	_banner.visible = false
 	_tip_owner = owner_obj
 	_tip_label.text = Controls.fill(text)
 	_tip.visible = true
@@ -302,6 +402,7 @@ func show_tip(owner_obj: Object, text: String) -> void:
 func hide_tip(owner_obj: Object) -> void:
 	if _tip_owner == owner_obj:
 		_tip.visible = false
+		_banner.visible = true
 		_tip_owner = null
 
 
@@ -312,7 +413,7 @@ func show_banner(title: String, subtitle: String) -> void:
 		var sub := UITheme.outlined_label(subtitle, 26)
 		sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		_banner.add_child(sub)
-	_banner.add_child(UITheme.title_label(title, 50))
+	_banner.add_child(UITheme.title_label(title, 38))
 	var t := create_tween()
 	t.tween_property(_banner, "modulate:a", 1.0, 0.4)
 	t.tween_interval(2.2)
@@ -454,7 +555,7 @@ class PowerBadge:
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 	func set_power(id: StringName) -> void:
-		icon = FoodDB.food_icon(id) if id != &"" else Art.tex("ui/btn_jump")
+		icon = FoodDB.food_icon(id) if id != &"" else TatoVisual.frame_texture("cel_0")
 		modulate = Color.WHITE
 		queue_redraw()
 

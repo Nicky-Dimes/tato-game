@@ -15,6 +15,24 @@ static func tex(short: String) -> Texture2D:
 	if _cache.has(short):
 		return _cache[short]
 	var found: Texture2D = null
+	var override_path := BASE + "override/" + short.replace("/", "_") + ".png"
+	if ResourceLoader.exists(override_path):
+		found = load(override_path) as Texture2D
+		if found != null:
+			found.set_meta("anchor", Vector2(found.get_width() * 0.5, found.get_height()))
+			found.set_meta("body_height", float(found.get_height()))
+			_cache[short] = found
+			return found
+	if short.begins_with("enemies/") and short.count("/") == 1:
+		found = ProductionArt.enemy_frame(short.get_file(), 0)
+		if found != null:
+			_cache[short] = found
+			return found
+	if short.begins_with("bosses/") and short.count("/") == 1:
+		found = ProductionArt.boss_frame(short.get_file(), 0)
+		if found != null:
+			_cache[short] = found
+			return found
 	for path: String in [BASE + "override/" + short.replace("/", "_") + ".png", BASE + short + ".png", BASE + short + ".svg"]:
 		if ResourceLoader.exists(path):
 			found = load(path) as Texture2D

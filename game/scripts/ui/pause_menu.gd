@@ -101,7 +101,24 @@ func close() -> void:
 func _show_sub(which: String) -> void:
 	_clear_sub()
 	var panel: Control
-	if which == "journal":
+	if which == "map":
+		var confirm := UITheme.panel()
+		confirm.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+		confirm.grow_horizontal = Control.GROW_DIRECTION_BOTH
+		confirm.grow_vertical = Control.GROW_DIRECTION_BOTH
+		var box := VBoxContainer.new()
+		box.add_theme_constant_override("separation", 14)
+		confirm.add_child(box)
+		box.add_child(UITheme.title_label("Back to the map?", 36))
+		box.add_child(UITheme.label("You can replay this stage any time.", 22))
+		var stay := _add(box, "Keep playing", _back_to_main)
+		_add(box, "Save and leave", func() -> void:
+			close()
+			GameState.save()
+			Game.leave_level(false))
+		panel = confirm
+		stay.grab_focus.call_deferred()
+	elif which == "journal":
 		var j := JournalPanel.new()
 		j.closed.connect(_back_to_main)
 		panel = j

@@ -5,6 +5,7 @@ extends Prop
 var food_id: StringName = &"FIRE_PEPPER"
 var _icon: Sprite2D
 var _cool := 0.0
+var _aura_time := 0.0
 
 
 func _configure() -> void:
@@ -26,6 +27,19 @@ func _configure() -> void:
 
 func _physics_process(delta: float) -> void:
 	_cool = maxf(_cool - delta, 0.0)
+	if not Settings.flag("reduced_motion"):
+		_aura_time += delta
+		_icon.rotation = sin(_aura_time * 2.0) * 0.07
+		if Engine.get_physics_frames() % 4 == 0:
+			queue_redraw()
+
+func _draw() -> void:
+	var color := Color(1.0, 0.83, 0.38, 0.5)
+	for n in 3:
+		var phase := float(n) * TAU / 3.0 + _aura_time * 1.3
+		var at := Vector2(sin(phase) * 29.0, -83.0 + cos(phase) * 22.0)
+		draw_circle(at, 2.8, color)
+		draw_circle(at + Vector2(-0.8, -0.8), 1.0, Color(1, 1, 1, 0.8))
 
 
 func _on_touch(body: Node) -> void:
@@ -36,6 +50,8 @@ func _on_touch(body: Node) -> void:
 		return
 	_cool = 1.0
 	player.collect_power(food_id)
+	Fx.pop_ring(level, global_position + Vector2(0, -65), Color(1, 0.9, 0.45, 0.9), 65.0)
+	Fx.sparkle(level, global_position + Vector2(0, -65), Color(1, 1, 0.65), 8)
 	var base := _icon.scale
 	var t := create_tween()
 	t.tween_property(_icon, "scale", base * 1.4, 0.08)

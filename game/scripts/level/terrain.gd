@@ -210,6 +210,21 @@ func _build_tiles() -> void:
 	tiles = TileMapLayer.new()
 	tiles.name = "Tiles"
 	tiles.tile_set = ts
+	# Overlay painted, irregular rock texture in world space rather than
+	# restarting the stone motif in every 32px atlas quadrant. Gameplay
+	# collisions, tile coordinates and existing turf edges stay unchanged.
+	var material_shader := load("res://assets/tiles/rock_worldspace.gdshader") as Shader
+	if material_shader != null:
+		var rock_tex := load("res://assets/production/terrain_materials.png") as Texture2D
+		var mask_tex := load("res://assets/tiles/rock_mask_%s.png" % theme) as Texture2D
+		if rock_tex != null and mask_tex != null:
+			var painted := ShaderMaterial.new()
+			painted.shader = material_shader
+			painted.set_shader_parameter("rock_texture", rock_tex)
+			painted.set_shader_parameter("rock_mask", mask_tex)
+			painted.set_shader_parameter("rock_region", ProductionArt.region_for(theme))
+			painted.set_shader_parameter("rock_world_span", 224.0)
+			tiles.material = painted
 	tiles.scale = Vector2(float(TILE) / (SUB * 2.0), float(TILE) / (SUB * 2.0))
 	tiles.collision_enabled = false
 	tiles.navigation_enabled = false

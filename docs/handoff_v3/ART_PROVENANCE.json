@@ -1,0 +1,122 @@
+[
+  {
+    "file": "game/assets/production/bosses.png",
+    "sha256": "28262b4e4efbd63f55493c7617d0dc0302a334154e8e4679ddc4af0268cf2084",
+    "source": "Original image_gen artwork made in this chat on2026-11-11 from owner reference/independent prompts",
+    "integration": "PNG intact; Godot atlas regions, anchors and connected silhouette masks are in animation_layout.json. chef_castle_corrected.png supersedes the earlier Chef rows."
+  },
+  {
+    "file": "game/assets/production/bosses_extra.png",
+    "sha256": "8531b20e33cf35f935991b2b1e1d50f3fe23cecf3c1c2e5bac7893cff2d87061",
+    "source": "Original image_gen artwork made in this chat on2026-11-11 from owner reference/independent prompts",
+    "integration": "PNG intact; Godot atlas regions, anchors and connected silhouette masks are in animation_layout.json. chef_castle_corrected.png supersedes the earlier Chef rows."
+  },
+  {
+    "file": "game/assets/production/candy_far.png",
+    "sha256": "9869b21be625355611f5acd7dc27e898864b99432fa8405c2691fa5586f6ae10",
+    "source": "Original image_gen artwork made in this chat on2026-11-11 from owner reference/independent prompts",
+    "integration": "PNG intact; Godot atlas regions, anchors and connected silhouette masks are in animation_layout.json. chef_castle_corrected.png supersedes the earlier Chef rows."
+  },
+  {
+    "file": "game/assets/production/castle_far.png",
+    "sha256": "c864286caa11c374ece68a2462953b01305d21ec40b19d3c39e1a2037bede96d",
+    "source": "Original image_gen artwork made in this chat on2026-11-11 from owner reference/independent prompts",
+    "integration": "PNG intact; Godot atlas regions, anchors and connected silhouette masks are in animation_layout.json. chef_castle_corrected.png supersedes the earlier Chef rows."
+  },
+  {
+    "file": "game/assets/production/chef_castle_corrected.png",
+    "sha256": "2989eb1d438897be3a8a569c57056ac48375acea34f28214cd98bb717f1db2c0",
+    "source": "Original image_gen artwork made in this chat on2026-11-11 from owner reference/independent prompts",
+    "integration": "PNG intact; Godot atlas regions, anchors and connected silhouette masks are in animation_layout.json. chef_castle_corrected.png supersedes the earlier Chef rows."
+  },
+  {
+    "file": "game/assets/production/enemies_flyers.png",
+    "sha256": "a4b8b11d0fb259219d24f78d0ce7c289b7a543a39d792ee6336820084c9ba123",
+    "source": "Original image_gen artwork made in this chat on2026-11-11 from owner reference/independent prompts",
+    "integration": "PNG intact; Godot atlas regions, anchors and connected silhouette masks are in animation_layout.json. chef_castle_corrected.png supersedes the earlier Chef rows."
+  },
+  {
+    "file": "game/assets/production/enemies_flyers_extra.png",
+    "sha256": "28fa52495612fbb3e40eaa5e594223132013810088b80feb21e4f17e40e0305e",
+    "source": "Original image_gen artwork made in this chat on2026-11-11 from owner reference/independent prompts",
+    "integration": "PNG intact; Godot atlas regions, anchors and connected silhouette masks are in animation_layout.json. chef_castle_corrected.png supersedes the earlier Chef rows."
+  },
+  {
+    "file": "game/assets/production/enemies_garden.png",
+    "sha256": "d66416ba825c5bc890addb0a87f625a71c3cff979919b2d2b240df2d967d6e8a",
+    "source": "Original image_gen artwork made in this chat on2026-11-11 from owner reference/independent prompts",
+    "integration": "PNG intact; Godot atlas regions, anchors and connected silhouette masks are in animation_layout.json. chef_castle_corrected.png supersedes the earlier Chef rows."
+  },
+  {
+    "file": "game/assets/production/enemies_garden_extra.png",
+    "sha256": "0a3a563f60e688c7553dd52a29c30db890f29c6d3c5e6509d980039eb067bcc6",
+    "source": "Original image_gen artwork made in this chat on2026-11-11 from owner reference/independent prompts",
+    "integration": "PNG intact; Godot atlas regions, anchors and connected silhouette masks are in animation_layout.json. chef_castle_corrected.png supersedes the earlier Chef rows."
+  },
+  {
+    "file": "game/assets/production/enemies_guardians.png",
+    "sha256": "f1115056a32d9c2095882ff99146e99da345c3f0d6cc5d66f9557b215d0e707d",
+    "source": "Original image_gen artwork made in this chat on2026-11-11 from owner reference/independent prompts",
+    "integration": "PNG intact; Godot atlas regions, anchors and connected silhouette masks are in animation_layout.json. chef_castle_corrected.png supersedes the earlier Chef rows."
+  },
+  {
+    "file": "game/assets/production/enemies_guardians_extra.png",
+    "sha256": "9a2420d957b3e3c0821494abedf6b8130bf009ae3cecd232ee8f98142ba8d176",
+    "source": "Original image_gen artwork made in this chat on2026-11-11 from owner reference/independent prompts",
+    "integration": "PNG intact; Godot atlas regions, anchors and connected silhouette masks are in animation_layout.json. chef_castle_corrected.png supersedes the earlier Chef rows."
+  },
+  {
+    "file": "game/assets/production/grassland_far.png",
+    "sha256": "90ca130d201501f0187c0411ae654862496dae10968496fb0378bc78232cb095",
+    "source": "Original image_gen artwork made in this chat on2026-11-11 from owner reference/independent prompts",
+    "integration": "PNG intact; Godot atlas regions, anchors and connected silhouette masks are in animation_layout.json. chef_castle_corrected.png supersedes the earlier Chef rows."
+  },
+  {
+    "file": "game/assets/production/icy_far.png",
+    "sha256": "932994d5e02605952831c938d5b642fdab38d114cca9c2f4aadadfd108556840",
+    "source": "Original image_gen artwork made in this chat on2026-11-11 from owner reference/independent prompts",
+    "integration": "PNG intact; Godot atlas regions, anchors and connected silhouette masks are in animation_layout.json. chef_castle_corrected.png supersedes the earlier Chef rows."
+  },
+  {
+    "file": "game/assets/production/orchard_far.png",
+    "sha256": "98b948214d780a4bb51658916bbb73b0f6e6eb5f79d4afe79207523c66006a6c",
+    "source": "Original image_gen artwork made in this chat on2026-11-11 from owner reference/independent prompts",
+    "integration": "PNG intact; Godot atlas regions, anchors and connected silhouette masks are in animation_layout.json. chef_castle_corrected.png supersedes the earlier Chef rows."
+  },
+  {
+    "file": "game/assets/production/tato_actions.png",
+    "sha256": "5f6e1c48c1caae512a779ce4729bd81d16b39c4424c5a48fb19e4ba21d2f9980",
+    "source": "Original image_gen artwork made in this chat on2026-11-11 from owner reference/independent prompts",
+    "integration": "PNG intact; Godot atlas regions, anchors and connected silhouette masks are in animation_layout.json. chef_castle_corrected.png supersedes the earlier Chef rows."
+  },
+  {
+    "file": "game/assets/production/tato_extra.png",
+    "sha256": "cf4d79a00b6a2e5bbf48dc91505671f4046c7f707a4b91e9ee16e4a7b4ae4b92",
+    "source": "Original image_gen artwork made in this chat on2026-11-11 from owner reference/independent prompts",
+    "integration": "PNG intact; Godot atlas regions, anchors and connected silhouette masks are in animation_layout.json. chef_castle_corrected.png supersedes the earlier Chef rows."
+  },
+  {
+    "file": "game/assets/production/terrain_materials.png",
+    "sha256": "3654e2f5ecc7a5ad5a2a424a2ccd616fd9afe55f7ffc51d0729ee2a15f2d242a",
+    "source": "Original image_gen artwork made in this chat on2026-11-11 from owner reference/independent prompts",
+    "integration": "PNG intact; Godot atlas regions, anchors and connected silhouette masks are in animation_layout.json. chef_castle_corrected.png supersedes the earlier Chef rows."
+  },
+  {
+    "file": "game/assets/production/windy_far.png",
+    "sha256": "b7115e39f6dc1126192708a2600300b445fd1cfa7a04cfe15a86b005600f7bce",
+    "source": "Original image_gen artwork made in this chat on2026-11-11 from owner reference/independent prompts",
+    "integration": "PNG intact; Godot atlas regions, anchors and connected silhouette masks are in animation_layout.json. chef_castle_corrected.png supersedes the earlier Chef rows."
+  },
+  {
+    "file": "game/assets/production/worlds_far.png",
+    "sha256": "43fecbcc0c78a52286aee5a78138b5acb1bfc051b9e2148ee77320a1f56ba63e",
+    "source": "Original image_gen artwork made in this chat on2026-11-11 from owner reference/independent prompts",
+    "integration": "PNG intact; Godot atlas regions, anchors and connected silhouette masks are in animation_layout.json. chef_castle_corrected.png supersedes the earlier Chef rows."
+  },
+  {
+    "file": "game/assets/production/worlds_mid.png",
+    "sha256": "c4300043119ba34a31cabcfba3c9f8a5d1052b97ece672a84e3feeebabfd4fb9",
+    "source": "Original image_gen artwork made in this chat on2026-11-11 from owner reference/independent prompts",
+    "integration": "PNG intact; Godot atlas regions, anchors and connected silhouette masks are in animation_layout.json. chef_castle_corrected.png supersedes the earlier Chef rows."
+  }
+]

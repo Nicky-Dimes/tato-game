@@ -28,7 +28,7 @@ static var _font_title: Font
 
 static func _make_font(weight: int) -> Font:
 	if not ResourceLoader.exists(FONT_PATH):
-		return null
+		return ThemeDB.fallback_font
 	var base := load(FONT_PATH) as Font
 	if base == null:
 		return null
@@ -188,7 +188,7 @@ static func title_label(text: String, size: int = 44, color: Color = YELLOW) -> 
 	l.add_theme_font_size_override("font_size", size)
 	l.add_theme_color_override("font_color", color)
 	l.add_theme_color_override("font_outline_color", PLUM)
-	l.add_theme_constant_override("outline_size", int(size * 0.32))
+	l.add_theme_constant_override("outline_size", maxi(3, int(size * 0.12)))
 	if font_title():
 		l.add_theme_font_override("font", font_title())
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -212,7 +212,7 @@ static func outlined_label(text: String, size: int = 24, color: Color = WHITE) -
 	l.add_theme_font_size_override("font_size", size)
 	l.add_theme_color_override("font_color", color)
 	l.add_theme_color_override("font_outline_color", PLUM)
-	l.add_theme_constant_override("outline_size", maxi(6, int(size * 0.3)))
+	l.add_theme_constant_override("outline_size", maxi(3, int(size * 0.15)))
 	if font_bold():
 		l.add_theme_font_override("font", font_bold())
 	return l

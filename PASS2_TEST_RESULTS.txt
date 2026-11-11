@@ -1,0 +1,111 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+ERROR: Parse JSON failed. Error at line 0: Expected key
+   at: parse_string (core/io/json.cpp:629)
+   GDScript backtrace (most recent call first):
+       [0] _read (res://autoload/SaveService.gd:201)
+       [1] load_slot (res://autoload/SaveService.gd:67)
+       [2] test_backup_recovers_a_damaged_save (res://tests/unit/test_save.gd:56)
+       [3] _run_file (res://tests/test_runner.gd:105)
+WARNING: Slot 3 was damaged; restored from backup.
+     at: push_warning (core/variant/variant_utility.cpp:1033)
+     GDScript backtrace (most recent call first):
+         [0] load_slot (res://autoload/SaveService.gd:71)
+         [1] test_backup_recovers_a_damaged_save (res://tests/unit/test_save.gd:56)
+         [2] _run_file (res://tests/test_runner.gd:105)
+  robot: W1-L1 GOAL    97%    59s   (column 281)
+  robot: W1-L2 GOAL    97%    62s   (column 297)
+  robot: W1-L3 GOAL    97%    66s   (column 309)
+  robot: W1-X GOAL    97%    57s   (column 291)
+  robot: W2-L1 GOAL    97%    64s   (column 295)
+  robot: W2-L2 GOAL    97%    62s   (column 311)
+  robot: W2-L3 GOAL    97%    73s   (column 317)
+  robot: W2-X GOAL    97%    58s   (column 299)
+  robot: W3-L1 GOAL    97%    60s   (column 301)
+  robot: W3-L2 GOAL    97%    69s   (column 317)
+  robot: W3-L3 GOAL    98%    78s   (column 329)
+  robot: W3-X GOAL    97%    59s   (column 301)
+  robot: W4-L1 GOAL    97%    73s   (column 305)
+  robot: W4-L2 GOAL    97%    70s   (column 317)
+  robot: W4-L3 GOAL    98%    82s   (column 323)
+  robot: W4-X GOAL    97%    66s   (column 311)
+  robot: W5-L1 GOAL    97%    50s   (column 307)
+  robot: W5-L2 GOAL    98%    62s   (column 317)
+  robot: W5-L3 GOAL    99%   124s   (column 337)
+  robot: W5-X GOAL    97%    56s   (column 313)
+  robot: W6-L1 GOAL    97%    66s   (column 315)
+  robot: W6-L2 GOAL    97%    54s   (column 325)
+  robot: W6-L3 GOAL    98%    91s   (column 333)
+  robot: W6-X GOAL    97%    48s   (column 303)
+ROBOT PLAYTHROUGH
+  W1-L1 GOAL    97%    59s
+  W1-L2 GOAL    97%    62s
+  W1-L3 GOAL    97%    66s
+  W1-X GOAL    97%    57s
+  W2-L1 GOAL    97%    64s
+  W2-L2 GOAL    97%    62s
+  W2-L3 GOAL    97%    73s
+  W2-X GOAL    97%    58s
+  W3-L1 GOAL    97%    60s
+  W3-L2 GOAL    97%    69s
+  W3-L3 GOAL    98%    78s
+  W3-X GOAL    97%    59s
+  W4-L1 GOAL    97%    73s
+  W4-L2 GOAL    97%    70s
+  W4-L3 GOAL    98%    82s
+  W4-X GOAL    97%    66s
+  W5-L1 GOAL    97%    50s
+  W5-L2 GOAL    98%    62s
+  W5-L3 GOAL    99%   124s
+  W5-X GOAL    97%    56s
+  W6-L1 GOAL    97%    66s
+  W6-L2 GOAL    97%    54s
+  W6-L3 GOAL    98%    91s
+  W6-X GOAL    97%    48s
+  cleared 24 of 24
+
+PASS  test_levels :: test_campaign_has_thirty_stages  (32 checks)
+PASS  test_levels :: test_every_stage_is_well_formed  (2131 checks)
+PASS  test_levels :: test_every_item_on_the_boards_is_used  (99 checks)
+PASS  test_levels :: test_art_exists_for_everything  (128 checks)
+PASS  test_powers :: test_twelve_powers_load_with_art_and_scripts  (73 checks)
+PASS  test_powers :: test_every_board_power_is_present  (12 checks)
+PASS  test_powers :: test_one_power_at_a_time  (12 checks)
+PASS  test_powers :: test_flavor_bursts_are_symmetric  (214 checks)
+PASS  test_save :: test_round_trip  (6 checks)
+PASS  test_save :: test_backup_recovers_a_damaged_save  (2 checks)
+PASS  test_save :: test_empty_slot  (3 checks)
+PASS  test_save :: test_migration_from_old_designs  (30 checks)
+PASS  test_save :: test_migration_rejects_wrong_types_and_keeps_unknown_fields  (5 checks)
+PASS  test_save :: test_game_state_saves_and_loads  (11 checks)
+PASS  test_save :: test_hearts_and_coins  (10 checks)
+PASS  test_bosses :: test_all_six_bosses  (42 checks)
+PASS  test_combat :: test_honk_bops_a_creature_and_it_drops_a_coin  (4 checks)
+PASS  test_combat :: test_stomp_bounces_and_spiky_things_cannot_be_stomped  (5 checks)
+PASS  test_combat :: test_running_out_of_hearts_goes_back_to_the_checkpoint  (6 checks)
+PASS  test_combat :: test_power_bowl_replaces_the_power_with_a_flavor_burst  (7 checks)
+PASS  test_combat :: test_every_power_attacks  (14 checks)
+PASS  test_combat :: test_freeze_makes_a_step_and_shield_blocks_hurt  (5 checks)
+PASS  test_combat :: test_blocks_crates_keys_and_pickups  (9 checks)
+PASS  test_combat :: test_goal_finishes_the_stage_and_awards_stars  (5 checks)
+PASS  test_movement :: test_spawns_standing_on_the_ground  (5 checks)
+PASS  test_movement :: test_walks_then_runs  (9 checks)
+PASS  test_movement :: test_jump_height_and_short_hop  (6 checks)
+PASS  test_movement :: test_coyote_time_and_jump_buffer  (8 checks)
+PASS  test_movement :: test_flap_and_glide  (9 checks)
+PASS  test_movement :: test_one_way_platform_and_drop_through  (4 checks)
+PASS  test_movement :: test_slopes_water_and_slide  (8 checks)
+PASS  test_screens :: test_title_screen_and_save_slots  (7 checks)
+PASS  test_screens :: test_settings_every_tab_and_control  (6 checks)
+PASS  test_screens :: test_storybook_every_story  (39 checks)
+PASS  test_screens :: test_world_map_every_world  (18 checks)
+PASS  test_screens :: test_credits  (2 checks)
+PASS  test_screens :: test_stage_screens_pause_notebook_wardrobe_results  (11 checks)
+PASS  test_screens :: test_home_nest_and_trial_room  (6 checks)
+PASS  test_campaign :: test_robot_reaches_every_goal  (48 checks)
+
+TESTS: 39 passed, 0 failed  (43.5s)
+WARNING: 44 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 20 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

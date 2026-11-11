@@ -40,8 +40,8 @@ func _build_backdrop() -> void:
 	sky.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	sky.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(sky)
-	for short: String in ["bg/grassland_far", "bg/grassland_mid"]:
-		var tex := Art.tex(short)
+	for short: String in ["far", "mid"]:
+		var tex := ProductionArt.landscape("grassland", short)
 		if tex == null:
 			continue
 		var hills := TextureRect.new()

@@ -1,0 +1,2 @@
+f3a89ae (HEAD -> fix/art-interface-automation) Integrate production art, four extra cels per character, gameplay HUD and reliable build checks
+72ae126 (master) Preserve original TATO handoff baseline

@@ -25,6 +25,8 @@ func _on_touch(body: Node) -> void:
 		return
 	player.bounce(-900.0 * p_float("power", 1.0) / 1.25 if Input.is_action_pressed("jump") else -900.0 * p_float("power", 1.0))
 	AudioService.play_varied("boing")
+	Fx.pop_ring(level, global_position + Vector2(0, -36), Color("b2f9ed"), 48.0)
+	Fx.puff(level, global_position + Vector2(0, -24), Color(1, 1, 1, 0.7), 4)
 	if not Settings.flag("reduced_motion"):
 		var t := create_tween()
 		t.tween_property(_sprite, "scale", _base * Vector2(1.2, 0.65), 0.06)

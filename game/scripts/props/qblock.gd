@@ -43,6 +43,8 @@ func open() -> void:
 	remove_from_group("hittable")
 	_sprite.modulate = Color(0.72, 0.62, 0.55)
 	AudioService.play("block")
+	Fx.pop_ring(level, global_position + Vector2(0, -30), Color("ffe08a"), 38.0)
+	Fx.sparkle(level, global_position + Vector2(0, -44), Color("ffcf5b"), 5)
 	level.spill(p_str("holds", "coins:3"), global_position + Vector2(0, -78))
 	if not Settings.flag("reduced_motion"):
 		var t := create_tween()

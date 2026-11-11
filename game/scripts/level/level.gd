@@ -24,6 +24,7 @@ var camera: CameraRig
 var hud: HUD
 var touch: TouchControls
 var backdrop: Backdrop
+var atmosphere: WorldAtmosphere
 var boss: Node = null
 
 var elapsed := 0.0
@@ -88,6 +89,10 @@ func _ready() -> void:
 	player.last_safe_position = player.position
 
 	_build_entities()
+	# Animated, theme-specific flowers, grass and pollen on actual walkable surfaces.
+	atmosphere = WorldAtmosphere.new()
+	add_child(atmosphere)
+	atmosphere.setup(self)
 
 	camera = CameraRig.new()
 	add_child(camera)

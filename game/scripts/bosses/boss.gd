@@ -75,7 +75,9 @@ func setup(lv: Level, e: Dictionary) -> void:
 	add_to_group("boss")
 	z_index = 1
 	sprite = Art.sized("bosses/" + boss_id, height)
-	_base_scale = sprite.scale.x
+	_base_scale = height / float(sprite.texture.get_meta("body_height"))
+	sprite.scale = Vector2.ONE * _base_scale
+	sprite.offset = -Vector2(sprite.texture.get_meta("anchor"))
 	add_child(sprite)
 	var w := height * 0.62
 	var shape := RectangleShape2D.new()
@@ -278,15 +280,22 @@ func _wind(delta: float) -> void:
 
 
 func _look() -> void:
-	sprite.flip_h = (facing * float(info.get("faces", 1))) < 0.0
-	var frame_id := int(_clock * (11.0 if mode == Mode.ATTACK else 5.0)) % 4
-	if Settings.flag("reduced_motion"):
-		frame_id = 0
-	var animation_tex := Art.tex("bosses/anim/%s_%d" % [boss_id, frame_id])
+	sprite.flip_h = facing < 0.0
+	var second := int(_clock * 7.0) % 2 == 1
+	var frame_id := 4 if second and not Settings.flag("reduced_motion") else 0
+	match mode:
+		Mode.WARN: frame_id = 5 if second else 1
+		Mode.ATTACK: frame_id = 6 if second else 2
+		Mode.REST: frame_id = 7 if second else 3
+	var animation_tex := ProductionArt.boss_frame(boss_id, frame_id)
 	if animation_tex != null:
 		sprite.texture = animation_tex
+		sprite.material = animation_tex.get_meta("silhouette_material") if animation_tex.has_meta("silhouette_material") else null
+		_base_scale = height / float(animation_tex.get_meta("body_height"))
+		sprite.offset = -Vector2(animation_tex.get_meta("anchor"))
+		sprite.scale = Vector2.ONE * _base_scale
 	var m := Color.WHITE
-	if mode == Mode.WARN and fmod(_clock, 0.2) > 0.1:
+	if mode == Mode.WARN and (Settings.flag("reduce_flashes") or fmod(_clock, 0.2) > 0.1):
 		m = Color(1.35, 1.25, 0.8)
 	if mode == Mode.REST:
 		m = Color(0.9, 0.9, 1.0)

@@ -1,6 +1,7 @@
 class_name TatoVisual
 extends Node2D
-## Tato's picture. Frames are the poses cut from the approved concept boards
+## Tato's picture. Production cels use a directly sampled 4x4 runtime atlas.
+## Legacy special forms retain their previous frames cut from concept boards
 ## (tools/art/extract_tato.py): every frame shares one canvas size and one
 ## foot anchor, so swapping frames never makes the body jump. Squash and
 ## stretch, lean, breathing and spin are added here in code, on top of the
@@ -13,23 +14,23 @@ const SPRITE_SCALE := 0.76
 
 ## name -> [frames, fps, loop]
 const ANIMS := {
-	"idle": [["idle_0", "idle_1", "idle_2", "idle_3", "idle_4", "idle_5"], 5.0, true],
-	"look": [["idle_4", "idle_3", "idle_2"], 3.0, true],
-	"walk": [["walk_0", "walk_1", "walk_2", "walk_3", "walk_4", "walk_extra_0", "walk_extra_1", "walk_extra_2"], 12.0, true],
-	"run": [["run_0", "run_1", "run_2", "run_3", "run_4", "run_extra_0", "run_extra_1", "run_extra_2"], 16.0, true],
-	"jump": [["jump_start_0", "jump_start_1", "jump_start_2"], 15.0, false],
-	"fall": [["fall_0", "fall_1", "fall_2"], 8.0, true],
-	"land": [["land_0", "land_1", "land_2", "land_3"], 18.0, false],
-	"attack": [["attack_0", "attack_1", "attack_2", "attack_3"], 18.0, false],
-	"glide": [["jump_air", "jump_flap"], 11.0, true],
-	"flap": [["jump_air"], 1.0, true],
-	"crouch": [["jump_crouch"], 1.0, true],
-	"slide": [["jump_crouch"], 1.0, true],
-	"swim": [["walk_2", "walk_1", "walk_2", "walk_3"], 5.0, true],
-	"honk": [["attack_0", "attack_1", "attack_2", "attack_3"], 16.0, false],
-	"eat": [["pickup_0", "pickup_1", "pickup_2", "pickup_3"], 11.0, false],
-	"hurt": [["hurt_0", "hurt_1", "hurt_2", "hurt_3"], 14.0, false],
-	"cheer": [["cheer", "jump_air", "cheer", "jump_flap"], 6.0, true],
+	"idle": [["cel_0", "cel_0", "cel_0", "cel_0", "cel_1", "cel_0", "cel_3", "cel_0"], 3.0, true],
+	"look": [["cel_3", "cel_2", "cel_3"], 3.0, false],
+	"walk": [["cel_4", "cel_16", "cel_5", "cel_6", "cel_17", "cel_7"], 10.0, true],
+	"run": [["cel_4", "cel_16", "cel_5", "cel_6", "cel_17", "cel_7"], 14.0, true],
+	"jump": [["cel_14", "cel_12"], 14.0, false],
+	"fall": [["cel_13"], 1.0, false],
+	"land": [["cel_14", "cel_14", "cel_0"], 14.0, false],
+	"attack": [["cel_8", "cel_9", "cel_10", "cel_11"], 18.0, false],
+	"glide": [["cel_13", "cel_12"], 7.0, true],
+	"flap": [["cel_13", "cel_12"], 10.0, false],
+	"crouch": [["cel_14"], 1.0, true],
+	"slide": [["cel_14"], 1.0, true],
+	"swim": [["cel_12", "cel_13"], 5.0, true],
+	"honk": [["cel_8", "cel_9", "cel_10", "cel_11"], 18.0, false],
+	"eat": [["cel_8", "cel_15", "cel_1", "cel_0"], 11.0, false],
+	"hurt": [["cel_18", "cel_18", "cel_19", "cel_0"], 14.0, false],
+	"cheer": [["cel_15", "cel_12", "cel_1", "cel_13"], 6.0, true],
 	"ball": [["roll_3"], 1.0, true],
 	"roll": [["roll_2"], 1.0, true],
 	"curl": [["roll_0"], 1.0, true],
@@ -42,6 +43,7 @@ const ANIMS := {
 }
 
 static var _textures: Dictionary = {}
+static var _action_atlas: Texture2D
 static var _shadow_tex: Texture2D
 
 var player: Tato
@@ -77,6 +79,7 @@ var _idle_timer := 0.0
 var _land_left := 0.0
 var _attack_left := 0.0
 var _hat: Sprite2D
+var _footstep_clock := 0.0
 
 
 func setup(owner_player: Tato) -> void:
@@ -127,6 +130,26 @@ static func shadow_texture() -> Texture2D:
 static func frame_texture(frame: String) -> Texture2D:
 	if _textures.has(frame):
 		return _textures[frame]
+	if frame.begins_with("cel_"):
+		if _action_atlas == null:
+			_action_atlas = load("res://assets/production/tato_actions.png")
+		var index := frame.substr(4).to_int()
+		if index >= 16:
+			var extra := load("res://assets/production/tato_extra.png") as Texture2D
+			var texture := AtlasTexture.new()
+			texture.atlas = extra
+			texture.region = Rect2((index - 16) * extra.get_width() / 4.0, 0, extra.get_width() / 4.0, extra.get_height())
+			texture.filter_clip = true
+			ProductionArt.apply_metrics(texture, "tato_extra.png", 0, index - 16)
+			_textures[frame] = texture
+			return texture
+		var cell := Vector2(_action_atlas.get_width() / 4.0, _action_atlas.get_height() / 4.0)
+		var cel := AtlasTexture.new()
+		cel.atlas = _action_atlas
+		cel.region = Rect2(Vector2(index % 4, index / 4) * cell, cell)
+		cel.filter_clip = true
+		_textures[frame] = cel
+		return cel
 	var path := FRAME_DIR + frame + ".png"
 	var tex: Texture2D = null
 	if ResourceLoader.exists(path):
@@ -165,6 +188,11 @@ func honk_flash() -> void:
 func _on_landed(impact: float) -> void:
 	if impact > 90.0:
 		_land_left = 0.24
+		if player != null and player.level != null and not Settings.flag("reduced_motion") and not Game.headless_test:
+			var intensity := 3 if impact < 300.0 else 6
+			Fx.puff(player.level, player.global_position + Vector2(0, -5), Color(1.0, 0.93, 0.79, 0.72), intensity)
+			if impact > 450.0:
+				Fx.pop_ring(player.level, player.global_position + Vector2(0, -5), Color(1.0, 0.84, 0.61, 0.5), 33.0)
 
 
 func _on_ability_started(_definition: Resource) -> void:
@@ -217,6 +245,16 @@ func _process(delta: float) -> void:
 		_idle_timer = 0.0
 	_set_anim(hint)
 	_advance(delta)
+	# Ground contact feedback makes the goose feel anchored, not pasted over the terrain.
+	if hint in ["walk", "run"] and player.is_on_floor() and not Settings.flag("reduced_motion") and not Game.headless_test:
+		_footstep_clock += delta
+		var stride_time := 0.29 if hint == "walk" else 0.18
+		if _footstep_clock >= stride_time:
+			_footstep_clock = 0.0
+			if player.level != null:
+				Fx.puff(player.level, player.global_position + Vector2(-player.facing * 18.0, -4.0), Color(0.96, 0.89, 0.74, 0.4), 2)
+	else:
+		_footstep_clock = 0.0
 
 	# --- facing
 	scale.x = -1.0 if player.facing < 0.0 else 1.0
@@ -325,6 +363,13 @@ func _show_frame() -> void:
 	var tex := frame_texture(frames[_frame_index])
 	if tex != null:
 		sprite.texture = tex
+		var ratio := tex.get_width() / CANVAS
+		sprite.scale = Vector2.ONE * SPRITE_SCALE / ratio
+		sprite.offset = -ANCHOR * ratio
+		if tex.has_meta("body_height"):
+			sprite.scale = Vector2.ONE * CANVAS * 0.70 * SPRITE_SCALE / float(tex.get_meta("body_height"))
+			sprite.offset = -Vector2(tex.get_meta("anchor"))
+		sprite.material = tex.get_meta("silhouette_material") if tex.has_meta("silhouette_material") else null
 
 
 func current_anim() -> String:

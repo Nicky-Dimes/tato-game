@@ -16,9 +16,21 @@ func _shots() -> ShotTaker:
 
 func _ready() -> void:
 	var level := ""
+	var power := ""
+	var panel := ""
+	var scale_proof := false
+	var map := ""
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--level="):
 			level = arg.substr(8)
+		elif arg.begins_with("--power="):
+			power = arg.substr(8)
+		elif arg == "--scale-proof":
+			scale_proof = true
+		elif arg.begins_with("--panel="):
+			panel = arg.substr(8)
+		elif arg.begins_with("--map="):
+			map = arg.substr(6)
 		elif arg.begins_with("--at="):
 			Game.debug_column = arg.substr(5).to_int()
 		elif arg == "--test":
@@ -40,10 +52,12 @@ func _ready() -> void:
 		var q: Variant = JavaScriptBridge.eval("new URLSearchParams(window.location.search).get('level') || ''", true)
 		if typeof(q) == TYPE_STRING and q != "":
 			level = q
+		var chosen_power: Variant = JavaScriptBridge.eval("new URLSearchParams(window.location.search).get('power') || ''", true)
+		if typeof(chosen_power) == TYPE_STRING:
+			power = chosen_power
 		var at: Variant = JavaScriptBridge.eval("new URLSearchParams(window.location.search).get('at') || ''", true)
 		if typeof(at) == TYPE_STRING and (at as String).is_valid_int():
 			Game.debug_column = (at as String).to_int()
-	var map := ""
 	if OS.has_feature("web"):
 		if str(JavaScriptBridge.eval("new URLSearchParams(window.location.search).get('fps') || ''", true)) != "":
 			Game.show_stats = true
@@ -61,5 +75,6 @@ func _ready() -> void:
 	elif level != "":
 		GameState.use_temp_profile()
 		Game.start_level(level)
+		Game.configure_debug_stage(power, panel, scale_proof)
 	else:
 		Game.goto_title()

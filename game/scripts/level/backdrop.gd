@@ -1,23 +1,20 @@
 class_name Backdrop
 extends Node2D
-## The scenery behind a stage: a sky gradient, drifting clouds and two or
-## three parallax layers per world theme. A handful of big quads, so it is
-## cheap to draw on phones.
-
+## Four independent depth planes: sky, clouds, distant scenery and low foliage.
+## All scenery stays behind the world; no screen-space foreground hides hazards.
 const SKIES := {
-	"grassland": [Color("6fc3f7"), Color("d9f3ff")],
+	"grassland": [Color("63bffc"), Color("dcf7e8")],
 	"nest": [Color("8fd0f5"), Color("fff0d9")],
-	"orchard": [Color("79c8f2"), Color("e6f7d9")],
+	"orchard": [Color("7cccf6"), Color("fff1c9")],
 	"candy": [Color("b9a2f2"), Color("ffe1f0")],
-	"icy": [Color("6fa8e8"), Color("e6f3ff")],
-	"windy": [Color("59b9f0"), Color("d6f5e6")],
-	"castle": [Color("8f8fe0"), Color("ffe6d0")],
+	"icy": [Color("8fb9ee"), Color("e6f3ff")],
+	"windy": [Color("68c6f4"), Color("e2f8df")],
+	"castle": [Color("777ab9"), Color("ffd6c8")],
 }
-
 var theme := "grassland"
+var _planes: Array[Sprite2D] = []
 
-
-func setup(theme_name: String, level_size: Vector2) -> void:
+func setup(theme_name: String, _level_size: Vector2) -> void:
 	theme = theme_name
 	z_index = -50
 	var sky_layer := CanvasLayer.new()
@@ -27,75 +24,59 @@ func setup(theme_name: String, level_size: Vector2) -> void:
 	var grad := Gradient.new()
 	grad.set_color(0, colors[0])
 	grad.set_color(1, colors[1])
-	var tex := GradientTexture2D.new()
-	tex.gradient = grad
-	tex.fill_from = Vector2(0, 0)
-	tex.fill_to = Vector2(0, 1)
-	tex.width = 4
-	tex.height = 128
-	var rect := TextureRect.new()
-	rect.texture = tex
-	rect.stretch_mode = TextureRect.STRETCH_SCALE
-	rect.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	sky_layer.add_child(rect)
+	var texture := GradientTexture2D.new()
+	texture.gradient = grad
+	texture.fill_from = Vector2.ZERO
+	texture.fill_to = Vector2(0, 1)
+	texture.width = 4
+	texture.height = 128
+	var sky := TextureRect.new()
+	sky.texture = texture
+	sky.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	sky.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	sky_layer.add_child(sky)
+	var clouds := Parallax2D.new()
+	clouds.scroll_scale = Vector2(0.04, 0.0)
+	clouds.repeat_size = Vector2(1800, 0)
+	clouds.repeat_times = 3
+	if not Settings.flag("reduced_motion"):
+		clouds.autoscroll = Vector2(-5, 0)
+	clouds.add_child(CloudBand.new())
+	add_child(clouds)
+	_add_plane("far", 0.12, 1.0)
+	_add_plane("mid", 0.32, 1.20)
+	get_viewport().size_changed.connect(_layout)
+	_layout()
 
-	_add_layer("bg/%s_clouds" % theme, Vector2(0.06, 0.04), level_size.y - 760.0, 1.4, Vector2(-7.0, 0.0))
-	_add_layer("bg/%s_far" % theme, Vector2(0.16, 0.5), level_size.y - 560.0, 1.5, Vector2.ZERO)
-	_add_layer("bg/%s_mid" % theme, Vector2(0.36, 0.75), level_size.y - 430.0, 1.3, Vector2.ZERO)
+func _add_plane(plane: String, scroll: float, art_scale: float) -> void:
+	var texture := ProductionArt.landscape(theme, plane)
+	var parallax := Parallax2D.new()
+	parallax.scroll_scale = Vector2(scroll, 0)
+	parallax.repeat_size = Vector2(texture.get_width() * art_scale, 0)
+	parallax.repeat_times = 4
+	var sprite := Sprite2D.new()
+	sprite.texture = texture
+	sprite.centered = false
+	sprite.scale = Vector2.ONE * art_scale
+	var material := ShaderMaterial.new()
+	material.shader = load("res://assets/production/parallax.gdshader")
+	material.set_shader_parameter("region", ProductionArt.region_for(theme) if texture is AtlasTexture else Vector4(0, 0, 1, 1))
+	sprite.material = material
+	parallax.add_child(sprite)
+	add_child(parallax)
+	_planes.append(sprite)
 
+func _layout() -> void:
+	var height := get_viewport().get_visible_rect().size.y
+	for i in _planes.size():
+		var sprite := _planes[i]
+		sprite.position.y = height - sprite.texture.get_height() * sprite.scale.y + (-140 if i == 0 else -80)
 
-static var _seamless_cache: Dictionary = {}
-
-
-## A layer whose left and right edges do not match shows a hard seam (a tree
-## cut in half, a step in the hills) every time it repeats. Such a layer is
-## doubled with a mirrored copy of itself, so each edge always meets itself.
-static func seamless(short: String, tex: Texture2D) -> Texture2D:
-	if _seamless_cache.has(short):
-		return _seamless_cache[short]
-	var out := tex
-	var img := tex.get_image()
-	if img != null and not img.is_empty():
-		if img.is_compressed():
-			img.decompress()
-		img.convert(Image.FORMAT_RGBA8)
-		var w := img.get_width()
-		var h := img.get_height()
-		var diff := 0.0
-		var rows := 0
-		for y in range(0, h, 4):
-			var a := img.get_pixel(0, y)
-			var b := img.get_pixel(w - 1, y)
-			diff += absf(a.r - b.r) + absf(a.g - b.g) + absf(a.b - b.b) + absf(a.a - b.a)
-			rows += 1
-		if rows > 0 and diff / rows > 0.06:
-			var wide := Image.create(w * 2, h, false, Image.FORMAT_RGBA8)
-			wide.blit_rect(img, Rect2i(0, 0, w, h), Vector2i.ZERO)
-			var flipped: Image = img.duplicate()
-			flipped.flip_x()
-			wide.blit_rect(flipped, Rect2i(0, 0, w, h), Vector2i(w, 0))
-			out = ImageTexture.create_from_image(wide)
-	_seamless_cache[short] = out
-	return out
-
-
-func _add_layer(short: String, scroll: Vector2, top_y: float, scale_by: float, autoscroll: Vector2) -> void:
-	var tex := Art.tex(short)
-	if tex == null:
-		return
-	tex = seamless(short, tex)
-	var px := Parallax2D.new()
-	px.scroll_scale = scroll
-	px.repeat_size = Vector2(tex.get_width() * scale_by, 0)
-	px.repeat_times = 4
-	if autoscroll != Vector2.ZERO and not Settings.flag("reduced_motion"):
-		px.autoscroll = autoscroll
-	var s := Sprite2D.new()
-	s.texture = tex
-	s.centered = false
-	s.scale = Vector2(scale_by, scale_by)
-	# keep each layer sitting at the bottom of the stage whatever its parallax
-	s.position = Vector2(0, top_y * scroll.y)
-	px.add_child(s)
-	add_child(px)
+class CloudBand:
+	extends Node2D
+	func _draw() -> void:
+		for i in 7:
+			var origin := Vector2(i * 270 + 40, 130 + (i % 3) * 42)
+			var color := Color(1.0, 0.99, 0.98, 1.0)
+			for j in 4:
+				draw_circle(origin + Vector2(j * 20, -sin(j * 1.0) * 15), 24 + (j % 2) * 10, color)
