@@ -109,3 +109,17 @@ The web build is tuned for 2018-2019 iPads and iPhones: single-threaded export, 
 render resolution (`game/web/shell.html`), one tile map and plain sprites, no particle
 systems, at most ten sound voices. "Graphics detail" in Settings (or `?dpr=`) changes the
 resolution cap.
+
+## Trying the web build on a phone or tablet (same Wi-Fi)
+
+The engine only starts on a secure connection. `http://localhost` on the same computer
+is fine; another device needs HTTPS:
+
+```bash
+tools/build.sh web
+python3 tools/serve_https.py        # prints https://<this computer's address>:8443
+```
+
+The certificate is made locally, so the browser warns once ("This Connection Is Not
+Private"); choose Show Details and visit the website. Plain `http://<address>` from
+another device shows "This browser is missing: Secure Context".
