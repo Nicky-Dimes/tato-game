@@ -99,6 +99,16 @@ html, body {
 #status-progress::-webkit-progress-value { background: #ff9a1f; }
 #status-progress::-moz-progress-bar { background: #ff9a1f; }
 
+#status-detail {
+	display: none;
+	max-width: 86vw;
+	font-size: 12px;
+	line-height: 1.35;
+	opacity: 0.75;
+	text-align: center;
+	word-break: break-word;
+}
+
 #status-notice {
 	display: none;
 	max-width: 80vw;
@@ -173,6 +183,7 @@ html, body {
 			<div id="status-title">Warming up the kitchen...</div>
 			<progress id="status-progress"></progress>
 			<div id="status-notice"></div>
+			<div id="status-detail"></div>
 		</div>
 		<div id="rotate">Turn your device sideways to play</div>
 
@@ -180,7 +191,29 @@ html, body {
 		<script>
 const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":false,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":60069756,"index.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4,"serviceWorker":"index.service.worker.js"};
 const GODOT_THREADS_ENABLED = false;
-const engine = new Engine(GODOT_CONFIG);
+// What went wrong, if anything: engine error output and uncaught page errors.
+// Shown on the loading screen when start-up stalls, so a photo of the screen is
+// enough to diagnose a device that will not start.
+const tatoProblems = [];
+function tatoNote(text) {
+	text = String(text || '').trim();
+	if (text && tatoProblems.indexOf(text) < 0) {
+		tatoProblems.push(text.slice(0, 220));
+		if (tatoProblems.length > 4) { tatoProblems.shift(); }
+	}
+}
+window.addEventListener('error', function (e) { tatoNote(e.message || (e.error && e.error.message)); });
+window.addEventListener('unhandledrejection', function (e) {
+	const r = e.reason;
+	tatoNote((r && (r.message || r.toString())) || 'a start-up step was rejected');
+});
+const engine = new Engine(Object.assign({}, GODOT_CONFIG, {
+	'onPrintError': function () {
+		const line = Array.prototype.slice.call(arguments).join(' ');
+		console.error(line);
+		if (/error|abort|exception|out of memory|unreachable|failed/i.test(line)) { tatoNote(line); }
+	},
+}));
 
 (function () {
 	const statusOverlay = document.getElementById('status');
@@ -188,7 +221,69 @@ const engine = new Engine(GODOT_CONFIG);
 	const statusNotice = document.getElementById('status-notice');
 	const statusTitle = document.getElementById('status-title');
 
+	const statusDetail = document.getElementById('status-detail');
+	const debug = /[?&]debug=1/.test(window.location.search);
 	let initializing = true;
+	let stage = 'checking for a newer version';
+	let stageSince = Date.now();
+	let percent = -1;
+	const began = Date.now();
+
+	function setStage(name, title) {
+		if (stage !== name) {
+			stage = name;
+			stageSince = Date.now();
+		}
+		if (title && initializing) {
+			statusTitle.textContent = title;
+		}
+	}
+
+	function deviceLine() {
+		const ua = navigator.userAgent || '';
+		const ver = (/Version\/([0-9.]+)/.exec(ua) || /OS ([0-9_]+)/.exec(ua) || [])[1] || '?';
+		let gl = 'no';
+		try { gl = document.createElement('canvas').getContext('webgl2') ? 'yes' : 'no'; } catch (e) { gl = 'error'; }
+		return 'Safari/OS ' + ver.replace(/_/g, '.') + ' · screen ' + window.innerWidth + 'x' + window.innerHeight +
+			' @' + (window.devicePixelRatio || 1) + ' · touch ' + (navigator.maxTouchPoints || 0) +
+			' · WebGL2 ' + gl + (navigator.deviceMemory ? ' · memory ' + navigator.deviceMemory + ' GB' : '');
+	}
+
+	function showDetail() {
+		const secs = Math.round((Date.now() - began) / 1000);
+		const inStage = Math.round((Date.now() - stageSince) / 1000);
+		statusDetail.textContent = 'Stage: ' + stage + (percent >= 0 && stage === 'downloading' ? ' ' + percent + '%' : '') +
+			' (' + inStage + ' s, ' + secs + ' s in all) · ' + deviceLine() +
+			(tatoProblems.length ? ' · Problem: ' + tatoProblems.join(' | ') : '');
+		statusDetail.style.display = 'block';
+	}
+
+	// If start-up stalls, say so and show what is known instead of sitting silent.
+	const watchdog = setInterval(function () {
+		if (!initializing) {
+			clearInterval(watchdog);
+			return;
+		}
+		const inStage = (Date.now() - stageSince) / 1000;
+		if (debug) { showDetail(); }
+		if (stage === 'starting the game' && tatoProblems.length && inStage > 6) {
+			statusTitle.textContent = 'The game could not start on this device';
+			statusNotice.textContent = 'Please send a photo of this screen so it can be fixed.';
+			statusNotice.style.display = 'block';
+			showDetail();
+		} else if (stage === 'starting the game' && inStage > 40) {
+			statusTitle.textContent = 'Still starting...';
+			statusNotice.textContent = 'Older iPads and iPhones can take a minute or two. If nothing happens, close other tabs and apps and reload. A photo of this screen helps to fix it.';
+			statusNotice.style.display = 'block';
+			showDetail();
+		} else if (stage === 'downloading' && inStage > 90) {
+			statusNotice.textContent = 'The download is slow. Check the Wi-Fi, or reload the page.';
+			statusNotice.style.display = 'block';
+			showDetail();
+		} else if (stage === 'checking for a newer version' && inStage > 30) {
+			showDetail();
+		}
+	}, 1000);
 
 	function hideStatus() {
 		if (!initializing) {
@@ -285,11 +380,19 @@ const engine = new Engine(GODOT_CONFIG);
 
 	window.tatoReady = hideStatus;
 	checkForUpdate().then(function () {
+		setStage('downloading', 'Warming up the kitchen...');
 		return engine.startGame({
 			'onProgress': function (current, total) {
 				if (current > 0 && total > 0) {
 					statusProgress.value = current;
 					statusProgress.max = total;
+					percent = Math.floor(100 * current / total);
+					if (current >= total) {
+						// everything is on the device; the engine now has to start up
+						setStage('starting the game', 'Starting the game...');
+					} else {
+						setStage('downloading', 'Warming up the kitchen... ' + percent + '%');
+					}
 				} else {
 					statusProgress.removeAttribute('value');
 					statusProgress.removeAttribute('max');
@@ -299,7 +402,7 @@ const engine = new Engine(GODOT_CONFIG);
 	}).then(function () {
 		// The game calls window.tatoReady() once its first screen is drawn;
 		// keep the loading picture up until then (or 12 s at most).
-		statusTitle.textContent = 'Almost ready...';
+		setStage('drawing the first screen', 'Almost ready...');
 		setTimeout(hideStatus, 12000);
 	}, displayFailureNotice);
 }());

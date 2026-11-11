@@ -4,7 +4,7 @@
 // Incrementing CACHE_VERSION will kick off the install event and force
 // previously cached resources to be updated from the network.
 /** @type {string} */
-const CACHE_VERSION = '1794425166|3363903';
+const CACHE_VERSION = '1794440329|2955155';
 /** @type {string} */
 const CACHE_PREFIX = 'TATO!-sw-cache-';
 const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION;
