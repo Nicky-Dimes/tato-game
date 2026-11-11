@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.4.0 merged — 2026-11-11 (branch `handoff-v4`, then `main`)
+
+ChatGPT's v0.4.0 gameplay revision (their commit `7e46497`) brought in as received and
+checked on macOS with Godot 4.7.2: 132 files load, art validator passes, 47 of 47 tests
+pass, six worlds and two boss arenas captured from the real game window with no errors,
+web / macOS / Windows / Linux exports rebuilt, exported macOS app launched and ran a stage.
+
+- From ChatGPT: higher jump (about 4.6 tiles held), longer coyote time and jump buffer,
+  wider bounce pads, optional platform routes and many more creatures in all 24 non-boss
+  stages, forward-guided bubbles, shader colour fix for fading run cels, painted props
+  and attack effect frames, cream HUD, fixed 16:9 framing.
+- Kept on top: the macOS fix in `tools/check.sh` (their copy still had the bash 3.2 bug).
+- Their notes: `docs/handoff_v4/`.
+
 ## 0.2.0 — 2026-11-10
 
 - Overhaul v1 merged into `main`.
