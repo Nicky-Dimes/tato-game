@@ -6,6 +6,7 @@ GODOT="${GODOT:-godot}"
 target="${1:-web}"
 case "$target" in web|macos|windows|linux|all) ;; *) echo 'usage: tools/build.sh web|macos|windows|linux|all' >&2; exit 2;; esac
 version=$("$GODOT" --version)
+bash tools/no_sync_duplicates.sh || exit 1
 case "$version" in 4.7.2.stable.*) ;; *) echo "Requires Godot 4.7.2 stable; found $version" >&2; exit 2;; esac
 mkdir -p build/logs
 "$GODOT" --headless --audio-driver Dummy --path game --import > build/logs/import.log 2>&1

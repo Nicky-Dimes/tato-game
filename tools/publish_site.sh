@@ -3,6 +3,7 @@
 # Pages serves). Does not switch branches, does not change project files, does not push.
 set -euo pipefail
 cd "$(dirname "$0")/.."
+bash tools/no_sync_duplicates.sh
 test -s build/web/index.html || { echo "build/web is missing: run tools/build.sh web first"; exit 1; }
 touch build/web/.nojekyll
 version="$(grep -m1 '^config/version=' game/project.godot | cut -d'"' -f2)"

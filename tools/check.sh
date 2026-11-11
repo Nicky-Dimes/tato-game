@@ -30,6 +30,7 @@ step() {
     echo '  Unexpected script error'; failed=1
   fi
 }
+bash tools/no_sync_duplicates.sh || exit 1
 echo "Godot: $version"
 if ! python3 tools/validate_art.py > "$log/art.log" 2>&1; then failed=1; fi
 cat "$log/art.log"
