@@ -30,7 +30,7 @@ func _build_page(pack: String) -> void:
 	_page.add_child(bg)
 	_text("TATO!  /  ANIMATION AUDIT  /  " + pack.to_upper(), Vector2(24, 16), 26)
 	_text("Actual Godot 4.7.2 render. Tight sprite regions prevent neighboring frames from bleeding in.", Vector2(24, 51), 17)
-	_text("Pose-comparison scale only. Gameplay: regular enemies 46–86px; bosses 170–215px.", Vector2(24, 74), 16)
+	_text("Pose-comparison scale only. Gameplay: regular enemies 62–108px; bosses 170–215px.", Vector2(24, 74), 16)
 	if pack == "tato":
 		for frame in 20:
 			var at := Vector2(135 + (frame % 5) * 247, 210 + (frame / 5) * 145)

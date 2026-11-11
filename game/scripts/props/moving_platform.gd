@@ -37,10 +37,8 @@ func _configure() -> void:
 	cs.one_way_collision = p_flag("thin")
 	_body.add_child(cs)
 	add_child(_body)
-	for i in _width:
-		var s := Art.icon(WorldKit.art(level.theme, "plat"), 64.0)
-		s.position = Vector2((i + 0.5) * Layers.TILE, 14)
-		_body.add_child(s)
+	PlayArt.platform(_body, _width * Layers.TILE, Vector2(0, -8), "log_step")
+
 	if p_flag("pull"):
 		add_to_group("taffy_target")
 		add_sense(Vector2(_width * Layers.TILE, 60), Vector2(_width * Layers.TILE * 0.5, 0))

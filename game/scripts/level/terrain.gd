@@ -327,12 +327,4 @@ func _place_slope(x: int, y: int, c: int) -> void:
 
 
 func _place_plank(x0: int, x1: int, y: int) -> void:
-	var first := x0 * 2
-	var last := x1 * 2 + 1
-	for sx in range(first, last + 1):
-		var part := 1
-		if sx == first:
-			part = 0
-		elif sx == last:
-			part = 2
-		tiles.set_cell(Vector2i(sx, y * 2), 0, Vector2i(4 + part, 2))
+	PlayArt.platform(self, (x1 - x0 + 1) * TILE, Vector2(x0 * TILE, y * TILE - 8), "island")

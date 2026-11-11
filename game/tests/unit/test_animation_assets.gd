@@ -39,8 +39,8 @@ func test_golem_frame_size_and_boss_gameplay_scale() -> void:
 			largest_regular = maxf(largest_regular, pixels)
 	for frame in 8:
 		var texture := ProductionArt.enemy_frame("rock_golem", frame)
-		var pixels := 86.0 * float(texture.get_meta("ink_height")) / float(texture.get_meta("body_height"))
-		check_near(pixels, 86.0, 86.0 * 0.12, "Rock Golem cel %d keeps its gameplay size" % frame)
+		var pixels := float(EnemyData.stat("rock_golem", "h")) * float(texture.get_meta("ink_height")) / float(texture.get_meta("body_height"))
+		check_near(pixels, float(EnemyData.stat("rock_golem", "h")), float(EnemyData.stat("rock_golem", "h")) * 0.12, "Rock Golem cel %d keeps its gameplay size" % frame)
 	for kind: String in ProductionArt.BOSS_IDS:
 		for frame in 8:
 			var texture := ProductionArt.boss_frame(kind, frame)

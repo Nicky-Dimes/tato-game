@@ -1,11 +1,19 @@
 ; Built by tools/build_levels.py from chunks: start bowl_q w4_icicles tunnel cp w4_ice crate_wall w4_pond spring_up cp w4_icicles gauntlet cp star_a hill end
 [meta]
+play_routes = 0.4
 id = W4-L2
 world = 4
 theme = icy
 kind = core
 hints = Icicles wobble, then drop. | The Cocoa Shield bounces snowballs back. | Ghosts only move when you look away.
 [legend]
+V = crow_swooper up=0.0 range=3
+Y = ice_puffin
+U = spring
+X = platform w=4 dx=3 dy=-1 t=2.8 thin
+O = platform w=3 dx=0 dy=0 t=3 thin
+J = pickup wings
+I = crate h=2 holds=coins:6
 a = ice_slime
 b = ice_puffin
 c = hedgehog_roller
@@ -22,18 +30,18 @@ D = decor
 2 = sign text=slide
 z = icicle
 [map]
- 
- 
- 
- 
- 
+
+
+
+
+
                                                                                                                                                                                                                                                                                *
-                                                                                                                                                                                    n o o                                                                                     ===
-                                    ##########################                                                                                                                     ======                 ##########################
-                          ?            z    z    z    z                                                                                                     n                                                z    z    z    z           e     ?                           ===     ===
-                                                                n  ##############                       o o o                     o                                                                                                                                                                   oTo
-                                                                                                                                 BB    q                                                                                                                               ===           ===            /######\
- @  1   2     D   Q     b    a   B       a        r                   c      oTo         C   h      b            a           a   BB        u     R                    a       S           a        C   h       a        r              a   c    r    t       C   h                                 /########\          D      E
+                    o o                                  J                o o               o o                                 oJo                                                 n o o                                  J                o o               o o             ===Jo               o o               o o
+                    ====            ##########################            ====              ====                                ====                                               ======                 ##########################        ====              ====              ====              ====              ====
+             o o          ?    o o     z    z    z o  z                              o o                                 o o                                n                  o o               o o         z    zo o z    z        o oe     ?        o o               o===     ===      o o               o o
+             ====              ====              ====           n  ##############    ====               o o o            ====     o                                            ====              ====              ====              ====              ====              ====              ====       oTo    ====
+                  V                 V                 V              X  V                 V                                   V  BB    q                                            V              X  V                 V                 V                 V          === X  V      ===        V   /######\      V
+ @  1   2  U  D   Q     b    a   B    I  aY h  U  r O                 c   I  oToh  U     C   h      b            a          Oa  IBB Y h    u     R                    a      US           a        C   hI   Y ha U    O r              a   cI   r h  t       C   h              I   Y h  U         /########\       I  DY h   E
 ####################################################################################################iiiiiiii  iiiiiiii##############################~~~~~~~~~~~~~~~~################################################################################################################################################################
 ####################################################################################################iiiiiiii  iiiiiiii##############################~~~~~~~~~~~~~~~~################################################################################################################################################################
 ####################################################################################################################################################################################################################################################################################################################################

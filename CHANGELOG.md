@@ -1,19 +1,5 @@
 # Changelog
 
-## 0.3.0 merged — 2026-11-11 (branch `handoff-v3`, then `main`)
-
-ChatGPT's corrected handoff v0.3.0 (their commit `f3a89ae`) brought in as received and
-checked on macOS with Godot 4.7.2: clean import, 128 files load, art validator passes
-(28 characters, 236 cels), 43 of 43 tests pass, six worlds and two boss arenas captured
-from the real game window with no errors, and web, macOS, Windows and Linux exports
-build. The exported macOS app was launched and ran a stage.
-
-- One fix on top: `tools/check.sh` stopped with "args[@]: unbound variable" under the
-  bash 3.2 that macOS ships.
-- An earlier, superseded package (Sunny Meadows pass 5) was not merged.
-- Their notes are in `docs/handoff_v3/`. Open scope is listed in
-  `docs/handoff_v3/CORRECTION_PASS_REPORT.md` and `README_START_HERE.md`.
-
 ## 0.2.0 — 2026-11-10
 
 - Overhaul v1 merged into `main`.
@@ -27,6 +13,20 @@ build. The exported macOS app was launched and ran a stage.
 - macOS, Windows and Linux exports now build (`tools/build.sh all`); the macOS app was
   launched and ran a stage. Windows and Linux files were built but not run.
 - README screenshots.
+
+## 0.3.0 merged — 2026-11-11 (branch `handoff-v3`, then `main`)
+
+ChatGPT's corrected handoff v0.3.0 (their commit `f3a89ae`) brought in as received and
+checked on macOS with Godot 4.7.2: clean import, 128 files load, art validator passes
+(28 characters, 236 cels), 43 of 43 tests pass, six worlds and two boss arenas captured
+from the real game window with no errors, and web, macOS, Windows and Linux exports
+build. The exported macOS app was launched and ran a stage.
+
+- One fix on top: `tools/check.sh` stopped with "args[@]: unbound variable" under the
+  bash 3.2 that macOS ships.
+- An earlier, superseded package (Sunny Meadows pass 5) was not merged.
+- Their notes are in `docs/handoff_v3/`. Open scope is listed in
+  `docs/handoff_v3/CORRECTION_PASS_REPORT.md` and `README_START_HERE.md`.
 
 ## Overhaul v1 merged — 2026-11-10 (branch `overhaul-v1`)
 

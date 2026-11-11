@@ -1,0 +1,38 @@
+; Built by tools/build_levels.py from chunks: start bowl_p w4_ice pillars cp w4_icicles moving_plat climb w4_pond cp lift key_gate cp star_c w4_ice end
+[meta]
+id = W4-L3
+world = 4
+theme = icy
+kind = core
+hints = A slippery climb. | Freeze the pond and walk across. | The Star is in the dip.
+[legend]
+a = ice_slime
+b = ice_puffin
+t = turtle_tank
+r = ice_puffin
+P = power FROSTBERRY
+R = power FROSTBERRY
+U = pickup magnet
+T = pickup treat
+D = decor
+M = platform w=2 dx=9 dy=0 t=3 thin
+V = platform w=2 dx=0 dy=-5 t=2.6 thin
+1 = sign text=key
+2 = sign text=swim
+z = icicle
+[map]
+ 
+ 
+ 
+ 
+ 
+ 
+                                                                                                                                                                                                                              n
+                                                                                                ##########################                                       n                                                          =====
+                                                                      o     T                      z    z    z    z                                            ######                   n                                                 k                                       =====
+                          o o               o o o                                                                                 o   o   o              ===   ######                                                                    ===          ###                                               o o o
+                                                                    ##    ##    ##                                                                             ######                                                                                 ###                   a
+ @  1   2     D   P     a    a   B      b            a              ##    ##    ##       C   h       a        r                                      ===       ######   t    R                    a      C   h        V                a              L    U     C   h  ######          ########    b            a           D      E
+########################################iiiiiiii  iiiiiiii########  ##    ##    ##  ###########################################  M          ####################################~~~~~~~~~~~~~~~~#############################################################################     *     ############iiiiiiii  iiiiiiii####################
+########################################iiiiiiii  iiiiiiii########  ##    ##    ##  ###########################################             ####################################~~~~~~~~~~~~~~~~####################################################################################################iiiiiiii  iiiiiiii####################
+##################################################################  ##    ##    ##  ###########################################             ##############################################################################################################################################################################################

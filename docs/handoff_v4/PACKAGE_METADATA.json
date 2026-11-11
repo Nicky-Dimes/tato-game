@@ -1,0 +1,18 @@
+{
+  "version": "0.4.0",
+  "date": "2026-11-11",
+  "engine": "4.7.2.stable.official.ed1daf0bf",
+  "source_commit": "7e46497ac3b903a3cb79f398ab4c023b83791a21",
+  "tests_passed": 47,
+  "tests_failed": 0,
+  "resources_checked": 132,
+  "active_production_cels": 236,
+  "added_cels": 112,
+  "characters": 28,
+  "new_play_prop_regions": 24,
+  "new_combat_fx_frames": 16,
+  "enriched_stages": 24,
+  "publish_status": "NOT_PUBLISHED",
+  "visual_approval": "PENDING",
+  "full_production_spec_complete": false
+}

@@ -1,0 +1,4 @@
+7e46497 (HEAD -> feat/playful-gameplay-v04) Increase fire-shot readability and show current boss scale in QA
+888a4f7 Improve jump routes, combat readability, sprite colors and kid-friendly landings for v0.4
+f3a89ae (fix/art-interface-automation) Integrate production art, four extra cels per character, gameplay HUD and reliable build checks
+72ae126 (master) Preserve original TATO handoff baseline

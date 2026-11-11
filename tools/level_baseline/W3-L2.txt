@@ -1,0 +1,42 @@
+; Built by tools/build_levels.py from chunks: start bowl_q w3_belts w3_saw cp crate_wall w3_belts spring_up moving_plat cp w3_drips gauntlet cp star_a pit_small end
+[meta]
+id = W3-L2
+world = 3
+theme = candy
+kind = core
+hints = The Noodle Whip reaches a long way and grabs coins. | Jump when the peppermint slides away. | The Star is up high.
+[legend]
+a = shock_slime
+b = candy_imp
+c = crab_snipper
+t = turtle_tank
+r = candy_imp
+Q = power NOODLE
+q = pickup corn
+u = pickup time
+e = pickup rainbow_star
+T = pickup treat
+D = decor
+M = platform w=2 dx=9 dy=0 t=3 thin
+1 = sign text=swap
+2 = sign text=notes
+G = conveyor w=4 dir=1
+H = conveyor w=4 dir=-1
+y = saw dx=4 t=2.6
+z = drip every=2.2
+[map]
+ 
+ 
+ 
+ 
+ 
+                                                                                                                                                                                                                                                                                     *
+                                                                                                                                                                n o o                                                                                                               ===
+                                                                     o        o        o                                                                       ======                                         ####################
+                          ?                                                                                                                                                                                     z     z     z                 e     ?                           ===     ===
+                                           o o        o o       n  y        y                                 o                  o o        o o                                     o   o   o                                                                                                            oTo
+                                                                                                             BB    q                                                                                                                                                         ===           ===
+ @  1   2     D   Q     b    a   B                                      a         b            C   h     a   BB        u                                  S           a                                C   h        a      c         n       a   c    r    t       C   h                              a          D     D      E
+##########################################G       H       ######################################################################G       H       #################################  M          ###########################################################################################################   ########################
+##########################################                ######################################################################                #################################             ###########################################################################################################   ########################
+##########################################                ######################################################################                #################################             ###########################################################################################################   ########################

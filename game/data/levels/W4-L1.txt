@@ -1,11 +1,19 @@
 ; Built by tools/build_levels.py from chunks: start bowl_p w4_ice qblocks cp w4_pond steps w4_icicles cp pit_plat w4_ice high_road cp star_b flat_coins end
 [meta]
+play_routes = 0.4
 id = W4-L1
 world = 4
 theme = icy
 kind = core
 hints = Ice is slippery: slow down before a ledge. | Freeze Shot turns a creature into a block you can stand on. | It also freezes the pond.
 [legend]
+V = crow_swooper up=0.0 range=3
+Y = ice_puffin
+U = spring
+X = platform w=4 dx=3 dy=-1 t=2.8 thin
+O = platform w=3 dx=0 dy=0 t=3 thin
+J = pickup wings
+I = crate h=2 holds=coins:6
 a = ice_slime
 b = ice_puffin
 r = ice_puffin
@@ -18,18 +26,18 @@ D = decor
 2 = sign text=power
 z = icicle
 [map]
- 
- 
- 
- 
- 
- 
- 
-                                                                                                                                              ##########################
-                                                                  ?%?    o o                            n                           oTo          z    z    z    z                          o o                                       oooooooo  n
-                          o o               o o o             n                                                                   ######                                                                        o o o               ==============              ########                   oTo
-                                                                                                                              ##########                                                  =====                                                                 #      #
- @  1   2     D   P     a    a   B      b            a               a      p      C   h     R                    a       ##############   a       a        r              C   h                            b            a             a     b           C   h  #  *   B      a          D    a      D     D      E
+
+
+
+
+
+
+                    o o               o o                                 oJo                                                   o o                                  J                                                                      o o               o o               oJo               o o
+                    ====              ====                                ====                                                  ====          ##########################                                                                    ====              ====              ====              ====
+             o o               o o                                ?%?o   o o                            n                o o        oTo    o o   z    z    z o oz                          o o                                       oooooooo  n       o o               o o
+             ====         o o  ====         o o o             n    ====                                                  ====     ######   ====              ====                                               o o o               ==============     ====     ######## ====              oTo
+                  V                 V                                   V                                                  X  ##########        V                 V                       =====                                           V              X  V   #      #      V                 V
+ @  1   2  U  D   P     a    a   B    I b Y h        a           U   aO     p      C   h     R                    a       ############## U a       a        r   O   I   Y hC   h                            b            a         U   a     b           C   hI # Y*h  B    O a          D    a   I  DY h  D      E
 ########################################iiiiiiii  iiiiiiii######################################~~~~~~~~~~~~~~~~########################################################################         ###########iiiiiiii  iiiiiiii##########################################################################################
 ########################################iiiiiiii  iiiiiiii######################################~~~~~~~~~~~~~~~~########################################################################         ###########iiiiiiii  iiiiiiii##########################################################################################
 ########################################################################################################################################################################################         #######################################################################################################################

@@ -924,3 +924,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+    # Preserve the v0.4 play routes whenever the base campaign is regenerated.
+    import runpy
+    runpy.run_path(os.path.join(ROOT, "tools", "enrich_levels.py"), run_name="__main__")

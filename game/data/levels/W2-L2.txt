@@ -1,11 +1,19 @@
 ; Built by tools/build_levels.py from chunks: start bowl_q w2_apples tunnel cp pit_double w2_hive crate_wall spring_up cp w2_branches gauntlet cp star_a hill end
 [meta]
+play_routes = 0.4
 id = W2-L2
 world = 2
 theme = orchard
 kind = core
 hints = Moles only pop up when you are near: hit them then. | Honey glues a creature to the spot. | A new bowl swaps your power with a Flavor Burst.
 [legend]
+V = bee_buzzer up=0.0 range=3
+Y = apple_chomper
+U = spring
+X = platform w=4 dx=3 dy=-1 t=2.8 thin
+O = platform w=3 dx=0 dy=0 t=3 thin
+J = pickup wings
+I = crate h=2 holds=coins:6
 a = apple_chomper
 b = mushroom_hopper
 c = crab_snipper
@@ -23,18 +31,18 @@ g = faller every=3
 y = hive
 m = mole_digger
 [map]
- 
- 
- 
- 
- 
+
+
+
+
+
                                                                                                                                                                                                                                                                          *
-                                         g      g      g                                                                                                                      n o o                       o o   n    o o                                                ===
-                                                                                                                                  y                                          ======                      ====       =====
-                          ?                                                                                                                                                                                                       e     ?                           ===     ===
-                                                               n   ##############                    o       o                ====    ====              o                                             ====              ====                                                                    oTo
-                                                                                                                                                       BB    q                                                                                                   ===           ===            /######\
- @  1   2     D   Q     b    a   B     a           m                  c      oTo         C   h     a      b               a                 r      a   BB        u      S           a        C   h          m        a           a   c    r    t       C   h                                 /########\          D      E
+                    o o               o og      g      goJo               o o               o o                                  J                o o               o o       n o o   oJo                 o o   n    o o  o o               oJo               o o       ===     o o               oJo               o o
+                    ====              ====              ====              ====              ====                                  y               ====              ====     ======   ====               ====       ===== ====              ====              ====              ====              ====              ====
+             o o          ?    o o               o o                                 o o                                 o o               o o               o o               o o               o o               o o            e  o o?              o o          ===  o o===            o o               o o
+             ====              ====              ====          n   ##############    ====            o       o           ==== ====    ==== ====         o    ====              ====              ==== ====         ==== ====         ====              ====              ====              ==== oTo          ====
+                  V                 V                 V              X  V                 V                                   V                 V      BB    q X  V                 V                 V                 V              X  V                 V    ===          V===            /######\         X  V
+ @  1   2  U  D   Q     b    a   B    Ia  Y h  U   mO                 c   I  oToh  U     C   h     a      b               a O   I   Y h  U  r      a   BB        u  I   S h  U    O a        C   h      I   m h  U   a           a   c    r I  tY h  U C   h                    I   Y h  U   /########\          D  I   E h
 ######################################################################################################  ####  ################################################################################################################################################################################################################
 ######################################################################################################  ####  ################################################################################################################################################################################################################
 ######################################################################################################  ####  ################################################################################################################################################################################################################

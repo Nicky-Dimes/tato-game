@@ -1,11 +1,19 @@
 ; Built by tools/build_levels.py from chunks: start bowl_q w5_bridges tunnel cp w5_gust crate_wall moving_plat spring_up cp w5_updraft gauntlet cp star_a hill end
 [meta]
+play_routes = 0.4
 id = W5-L2
 world = 5
 theme = windy
 kind = core
 hints = Thunder Corn's bolt jumps between creatures. | Onion Knights block shots from the front. | Hit them from behind or jump on them.
 [legend]
+V = crow_swooper up=0.0 range=3
+Y = pepper_goblin
+U = spring
+X = platform w=4 dx=3 dy=-1 t=2.8 thin
+O = platform w=3 dx=0 dy=0 t=3 thin
+J = pickup wings
+I = crate h=2 holds=coins:6
 a = fire_slime
 b = pepper_goblin
 c = crab_snipper
@@ -23,18 +31,18 @@ M = platform w=2 dx=9 dy=0 t=3 thin
 2 = sign text=flap
 g = wind w=12 h=6 dir=1 power=0.9
 [map]
- 
- 
- 
- 
- 
+
+
+
+
+
                                                                                                                                                                                                                           n                                                    *
-                                                                                                                                                                                    n o o                               =====                                                 ===
-                                            o o      o o                                                                                                                           ======
-                          ?                                                                                   o  o  o                                                                                                                   e     ?                           ===     ===
-                                         =====    =====    ==== n      ##############                                                 o                   o   o   o                                                                                                                                   oTo
-                                                                                                                                     BB    q                                                                                                                           ===           ===            /######\
- @  1   2     D   Q     b    a   B                                        c      oTo         C   h                               a   BB        u                              S           a        C   h      a    x          x        a   c    r    t       C   h                                 /########\          D      E
+                    o o                                                   o o               oJo                                 o o               o o                               n oJo               o o             =====               oJo               o o             === o               oJo               o o
+                    ====                    o o      o o                  ====              ====                                ====              ====                             ======               ====              ====              ====              ====              ====              ====              ====
+             o o          ?                                        o o               o o                      o  o  o    o o               o o                                 o o               o o               o o               o oe     ?        o o               o===     ===      o o               o o
+             ====                        =====    =====    ==== n  ====##############====                                ====         o    ====           o   o   o            ====              ====              ====              ====              ====              ====              ====       oTo    ====
+                  V                                                     V                 V                                X  V      BB    q    V                                   V                 V              X  V                 V                 V          ===    V      ===     X  V   /######\      V
+ @  1   2  U  D   Q     b    a   B                                        c   Y hoTo    O    C   h                              Ia  YBB  U     u                              S   O   I   a h  U   C   h      a    x      I   x h  U   aO  c    r    t       CI  hY h  U                          I/########\          D      E
 ########################################                      ############################################g           #################################  M          ################################################################################################################################################################
 ########################################                      ############################################            #################################             ################################################################################################################################################################
 ########################################                      ############################################            #################################             ################################################################################################################################################################

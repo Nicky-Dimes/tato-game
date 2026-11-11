@@ -1,0 +1,44 @@
+; Built by tools/build_levels.py from chunks: start bowl_q w6_maces tunnel cp cracked w6_bridge crate_wall spring_up cp w6_torches gauntlet cp star_a hill end
+[meta]
+id = W6-L2
+world = 6
+theme = castle
+kind = core
+hints = Tomato Bomb breaks cracked walls. | Walk under a mace as it swings away. | Rock Golems take a lot of hits.
+[legend]
+a = shock_slime
+b = pepper_goblin
+c = onion_knight
+t = rock_golem
+r = carrot_archer
+Q = power TOMATO_BOMB
+R = power GARLIC_DASH
+q = pickup banana
+j = pickup gem
+u = pickup clover
+e = pickup rainbow_star
+T = pickup treat
+D = decor
+1 = sign text=swap
+2 = sign text=button
+J = button opens=b1 mode=once
+A = bridge id=b1 w=6
+y = mace r=2 t=3.2
+z = torch every=2.4
+K = cracked h=2
+[map]
+ 
+ 
+ 
+ 
+ 
+                                                                                                                                                                                                                                                                                       *
+                                    ############################                                                                                                                          n o o                                                                                       ===
+                                        y        y        y                                                                                                                              ======
+                          ?                                                                                                                                                                                                    n                e     ?                           ===     ===
+                                                                  n  ##############                             ####                                                o                                                         ####                                                                            oTo
+                                                                                                                ####                                               BB    q                                              ####  ####                                             ===           ===            /######\
+ @  1   2     D   Q     b    a   B          t          c                c      oTo         C   h     R          K    j   a     J      A                        a   BB        u      S           a        C   h     z    ####z ####   z         a   c    r    t       C   h                                 /########\          D      E
+######################################################################################################################################      ################################################################################################################################################################################################
+######################################################################################################################################      ################################################################################################################################################################################################
+######################################################################################################################################      ################################################################################################################################################################################################

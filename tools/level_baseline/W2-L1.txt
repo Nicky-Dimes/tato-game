@@ -1,0 +1,37 @@
+; Built by tools/build_levels.py from chunks: start bowl_p w2_apples qblocks pit_small cp w2_branches steps water cp w2_hive high_road cp star_b flat_coins end
+[meta]
+id = W2-L1
+world = 2
+theme = orchard
+kind = core
+hints = Apples wobble before they fall. | Watermelon throws three slices at once. | Smash the crate by the stone room for the Star.
+[legend]
+a = apple_chomper
+b = mushroom_hopper
+r = carrot_archer
+P = power WATERMELON
+p = pickup leaf
+q = pickup grape
+T = pickup treat
+D = decor
+1 = sign text=apples
+2 = sign text=power
+g = faller every=3
+y = hive
+m = mole_digger
+[map]
+ 
+ 
+ 
+ 
+ 
+ 
+                                         g      g      g                                                          o o   n    o o
+                                                                                                                 ====       =====                                                                         y
+                                                                  ?%?    o o                                                                        oTo                                                                    oooooooo  n
+                          o o                               n                          oTo                    ====              ====              ######            o   o   o                         ====    ====        ==============              ########                   oTo
+                                                                                                                                              ##########                                                                                              #      #
+ @  1   2     D   P     a    a   B     a           m                 a      p       a          D     C   h          m        a            ##############   a       q                   C   h      a                 r        a     b           C   h  #  *   B      a          D    a      D     D      E
+#######################################################################################   #########################################################################~~~~~~~~~~~~###############################################################################################################################
+#######################################################################################   #########################################################################~~~~~~~~~~~~###############################################################################################################################
+#######################################################################################   ####################################################################################################################################################################################################################

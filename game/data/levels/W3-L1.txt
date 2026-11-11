@@ -1,11 +1,19 @@
 ; Built by tools/build_levels.py from chunks: start bowl_p w3_belts qblocks cp w3_saw pit_plat tower cp w3_drips steps high_road cp star_b flat_coins end
 [meta]
+play_routes = 0.4
 id = W3-L1
 world = 3
 theme = candy
 kind = core
 hints = Candy belts carry you along. | Popcorn pops up and over: good for things above. | Watch the pink goo dripping from the ceiling.
 [legend]
+V = balloon_jelly up=0.0 range=3
+Y = candy_imp
+U = spring
+X = platform w=4 dx=3 dy=-1 t=2.8 thin
+O = platform w=3 dx=0 dy=0 t=3 thin
+J = pickup wings
+I = crate h=2 holds=coins:6
 a = shock_slime
 b = candy_imp
 c = crab_snipper
@@ -20,18 +28,18 @@ H = conveyor w=4 dir=-1
 y = saw dx=4 t=2.6
 z = drip every=2.2
 [map]
- 
- 
- 
- 
+
+
+
+
                                                                                                                                                       n
                                                                                                                                                     =====
- 
-                                                                                                 o        o        o                            ====       ====           ####################
-                                                                    ?%?    o o                                                   o o                                        z     z     z                           oTo          oooooooo  n
-                          o o              o o        o o                                      y        y                                             ====                                                        ######        ==============              ########                   oTo
-                                                                                                                                =====                                                                         ##########                                    #      #
- @  1   2     D   P     a    a   B                                     a      p      C   h          a         b                                   a         b      C   h        a      c         n        ##############   a       a     b           C   h  #  *   B      a          D    a      D     D      E
+                    o o                                                   o o               oJo               o o                                                   oJo                                 o o               oJo               o o               o o               oJo               o o
+                    ====                                                  ====              ==== o        o   ==== o                            ====       ====     ====  ####################          ====              ====              ====              ====              ====              ====
+             o o                                                   o?%?    o o       o o                                         o o       o o               o o            z  o oz     z        o o                oTo          oooooooo  n           o o               o o               o o
+             ====         o o              o o        o o          ====              ====      y        y                                  ====       ====   ====              ====              ====             ######        ==============         ==== ########     ====          oTo ====
+                  V                                                     V                 V              X  V                   =====           V                 V                 V              X  V       ##########V                 V                 #      #       X  V                 V
+ @  1   2  U  D   P     a    a   B                                     a  I   p h  U C  Oh          a         b   Y h                    U        a         b   O  CI  hY h  U  a      c         n      I ##############   a       a     b  I   Y h  C   h  #  *   B      a     I   YDh  Ua      D     D      E
 ##########################################G       H       ####################################################################         #############################################################################################################################################################################
 ##########################################                ####################################################################         #############################################################################################################################################################################
 ##########################################                ####################################################################         #############################################################################################################################################################################

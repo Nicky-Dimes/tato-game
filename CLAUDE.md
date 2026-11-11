@@ -1,3 +1,5 @@
+> Current source is v0.4.0. Read the root README_START_HERE.md, CORRECTION_PASS_REPORT.md and QA_CORRECTIONS/v04/ first. Preserve the higher jump, wide pads/routes, correct shader tinting and guided bubbles. Current suite: 47 tests; original 39-test references below are historical.
+
 # CLAUDE.md — TATO! Lead Development Agent
 
 **Read `README_START_HERE.md` and `MASTER_BUILD_DIRECTIVE.md` before editing.** This repository is a **working game**, not a blank project. The owner has rejected previous low-quality decorative passes. Do not reset the game or deliver more concept-only artwork.
@@ -25,7 +27,7 @@ Finish **TATO! — A Little Goose With a Big Appetite** as a beautiful, complete
 - Check newly generated sprites for identical anatomy, transparent edges, consistent silhouette, correct anchor, no pasted labels/background fragments, no uncanny extra limbs.
 - Avoid stretching small reference-art crops to fill a huge scene. Generate separate original high-resolution parallax plates/terrain/props, export with correct alpha, and animate where appropriate.
 - Do not overwrite the approved reference images. Never silently regenerate existing asset sheets with generators and discard new production art.
-- Every milestone: import -> script/resource check -> unit/integration -> gameplay screenshot -> review against approved target; run all 39 and stage smoke checks before release.
+- Every milestone: import -> script/resource check -> unit/integration -> gameplay screenshot -> review against approved target; run all 47 and stage smoke checks before release.
 - Never claim an automated test has passed if it has not run. Separate test success from visual approval. Report blockers and remaining scope honestly.
 - Work progressively across *all six worlds*, not just Sunny Meadows. Full campaign, boss levels and extras required. Do not declare done after one sprint.
 - Respect code/graphics architecture and older mobile hardware. Keep draw calls, animation memory and texture atlas size appropriate. Retain Reduced Motion, Cozy Mode and captions.

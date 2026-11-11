@@ -12,13 +12,13 @@ var _halo: Node2D
 func _configure() -> void:
 	add_to_group("checkpoint")
 	checkpoint_id = "cp_%d_%d" % [cell.x, cell.y]
-	var flag := Art.sized(WorldKit.art(level.theme, "flag"), 74.0)
+	var flag := Sprite2D.new()
 	flag.position = Vector2(-26, 0)
 	flag.modulate = Color(0.8, 0.8, 0.85)
 	flag.name = "Flag"
 	add_child(flag)
-	_bell = Art.sized("items/checkpoint", 58.0)
-	_bell.position = Vector2(24, 0)
+	_bell = PlayArt.standing("checkpoint", 105)
+	_bell.position = Vector2.ZERO
 	_bell.modulate = Color(0.78, 0.78, 0.85)
 	add_child(_bell)
 	_halo = Node2D.new()

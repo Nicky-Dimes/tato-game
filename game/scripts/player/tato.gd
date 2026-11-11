@@ -29,16 +29,16 @@ const AIR_ACCEL := 1150.0
 const AIR_DECEL := 420.0
 const ICE_ACCEL := 420.0
 const ICE_DECEL := 150.0
-const JUMP_VELOCITY := -690.0     # a held jump clears two tiles with room to spare
-const JUMP_CUT := 0.45
+const JUMP_VELOCITY := -940.0     # held jump reaches about4.6tiles; a short tap still clears broad steps
+const JUMP_CUT := 0.72
 const GRAVITY := 1500.0
-const FALL_GRAVITY := 1850.0
+const FALL_GRAVITY := 1700.0
 const MAX_FALL := 920.0
-const FLAP_VELOCITY := -350.0
+const FLAP_VELOCITY := -450.0
 const MAX_FLAPS := 3
 const GLIDE_FALL := 165.0
-const COYOTE_TIME := 0.10
-const JUMP_BUFFER := 0.12
+const COYOTE_TIME := 0.16
+const JUMP_BUFFER := 0.18
 const SWIM_SPEED := 165.0
 const SLIDE_MAX := 540.0
 const HONK_COOLDOWN := 0.32
@@ -437,7 +437,7 @@ func _move_swim(delta: float) -> void:
 func _center_in_water() -> bool:
 	if level == null or not level.has_method("water_at"):
 		return false
-	return level.water_at(global_position + Vector2(0, -22.0))
+	return level.water_at(global_position + Vector2(0, -22.0)) or (velocity.y >= -80 and level.water_at(global_position + Vector2(0, -12.0)))
 
 
 func _water_surface_y() -> float:

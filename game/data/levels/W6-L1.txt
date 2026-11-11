@@ -1,11 +1,19 @@
 ; Built by tools/build_levels.py from chunks: start bowl_p w6_torches qblocks cp w6_bridge steps w6_maces cp pit_plat w6_torches high_road cp star_b flat_coins end
 [meta]
+play_routes = 0.4
 id = W6-L1
 world = 6
 theme = castle
 kind = core
 hints = Step on the button to lower the drawbridge. | Lemon Beam goes through everything in a line. | Torches flare on a rhythm.
 [legend]
+V = pie_bat up=0.0 range=3
+Y = onion_knight
+U = spring
+X = platform w=4 dx=3 dy=-1 t=2.8 thin
+O = platform w=3 dx=0 dy=0 t=3 thin
+I = pickup wings
+Q = crate h=2 holds=coins:6
 a = shock_slime
 b = pepper_goblin
 c = onion_knight
@@ -21,18 +29,18 @@ A = bridge id=b1 w=6
 y = mace r=2 t=3.2
 z = torch every=2.4
 [map]
- 
- 
- 
- 
- 
- 
-                                                                                                                                                    ############################
-                                                                                                                                                        y        y        y
-                                                   n                ?%?    o o                                                            oTo                                                      o o                         n               oooooooo  n
-                          o o                     ####                                                                                  ######                                                                                ####            ==============              ########                   oTo
-                                            ####  ####                                                                              ##########                                                    =====                 ####  ####                                        #      #
- @  1   2     D   P     a    a   B     z    ####z ####   z             a      p      C   h     J      A                         ##############   a          t          c           C   h                           z    ####z ####   z           a     b           C   h  #  *   B      a          D    a      D     D      E
+
+
+
+
+
+
+                    o o               o o               oIo               o o               o o                                 oIo               o ############################      oIo                                 o o               o o               oIo               o o               o o               oIo
+                    ====              ====              ====              ====              ====                                ====              ====  y        y  ====  y           ====                                ====              ====              ====              ====              ====              ====
+             o o               o o                 n               o?%?    o o       o o                                 o o              oTo                o o               o o                 o o             o o         n     o o       oooooooo  n                                 o o               o o
+             ====         o o  ====               ####             ====              ====                                ====           ######               ====              ====                                ====       ####   ====     ==============              ########         ====      oTo     ====
+                  V                 V       ####  ####V              X  V                 V                                   V     ##########  V              X  V                 V             =====                 ####  ####        V              X  V             #   V  #              V                 V
+ @  1   2  U  D   P     a    a   B    Qz  Y ####z ####   z             a  Q   p h  U C   h     J      A                     O   ##############   a          t       Q  cY h  U    OC   h                           z    ####z #### U z           a     b      Q   YCh  h  #  *   B      a         QD  Y a  U   DO    D      E
 ######################################################################################################      ####################################################################################         #########################################################################################################################
 ######################################################################################################      ####################################################################################         #########################################################################################################################
 ######################################################################################################      ####################################################################################         #########################################################################################################################

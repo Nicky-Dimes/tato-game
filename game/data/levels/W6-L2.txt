@@ -1,11 +1,19 @@
 ; Built by tools/build_levels.py from chunks: start bowl_q w6_maces tunnel cp cracked w6_bridge crate_wall spring_up cp w6_torches gauntlet cp star_a hill end
 [meta]
+play_routes = 0.4
 id = W6-L2
 world = 6
 theme = castle
 kind = core
 hints = Tomato Bomb breaks cracked walls. | Walk under a mace as it swings away. | Rock Golems take a lot of hits.
 [legend]
+V = pie_bat up=0.0 range=3
+Y = onion_knight
+U = spring
+X = platform w=4 dx=3 dy=-1 t=2.8 thin
+O = platform w=3 dx=0 dy=0 t=3 thin
+I = pickup wings
+W = crate h=2 holds=coins:6
 a = shock_slime
 b = pepper_goblin
 c = onion_knight
@@ -27,18 +35,18 @@ y = mace r=2 t=3.2
 z = torch every=2.4
 K = cracked h=2
 [map]
- 
- 
- 
- 
- 
+
+
+
+
+
                                                                                                                                                                                                                                                                                        *
-                                    ############################                                                                                                                          n o o                                                                                       ===
-                                        y        y        y                                                                                                                              ======
-                          ?                                                                                                                                                                                                    n                e     ?                           ===     ===
-                                                                  n  ##############                             ####                                                o                                                         ####                                                                            oTo
-                                                                                                                ####                                               BB    q                                              ####  ####                                             ===           ===            /######\
- @  1   2     D   Q     b    a   B          t          c                c      oTo         C   h     R          K    j   a     J      A                        a   BB        u      S           a        C   h     z    ####z ####   z         a   c    r    t       C   h                                 /########\          D      E
+                    o o             ############################          o o               o o               oIo               o o                                 o o                I  n o o         o o               o o               oIo               o o               o o   ===         oIo               o o
+                    ====                y        y        y               ====              ====              ====              ====                                ====                 ======         ====              ====              ====              ====              ====              ====              ====
+             o o          ?    o o               o o                                 o o               o o               o o                                 o o               o o               o o               o o         n     o o        e     ?o o               o o      ===     ===o
+             ====              ====              ====             n  ##############  ====              ====     ####     ====                                ====   o          ====              ====              ====       ####   ====              ====              ====              ====               oTo
+                  V                 V                 V              X  V                 V                 V   ####          V                                X  VBB    q          V                 V                 ####  ####     X  V                 V                 V===           ===V           /######\
+ @  1   2  U  D   Q     b    a   B    W   Y t  U    O  c                c W   YoTo U       C   h     R    O   W K Y hj U a     J      A                        a   BB   Y h  u    O S           a       WC  Yhh  U z    ####z ####   z      W  aY hc U  r    t       C   h      W   Y h  U    O            /########\   Y h    D      E
 ######################################################################################################################################      ################################################################################################################################################################################################
 ######################################################################################################################################      ################################################################################################################################################################################################
 ######################################################################################################################################      ################################################################################################################################################################################################

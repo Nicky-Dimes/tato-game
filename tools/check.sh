@@ -47,6 +47,6 @@ grep -E '^FAIL|^        - |^TESTS' "$log/tests.log" || true
 # A zero exit code without the final test marker is never a passing run.
 grep -qE '^TESTS: [0-9]+ passed, 0 failed' "$log/tests.log" || failed=1
 if [ "$failed" -eq 0 ]; then echo 'RESULT: all checks passed';
-else echo 'RESULT: checks failed'; tail -35 "$log/import.log" "$log/resources.log" "$log/tests.log"; fi
+else echo 'RESULT: checks failed'; tail -n 35 "$log/import.log" "$log/resources.log" "$log/tests.log"; fi
 echo "Full logs retained: $log"
 exit "$failed"

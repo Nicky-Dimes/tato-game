@@ -60,6 +60,8 @@ func _physics_process(delta: float) -> void:
 	if _done:
 		return
 	_age += delta
+	if look == "bubble" and not hostile:
+		_guide_bubble(delta)
 	velocity.y += fall * delta
 	var step := velocity * delta
 	if wobble != 0.0:
@@ -72,6 +74,32 @@ func _physics_process(delta: float) -> void:
 	if _age >= life:
 		finish()
 	queue_redraw()
+
+
+func _guide_bubble(delta: float) -> void:
+	if _age > 1.15:
+		velocity.y -= 55.0 * delta
+		return
+	var direction := signf(velocity.x)
+	var best: Node2D = null
+	var distance := 560.0 * 560.0
+	for candidate in get_tree().get_nodes_in_group("hittable"):
+		if not (candidate is Enemy or candidate is Boss):
+			continue
+		if candidate is Enemy and candidate.dead:
+			continue
+		if candidate is Boss and candidate.mode == Boss.Mode.DEFEATED:
+			continue
+		var aim: Vector2 = candidate.global_position - Vector2(0, candidate.height * 0.5) - global_position
+		if aim.x * direction < 0 or absf(aim.y) > 190:
+			continue
+		if aim.length_squared() < distance:
+			best = candidate
+			distance = aim.length_squared()
+	var want := 0.0
+	if best != null:
+		want = clampf((best.global_position.y - best.height * 0.5 - global_position.y) * 3.5, -145.0, 145.0)
+	velocity.y = move_toward(velocity.y, want, 360.0 * delta)
 
 
 func _touch(node: Node) -> void:
@@ -132,6 +160,8 @@ func finish() -> void:
 		return
 	_done = true
 	var parent := get_parent()
+	if not hostile and parent != null:
+		PlayArt.impact(parent, global_position)
 	if splash > 0.0 and parent != null:
 		if hostile:
 			Fx.pop_ring(parent, global_position, color, splash)
@@ -148,6 +178,18 @@ func finish() -> void:
 
 
 func _draw() -> void:
+	var texture := PlayArt.frame(look, int(_age * 16))
+	if texture != null:
+		var width := radius * (5.7 if look in ["fire", "ice"] else 4.1)
+		var anchor_x := 0.70 if look in ["fire", "ice"] else 0.5
+		draw_texture_rect(texture, Rect2(-width * anchor_x, -width * 0.5, width, width), false)
+		return
+	var food_icons := {"honey": &"HONEYCOMB", "melon": &"WATERMELON", "kernel": &"POPCORN", "tomato": &"TOMATO_BOMB"}
+	if food_icons.has(look) and not hostile:
+		var icon := FoodDB.food_icon(food_icons[look])
+		if icon != null:
+			draw_texture_rect(icon, Rect2(-radius * 1.8, -radius * 1.8, radius * 3.6, radius * 3.6), false)
+			return
 	var line := Color("3a1f4d")
 	var r := radius
 	match look:

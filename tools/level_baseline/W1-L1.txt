@@ -1,0 +1,32 @@
+; Built by tools/build_levels.py from chunks: start flat_coins qblocks steps bowl_p cp pit_small tower hill w1_shrooms cp high_road cp star_b flat_coins end
+[meta]
+id = W1-L1
+world = 1
+theme = grassland
+kind = core
+hints = Jump on the slimes or honk at them. | The first food bowl gives you Fire Shot. | Smash the crate by the little stone room to find the Star.
+[legend]
+a = slime_blob
+b = mushroom_hopper
+P = power FIRE_PEPPER
+p = pickup flower
+D = decor
+1 = sign text=move
+2 = sign text=honk
+g = shroom
+[map]
+ 
+ 
+ 
+ 
+                                                                                                                                    n
+                                                                                                                                  =====
+ 
+                                                                                                                              ====       ====
+                                      ?%?    o o                  ooo                                                                                                       o o  o o  o o                    oooooooo  n
+                     ooo                               n        ######                o o                        ooo                ====                ooo                                                 ==============              ########                   ooo
+                                                            ##########                                                                                /######\                                                                          #      #
+ @  1   2     D    D    a      D         a      p       ##############   a    P     a    a   B     C   h      a          D      a         b          /########\              g    g    g           C   h       a     b           C   h  #  *   B      a          D    a      D     D      E
+#################################################################################################################   #######################################################  #    #    #   #####################################################################################################
+#################################################################################################################   #######################################################  #    #    #   #####################################################################################################
+#################################################################################################################   #######################################################  #    #    #   #####################################################################################################

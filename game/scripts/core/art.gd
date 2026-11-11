@@ -23,6 +23,11 @@ static func tex(short: String) -> Texture2D:
 			found.set_meta("body_height", float(found.get_height()))
 			_cache[short] = found
 			return found
+	var play_names := {"items/spring_pad": "spring", "items/checkpoint": "checkpoint", "items/question_block": "question", "items/crate": "crate"}
+	if short.begins_with("play/") or play_names.has(short):
+		found = PlayArt.prop(short.get_file() if short.begins_with("play/") else str(play_names[short]))
+		_cache[short] = found
+		return found
 	if short.begins_with("enemies/") and short.count("/") == 1:
 		found = ProductionArt.enemy_frame(short.get_file(), 0)
 		if found != null:

@@ -51,8 +51,8 @@ func test_jump_height_and_short_hop() -> void:
 		top = minf(top, p.global_position.y)
 	Input.action_release("jump")
 	var full := ground - top
-	check_gt(full, 2.2 * Layers.TILE, "a held jump clears two tiles with room to spare (%.0f px)" % full)
-	check_lt(full, 2.8 * Layers.TILE, "a held jump stays under three tiles (%.0f px)" % full)
+	check_gt(full, 4.0 * Layers.TILE, "the higher held jump clears four tiles (%.0f px)" % full)
+	check_lt(full, 5.1 * Layers.TILE, "jump remains controllable below five tiles (%.0f px)" % full)
 	await frames(30)
 	check(p.is_on_floor(), "lands again")
 	# short tap

@@ -89,6 +89,11 @@ func _play(id: String) -> Dictionary:
 			elif stuck > 150 and stuck % 60 == 0:
 				Input.action_press("jump")
 				jump_hold = 30
+	if not level.finished:
+		print("  unfinished position=", p.global_position, " state=", p.state, " velocity=", p.velocity)
+		for entity in level.entities.get_children():
+			if entity.get_script().resource_path.ends_with("/goal.gd"):
+				print("  goal=", entity.global_position, " awake=", entity.get("_awake"))
 	release_all()
 	return {"done": level.finished, "x": best_x, "width": level.data.pixel_size().x, "frames": frame, "notes": level.notes_found}
 

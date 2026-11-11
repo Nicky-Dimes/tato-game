@@ -7,7 +7,7 @@ var _text := ""
 
 
 func _configure() -> void:
-	add_child(Art.sized(WorldKit.art(level.theme, "sign"), 66.0))
+	add_child(Art.sized(WorldKit.art(level.theme, "sign"), 90.0))
 	_text = Story.sign_text(p_str("text", arg(0)))
 	var touch := add_touch(Vector2(150, 140), Vector2(0, -70))
 	touch.body_entered.connect(func(body: Node) -> void:

@@ -6,7 +6,9 @@ uniform float rock_strength : hint_range(0.0, 1.0) = 0.94;
 uniform float rock_world_span = 320.0;
 uniform vec4 rock_region = vec4(0.0, 0.0, 1.0, 1.0);
 varying vec2 rock_world_uv;
+varying vec4 vertex_tint;
 void vertex() {
+    vertex_tint = COLOR;
     rock_world_uv = (MODEL_MATRIX * vec4(VERTEX, 0.0, 1.0)).xy / rock_world_span;
 }
 vec3 sample_rock(vec2 p) {
@@ -21,7 +23,7 @@ vec3 wrapped_rock(vec2 p) {
                mix(sample_rock(q - vec2(0.0, 0.8)), sample_rock(q - vec2(0.8)), blend.x), blend.y);
 }
 void fragment() {
-    vec4 original_color = texture(TEXTURE, UV) * COLOR;
+    vec4 original_color = texture(TEXTURE, UV) * vertex_tint;
     float material_area = texture(rock_mask, UV).r * rock_strength;
     vec3 painted_stone = wrapped_rock(rock_world_uv);
     painted_stone *= 0.94 + 0.06 * sin(rock_world_uv.x * 1.7 + rock_world_uv.y * 0.8);

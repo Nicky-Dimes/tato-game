@@ -1,0 +1,39 @@
+; Built by tools/build_levels.py from chunks: start bowl_q w4_icicles tunnel cp w4_ice crate_wall w4_pond spring_up cp w4_icicles gauntlet cp star_a hill end
+[meta]
+id = W4-L2
+world = 4
+theme = icy
+kind = core
+hints = Icicles wobble, then drop. | The Cocoa Shield bounces snowballs back. | Ghosts only move when you look away.
+[legend]
+a = ice_slime
+b = ice_puffin
+c = hedgehog_roller
+t = turtle_tank
+r = ice_puffin
+Q = power COCOA_SHIELD
+R = power FROSTBERRY
+q = pickup cherry
+u = pickup mushroom
+e = pickup rainbow_star
+T = pickup treat
+D = decor
+1 = sign text=swap
+2 = sign text=slide
+z = icicle
+[map]
+ 
+ 
+ 
+ 
+ 
+                                                                                                                                                                                                                                                                               *
+                                                                                                                                                                                    n o o                                                                                     ===
+                                    ##########################                                                                                                                     ======                 ##########################
+                          ?            z    z    z    z                                                                                                     n                                                z    z    z    z           e     ?                           ===     ===
+                                                                n  ##############                       o o o                     o                                                                                                                                                                   oTo
+                                                                                                                                 BB    q                                                                                                                               ===           ===            /######\
+ @  1   2     D   Q     b    a   B       a        r                   c      oTo         C   h      b            a           a   BB        u     R                    a       S           a        C   h       a        r              a   c    r    t       C   h                                 /########\          D      E
+####################################################################################################iiiiiiii  iiiiiiii##############################~~~~~~~~~~~~~~~~################################################################################################################################################################
+####################################################################################################iiiiiiii  iiiiiiii##############################~~~~~~~~~~~~~~~~################################################################################################################################################################
+####################################################################################################################################################################################################################################################################################################################################

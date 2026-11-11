@@ -1,0 +1,37 @@
+; Built by tools/build_levels.py from chunks: start bowl_r boost w5_gust coin_run w5_bridges cp flyers w5_gust coin_run w5_updraft cp star_a w5_gust end
+[meta]
+id = W5-X
+world = 5
+theme = windy
+kind = optional
+hints = Ride the wind from one end to the other. | Glide with jump held. | Coins everywhere!
+[legend]
+a = fire_slime
+c = crab_snipper
+f = crow_swooper up=1.5 range=3
+F = balloon_jelly up=3 range=4
+R = power BUBBLEBERRY
+U = pickup leaf
+w = pickup wings
+T = pickup treat
+D = decor
+x = spiky
+1 = sign text=wind
+2 = sign text=hearts
+g = wind w=12 h=6 dir=1 power=0.9
+[map]
+ 
+ 
+ 
+ 
+ 
+                                                                                                                                                                                                                                          n                              *
+                                                                                                                                                                                                                                        =====                           ===
+                                                                                                                o o      o o
+                                       ?   ?                  o  o  o                                                                               o   o   o   o               o  o  o                                                                             ===     ===                 o  o  o
+                                                                      n          ooo   oTo   ooo   ooo       =====    =====    ====                               n                                ooo   oTo   ooo   ooo
+                                                                                          w                                                                                                                 w                                                    ===           ===
+ @  1   2     D   R      c     a          U     a                                   f        F                                           C   h     f       F     f                                    f        F              a    x          x        C   h                                                       D      E
+##########################################################g           ######################################                      ##########################################g           ####################################################################################################g           ########################
+##########################################################            ######################################                      ##########################################            ####################################################################################################            ########################
+##########################################################            ######################################                      ##########################################            ####################################################################################################            ########################

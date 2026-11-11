@@ -75,8 +75,8 @@ func _layout() -> void:
 class CloudBand:
 	extends Node2D
 	func _draw() -> void:
-		for i in 7:
-			var origin := Vector2(i * 270 + 40, 130 + (i % 3) * 42)
-			var color := Color(1.0, 0.99, 0.98, 1.0)
-			for j in 4:
-				draw_circle(origin + Vector2(j * 20, -sin(j * 1.0) * 15), 24 + (j % 2) * 10, color)
+		var texture := PlayArt.prop("cloud")
+		for i in 5:
+			var at := Vector2(i * 380 + 30, 95 + (i % 3) * 50)
+			var size := Vector2(220 + (i % 2) * 55, 110)
+			draw_texture_rect(texture, Rect2(at, size), false, Color(1, 1, 1, 0.7))

@@ -1,11 +1,19 @@
 ; Built by tools/build_levels.py from chunks: start bowl_r boost flyers w3_belts coin_run cp flyers spring_up coin_run w3_saw cp star_a flyers end
 [meta]
+play_routes = 0.4
 id = W3-X
 world = 3
 theme = candy
 kind = optional
 hints = Pop the Balloon Jellies' balloons and they fall. | Lots of coins up in the air. | Keep bouncing!
 [legend]
+V = balloon_jelly up=0.0 range=3
+Y = candy_imp
+X = spring
+O = platform w=4 dx=3 dy=-1 t=2.8 thin
+J = platform w=3 dx=0 dy=0 t=3 thin
+I = pickup wings
+A = crate h=2 holds=coins:6
 a = shock_slime
 b = candy_imp
 c = crab_snipper
@@ -22,18 +30,18 @@ G = conveyor w=4 dir=1
 H = conveyor w=4 dir=-1
 y = saw dx=4 t=2.6
 [map]
- 
- 
- 
- 
- 
+
+
+
+
+
                                                                                                                                                                                                                                                                  *
-                                                                                                                                                                          n o o                                                                                 ===
-                                                                                                                                                                         ======                                      o        o        o
-                                       ?   ?            o   o   o   o                                                                         o   o   o   o                                                                                                 ===     ===           o   o   o   o
-                                                             n                   o o        o o          ooo   oTo   ooo   ooo                           n                               ooo   oTo   ooo   ooo     y        y
-                                                                                                                  w                                                                               w                                                      ===           ===
- @  1   2     D   R      c     a          U     a      f       F     f                                      f        F             C   h     f       F     f        S           a           f        F                  a         b            C   h                             f       F     f       D      E
+                    o o               o o               oIo               o o                                 o o               oIo               o o               o o   n o o       oIo               o o               o o               oIo               o ===             o o               oIo
+                    ====              ====              ====              ====                                ====              ====              ====              ==== ======       ====              ====         o    ====o        o    ====              ====              ====              ====
+             o o               o o     ?   ?     o o    o   o   o  ooo                                                                     o oo   o   o   o  o o               o o                                                   o o               o o  ===     ===  o o      o   o   oo oo
+             ====              ====              ====        n     ====          o o        o o          ooo   oTo   ooo   ooo             ====          n   ====              ====      ooo   oTo   ooo   ooo     y        y        ====              ====              ====              ====
+                  V                 V                 V              O  V                                   V     w           V                 V              O  V                 V             w   V                 V              O  V              ===V          ===    V                 V
+ @  1   2  X  D   R      c     a      A   U h  Xa   J  f       F     f    A   Y h                    X      f        F      J   A  CY hh X   f       F     f        S   Y h  X  a J         f        F  A   Y h  X      a         b         A  CY hh X                          Af  Y h  F    Jf       D      E
 ################################################################################G       H       ####################################################################################################################################################################################################################
 ################################################################################                ####################################################################################################################################################################################################################
 ################################################################################                ####################################################################################################################################################################################################################

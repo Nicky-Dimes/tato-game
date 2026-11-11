@@ -175,6 +175,7 @@ func _hit_feedback(final: bool) -> void:
 	if level == null:
 		return
 	var at := global_position + Vector2(0, -height * 0.55)
+	PlayArt.impact(level, at)
 	Fx.sparkle(level, at, Color(1.0, 0.97, 0.7), 7 if final else 4)
 	Fx.pop_ring(level, at, Color(1, 1, 1, 0.9), height * (0.9 if final else 0.55))
 	level.shake(5.0 if final else 2.5)

@@ -308,15 +308,9 @@ func _process(delta: float) -> void:
 	body.rotation = _lean + extra_rotation + _spin
 	body.scale = s * body_scale
 
-	# --- tint / invulnerability blink
-	var m := tint
-	if _blink_left > 0.0:
-		_blink_left -= delta
-		if not Settings.flag("reduce_flashes"):
-			m.a = 0.45 if fmod(_blink_left, 0.16) > 0.08 else 1.0
-		else:
-			m.a = 0.7
-	body.modulate = m
+	# Damage never alternates the character's opacity or washes out run cels.
+	_blink_left = maxf(0.0, _blink_left - delta)
+	body.modulate = tint
 
 	if _honk_marks > 0.0:
 		_honk_marks -= delta

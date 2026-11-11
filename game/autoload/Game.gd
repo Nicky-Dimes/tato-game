@@ -200,7 +200,7 @@ func configure_debug_stage(power: String, panel: String, scale_proof: bool = fal
 		stage.entities.add_child(enemy)
 		enemy.global_position = stage.player.position - Vector2(220, 0)
 		var caption := Label.new()
-		caption.text = "Scale QA: Rock Golem 86px · Tato ~102px · Boss " + str(int(stage.boss.height)) + "px" if stage.boss != null else "Scale QA"
+		caption.text = "Scale QA: Rock Golem %dpx · Tato ~102px · Boss %dpx" % [int(enemy.height), int(stage.boss.height)] if stage.boss != null else "Scale QA"
 		caption.position = Vector2(24, 230)
 		caption.add_theme_font_size_override("font_size", 18)
 		caption.add_theme_color_override("font_color", Color.WHITE)

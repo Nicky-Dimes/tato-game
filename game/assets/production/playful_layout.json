@@ -1,0 +1,154 @@
+{
+  "mushroom": [
+    6,
+    96,
+    308,
+    196
+  ],
+  "spring": [
+    326,
+    86,
+    293,
+    205
+  ],
+  "crate": [
+    662,
+    54,
+    244,
+    240
+  ],
+  "question": [
+    982,
+    60,
+    232,
+    228
+  ],
+  "checkpoint": [
+    19,
+    352,
+    277,
+    257
+  ],
+  "goal": [
+    342,
+    330,
+    257,
+    283
+  ],
+  "log_step": [
+    632,
+    417,
+    302,
+    133
+  ],
+  "island": [
+    946,
+    380,
+    301,
+    203
+  ],
+  "cloud_platform": [
+    4,
+    713,
+    309,
+    154
+  ],
+  "lily": [
+    320,
+    690,
+    300,
+    182
+  ],
+  "cracked": [
+    665,
+    666,
+    240,
+    227
+  ],
+  "spring_compressed": [
+    949,
+    749,
+    294,
+    137
+  ],
+  "hud_panel": [
+    0,
+    992,
+    314,
+    197
+  ],
+  "sign": [
+    350,
+    973,
+    256,
+    244
+  ],
+  "cloud": [
+    627,
+    1001,
+    307,
+    183
+  ],
+  "bush": [
+    944,
+    987,
+    298,
+    215
+  ],
+  "bowl": [
+    53,
+    109,
+    341,
+    275,
+    "play_interactions.png"
+  ],
+  "thorn": [
+    454,
+    50,
+    413,
+    335,
+    "play_interactions.png"
+  ],
+  "spikes": [
+    908,
+    103,
+    401,
+    273,
+    "play_interactions.png"
+  ],
+  "roller": [
+    1370,
+    90,
+    367,
+    296,
+    "play_interactions.png"
+  ],
+  "ice_spikes": [
+    49,
+    496,
+    343,
+    342,
+    "play_interactions.png"
+  ],
+  "mace": [
+    537,
+    457,
+    255,
+    414,
+    "play_interactions.png"
+  ],
+  "saw": [
+    932,
+    491,
+    356,
+    350,
+    "play_interactions.png"
+  ],
+  "torch": [
+    1398,
+    465,
+    290,
+    378,
+    "play_interactions.png"
+  ]
+}

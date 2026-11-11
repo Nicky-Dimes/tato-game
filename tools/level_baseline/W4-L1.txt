@@ -1,0 +1,35 @@
+; Built by tools/build_levels.py from chunks: start bowl_p w4_ice qblocks cp w4_pond steps w4_icicles cp pit_plat w4_ice high_road cp star_b flat_coins end
+[meta]
+id = W4-L1
+world = 4
+theme = icy
+kind = core
+hints = Ice is slippery: slow down before a ledge. | Freeze Shot turns a creature into a block you can stand on. | It also freezes the pond.
+[legend]
+a = ice_slime
+b = ice_puffin
+r = ice_puffin
+P = power FROSTBERRY
+R = power FROSTBERRY
+p = pickup crystal
+T = pickup treat
+D = decor
+1 = sign text=ice
+2 = sign text=power
+z = icicle
+[map]
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+                                                                                                                                              ##########################
+                                                                  ?%?    o o                            n                           oTo          z    z    z    z                          o o                                       oooooooo  n
+                          o o               o o o             n                                                                   ######                                                                        o o o               ==============              ########                   oTo
+                                                                                                                              ##########                                                  =====                                                                 #      #
+ @  1   2     D   P     a    a   B      b            a               a      p      C   h     R                    a       ##############   a       a        r              C   h                            b            a             a     b           C   h  #  *   B      a          D    a      D     D      E
+########################################iiiiiiii  iiiiiiii######################################~~~~~~~~~~~~~~~~########################################################################         ###########iiiiiiii  iiiiiiii##########################################################################################
+########################################iiiiiiii  iiiiiiii######################################~~~~~~~~~~~~~~~~########################################################################         ###########iiiiiiii  iiiiiiii##########################################################################################
+########################################################################################################################################################################################         #######################################################################################################################

@@ -1,11 +1,19 @@
 ; Built by tools/build_levels.py from chunks: start bowl_r boost gauntlet w6_maces coin_run cp flyers cracked w6_torches spike_hop cp star_a gauntlet end
 [meta]
+play_routes = 0.4
 id = W6-X
 world = 6
 theme = castle
 kind = optional
 hints = A bit of everything. | Take it one room at a time. | You can do it!
 [legend]
+V = pie_bat up=0.0 range=3
+Y = onion_knight
+X = spring
+O = platform w=4 dx=3 dy=-1 t=2.8 thin
+J = platform w=3 dx=0 dy=0 t=3 thin
+I = pickup wings
+A = crate h=2 holds=coins:6
 a = shock_slime
 c = onion_knight
 t = rock_golem
@@ -25,18 +33,18 @@ y = mace r=2 t=3.2
 z = torch every=2.4
 K = cracked h=2
 [map]
- 
- 
- 
- 
- 
+
+
+
+
+
                                                                                                                                                                                                                                                                    *
-                                                                          ############################                                                                                                                                                            ===
-                                                                              y        y        y                                                                                                                            o      o
-                                       ?   ?            e     ?                                                                               o   o   o   o                                              n                                                    ===     ===           e     ?
-                                                               n                                         ooo   oTo   ooo   ooo                              n                 ####                      ####
-                                                                                                                  w                                                           ####                ####  ####               ====   ====   ==                ===           ===
- @  1   2     D   R      c     a          U     a      a   c    r    t            t          c              f        F             C   h     f       F     f       R          K    j   a     z    ####z ####   z          ^^^^^^^^^^^^^^^^       C   h                             a   c    r    t       D      E
+                    o o               o o               oIo               ############################        oIo               o o               o o               oIo               o o               o o                I                o o               o o ===           oIo               o o
+                    ====              ====              ====              ====y        y    ====y             ====              ====              ====              ====              ====              ====                 o      o       ====              ====              ====              ====
+             o o               o o     ?   ?     o o    e     ?    o o               o o                                                   o oo   o   o   o  o o                                 o o     n         o o               o o               o o    ===     ===o o        e     ?o o
+             ====              ====              ====          n   ====              ====                ooo   oTo   ooo   ooo             ====             n====             ####               ====   ####       ====              ====              ====              ====              ====
+                  V                 V                 V              O  V                 V                 V     w           V              O  V                 V           ####  V             ####V ####         O  V  ====   ====  ======================           ===  V              O  V
+ @  1   2  X  D   R      c     a      A   U h  Xa   J  a   c    r    t    A   Y h tX         c            J f A   Y hF X           C   h     f    A  FY h  f    J  R          K    j  Aa  Y hz X  ####z ####   z          ^^^^^^^^^^^^^^^^       C   h        A   Y h  X    J      a   c    r    tA   Y hD      E
 ######################################################################################################################################################################################################################################################################################################################
 ######################################################################################################################################################################################################################################################################################################################
 ######################################################################################################################################################################################################################################################################################################################

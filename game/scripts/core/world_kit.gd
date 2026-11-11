@@ -62,6 +62,9 @@ static func kit(theme: String) -> Dictionary:
 ## Short art name ("world/grassland_hazard1") for a part, falling back to the
 ## Grassland kit when a world has no such drawing.
 static func art(theme: String, part: String) -> String:
+	var upgraded := {"flag": "goal", "sign": "sign", "block2": "cracked", "plat": "log_step", "plat2": "island", "bowl": "bowl", "spiky": "thorn", "spikes": "spikes", "roller": "roller", "icicle": "ice_spikes", "mace": "mace", "saw": "saw", "torch": "torch"}
+	if upgraded.has(part):
+		return "play/" + str(upgraded[part])
 	var world := theme if KITS.has(theme) else "grassland"
 	var k: Dictionary = KITS[world]
 	if not k.has(part):
@@ -73,6 +76,4 @@ static func art(theme: String, part: String) -> String:
 
 
 static func decor(theme: String, index: int) -> String:
-	var world := theme if KITS.has(theme) else "grassland"
-	var list: Array = KITS[world]["decor"]
-	return "world/%s_%s" % [world, str(list[absi(index) % list.size()])]
+	return "play/bush"

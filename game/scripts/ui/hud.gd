@@ -81,12 +81,13 @@ func setup(lv: Level) -> void:
 	var health_row := HBoxContainer.new()
 	health_row.add_theme_constant_override("separation", 10)
 	health.add_child(health_row)
-	var portrait := _icon("ui/tato_hud_portrait", 60)
+	var portrait := _icon("ui/tato_hud_portrait", 66)
+	portrait.texture = TatoVisual.frame_texture("cel_0")
 	health_row.add_child(portrait)
 	var health_info := VBoxContainer.new()
 	health_info.alignment = BoxContainer.ALIGNMENT_CENTER
 	health_row.add_child(health_info)
-	health_info.add_child(UITheme.label("TATO!", 17, UITheme.CREAM, true))
+	health_info.add_child(UITheme.label("TATO!", 17, UITheme.PLUM, true))
 	var hearts := HBoxContainer.new()
 	hearts.add_theme_constant_override("separation", 2)
 	health_info.add_child(hearts)
@@ -106,7 +107,7 @@ func setup(lv: Level) -> void:
 	power_info.add_theme_constant_override("separation", 2)
 	power_info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	power_row.add_child(power_info)
-	_power_name = UITheme.label("Honk", 23, UITheme.CREAM, true)
+	_power_name = UITheme.label("Honk", 24, UITheme.PLUM, true)
 	_power_name.name = "PowerName"
 	power_info.add_child(_power_name)
 	_readiness = ProgressBar.new()
@@ -123,7 +124,7 @@ func setup(lv: Level) -> void:
 		style.set_content_margin_all(0)
 		_readiness.add_theme_stylebox_override(style_name, style)
 	power_info.add_child(_readiness)
-	_power_hint = UITheme.label("", 15, UITheme.PEACH)
+	_power_hint = UITheme.label("", 16, UITheme.PLUM_SOFT)
 	power_info.add_child(_power_hint)
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -135,15 +136,15 @@ func setup(lv: Level) -> void:
 	right.add_theme_constant_override("separation", 8)
 	counts.add_child(right)
 	right.add_child(_icon("items/coin", 34))
-	_coins = UITheme.label("0", 28, UITheme.CREAM, true)
+	_coins = UITheme.label("0", 28, UITheme.PLUM, true)
 	_coins.custom_minimum_size.x = 42
 	right.add_child(_coins)
 	right.add_child(_icon("items/treasure_note", 34))
-	_notes = UITheme.label("0/3", 25, UITheme.CREAM, true)
+	_notes = UITheme.label("0/3", 25, UITheme.PLUM, true)
 	right.add_child(_notes)
 	_key_icon = _icon("items/key", 26)
 	right.add_child(_key_icon)
-	_keys = UITheme.label("0", 22, UITheme.CREAM, true)
+	_keys = UITheme.label("0", 22, UITheme.PLUM, true)
 	right.add_child(_keys)
 	var pause := UITheme.button("II", Vector2(74, 76))
 	pause.name = "PauseButton"
@@ -165,7 +166,7 @@ func setup(lv: Level) -> void:
 	stage.add_child(stage_info)
 	var stage_title := UITheme.label(level.level_id + "  ·  " + LevelDB.stage_name(level.level_id), 19, UITheme.PLUM, true)
 	stage_info.add_child(stage_title)
-	_objective = UITheme.label("", 14, UITheme.PLUM_SOFT)
+	_objective = UITheme.label("", 17, UITheme.PLUM_SOFT)
 	stage_info.add_child(_objective)
 	_journey = ProgressBar.new()
 	_journey.max_value = 1.0
@@ -362,7 +363,7 @@ func _plate(parent: Node, width: float) -> PanelContainer:
 	var panel := PanelContainer.new()
 	panel.custom_minimum_size = Vector2(width, 80)
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	panel.add_theme_stylebox_override("panel", UITheme.box(Color("343052"), Color("ffdc83"), 23, 3))
+	panel.add_theme_stylebox_override("panel", UITheme.box(Color("fff7df"), Color("d6a334"), 20, 3))
 	parent.add_child(panel)
 	return panel
 

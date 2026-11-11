@@ -1,0 +1,38 @@
+; Built by tools/build_levels.py from chunks: start bowl_r boost flyers coin_run w2_hive cp flyers pillars coin_run w2_branches cp star_a flyers end
+[meta]
+id = W2-X
+world = 2
+theme = orchard
+kind = optional
+hints = A whole stage of things that fly. | Popcorn-style arcs are great here, but any power works. | Keep moving!
+[legend]
+a = apple_chomper
+c = crab_snipper
+f = crow_swooper up=1.5 range=3
+F = bee_buzzer up=3 range=4
+r = carrot_archer
+R = power FIRE_PEPPER
+U = pickup feather
+w = pickup wings
+T = pickup treat
+D = decor
+1 = sign text=flap
+2 = sign text=hearts
+y = hive
+m = mole_digger
+[map]
+ 
+ 
+ 
+ 
+ 
+                                                                                                                                                                                                                                                               *
+                                                                                                                                                                                                                      o o   n    o o                          ===
+                                                                                                                y                                                                                                    ====       =====
+                                       ?   ?            o   o   o   o                                                                       o   o   o   o             o     T                                                                             ===     ===           o   o   o   o
+                                                             n               ooo   oTo   ooo   ooo          ====    ====                                  n                              ooo   oTo   ooo   ooo    ====              ====
+                                                                                      w                                                                             ##    ##    ##                w                                                    ===           ===
+ @  1   2     D   R      c     a          U     a      f       F     f          f        F              a                 r      C   h     f       F     f          ##    ##    ##          f        F                  m        a           C   h                             f       F     f       D      E
+##################################################################################################################################################################  ##    ##    ##  ##############################################################################################################################
+##################################################################################################################################################################  ##    ##    ##  ##############################################################################################################################
+##################################################################################################################################################################  ##    ##    ##  ##############################################################################################################################
