@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+		<meta name="apple-mobile-web-app-title" content="TATO!">
+		<meta name="theme-color" content="#301444">
+		<link rel="apple-touch-icon" href="index.180x180.png">
+		<title>TATO!</title>
+		<style>
+html, body {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	height: 100%;
+	overflow: hidden;
+	background-color: #301444;
+	color: #fff9ef;
+	touch-action: none;
+	-webkit-user-select: none;
+	user-select: none;
+	-webkit-touch-callout: none;
+	-webkit-tap-highlight-color: transparent;
+	overscroll-behavior: none;
+	font-family: -apple-system, 'Avenir Next', 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Keep the game clear of notches and the home bar. */
+#frame {
+	position: fixed;
+	top: env(safe-area-inset-top, 0px);
+	right: env(safe-area-inset-right, 0px);
+	bottom: env(safe-area-inset-bottom, 0px);
+	left: env(safe-area-inset-left, 0px);
+}
+
+#canvas {
+	display: block;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+#canvas:focus {
+	outline: none;
+}
+
+#status {
+	position: fixed;
+	inset: 0;
+	background-color: #fdf2e0;
+	color: #301444;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	gap: 18px;
+	z-index: 2;
+}
+
+#status-splash {
+	width: min(46vw, 46vh);
+	height: auto;
+	animation: bob 1.6s ease-in-out infinite;
+}
+
+@keyframes bob {
+	0%, 100% { transform: translateY(0) scale(1, 1); }
+	50% { transform: translateY(-8px) scale(1.02, 0.98); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	#status-splash { animation: none; }
+}
+
+#status-title {
+	font-size: clamp(18px, 4vw, 30px);
+	font-weight: 700;
+	letter-spacing: 0.02em;
+}
+
+#status-progress {
+	appearance: none;
+	-webkit-appearance: none;
+	width: min(60vw, 420px);
+	height: 18px;
+	border: 4px solid #301444;
+	border-radius: 14px;
+	background: #f3e6d2;
+	overflow: hidden;
+}
+
+#status-progress::-webkit-progress-bar { background: #f3e6d2; }
+#status-progress::-webkit-progress-value { background: #ff9a1f; }
+#status-progress::-moz-progress-bar { background: #ff9a1f; }
+
+#status-notice {
+	display: none;
+	max-width: 80vw;
+	background: #fff9ef;
+	border: 4px solid #301444;
+	border-radius: 16px;
+	padding: 14px 18px;
+	line-height: 1.35;
+	text-align: center;
+}
+
+/* Phones held upright: ask for a turn (the game is landscape). */
+#rotate {
+	display: none;
+	position: fixed;
+	inset: 0;
+	z-index: 3;
+	background: #301444;
+	color: #fff9ef;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	font-size: 22px;
+	font-weight: 700;
+	padding: 24px;
+}
+
+@media (orientation: portrait) and (max-width: 600px) {
+	#rotate { display: flex; }
+}
+		</style>
+		<script>
+// Older phones and tablets draw a lot of pixels on their sharp screens.
+// Rendering at a gentler pixel ratio keeps the game smooth; "Graphics
+// detail" in Settings (or ?dpr=2 in the address) changes it.
+(function () {
+	var real = window.devicePixelRatio || 1;
+	var touch = (navigator.maxTouchPoints || 0) > 1;
+	var cap = touch ? 1.5 : 2;
+	try {
+		var q = localStorage.getItem('tato_quality');
+		if (q === 'low') { cap = 1; }
+		if (q === 'high') { cap = touch ? 2 : 3; }
+	} catch (e) { /* private mode: keep defaults */ }
+	var m = /[?&]dpr=([0-9.]+)/.exec(window.location.search);
+	if (m) { cap = Math.max(0.5, Math.min(3, parseFloat(m[1]))); }
+	if (real > cap) {
+		try {
+			Object.defineProperty(window, 'devicePixelRatio', { get: function () { return cap; } });
+		} catch (e) { /* leave as is */ }
+	}
+}());
+		</script>
+		<link id="-gd-engine-icon" rel="icon" type="image/png" href="index.icon.png" />
+<link rel="apple-touch-icon" href="index.apple-touch-icon.png"/>
+<link rel="manifest" href="index.manifest.json">
+
+	</head>
+	<body>
+		<div id="frame">
+			<canvas id="canvas">
+				Your browser does not support the canvas tag.
+			</canvas>
+		</div>
+
+		<noscript>
+			TATO! needs JavaScript to run.
+		</noscript>
+
+		<div id="status">
+			<img id="status-splash" src="index.png" alt="Tato">
+			<div id="status-title">Warming up the kitchen...</div>
+			<progress id="status-progress"></progress>
+			<div id="status-notice"></div>
+		</div>
+		<div id="rotate">Turn your device sideways to play</div>
+
+		<script src="index.js"></script>
+		<script>
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":false,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":60069756,"index.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4,"serviceWorker":"index.service.worker.js"};
+const GODOT_THREADS_ENABLED = false;
+const engine = new Engine(GODOT_CONFIG);
+
+(function () {
+	const statusOverlay = document.getElementById('status');
+	const statusProgress = document.getElementById('status-progress');
+	const statusNotice = document.getElementById('status-notice');
+	const statusTitle = document.getElementById('status-title');
+
+	let initializing = true;
+
+	function hideStatus() {
+		if (!initializing) {
+			return;
+		}
+		statusOverlay.remove();
+		initializing = false;
+	}
+
+	function displayFailureNotice(err) {
+		console.error(err);
+		let text = 'Something went wrong while loading.';
+		if (err instanceof Error) {
+			text = err.message;
+		} else if (typeof err === 'string') {
+			text = err;
+		}
+		statusProgress.style.display = 'none';
+		statusTitle.textContent = 'Oh no!';
+		statusNotice.textContent = text + ' Try reloading the page.';
+		statusNotice.style.display = 'block';
+		initializing = false;
+	}
+
+	// Stop the page itself from scrolling, zooming or showing menus on long presses.
+	['gesturestart', 'gesturechange', 'contextmenu'].forEach(function (name) {
+		document.addEventListener(name, function (e) { e.preventDefault(); }, { passive: false });
+	});
+
+	const missing = Engine.getMissingFeatures({ threads: GODOT_THREADS_ENABLED });
+	if (missing.length !== 0) {
+		displayFailureNotice('This browser is missing: ' + missing.join(', ') + '.');
+		return;
+	}
+	// The game is kept on the device so it opens quickly and works offline.
+	// Before starting, ask whether a newer version has been published; if so
+	// switch to it now (the page reloads itself) instead of one visit later.
+	function checkForUpdate() {
+		if (!('serviceWorker' in navigator)) {
+			return Promise.resolve();
+		}
+		return navigator.serviceWorker.getRegistration().then(function (reg) {
+			if (!reg) {
+				return undefined;
+			}
+			return new Promise(function (resolve) {
+				let settled = false;
+				function carryOn() {
+					if (!settled) {
+						settled = true;
+						resolve();
+					}
+				}
+				function switchTo(worker) {
+					statusTitle.textContent = 'Getting the newest version...';
+					worker.postMessage('update');
+					setTimeout(carryOn, 8000); // the reload normally happens first
+				}
+				function watch(worker) {
+					if (!worker) {
+						return;
+					}
+					worker.addEventListener('statechange', function () {
+						if (worker.state === 'installed') {
+							switchTo(worker);
+						} else if (worker.state === 'redundant') {
+							carryOn();
+						}
+					});
+				}
+				const quick = setTimeout(carryOn, 3000); // offline or slow: just play
+				if (reg.waiting) {
+					clearTimeout(quick);
+					switchTo(reg.waiting);
+					return;
+				}
+				reg.addEventListener('updatefound', function () {
+					clearTimeout(quick);
+					setTimeout(carryOn, 20000);
+					watch(reg.installing);
+				});
+				reg.update().then(function () {
+					if (!reg.installing && !reg.waiting) {
+						clearTimeout(quick);
+						carryOn();
+					}
+				}).catch(function () {
+					clearTimeout(quick);
+					carryOn();
+				});
+			});
+		}).catch(function () { return undefined; });
+	}
+
+	window.tatoReady = hideStatus;
+	checkForUpdate().then(function () {
+		return engine.startGame({
+			'onProgress': function (current, total) {
+				if (current > 0 && total > 0) {
+					statusProgress.value = current;
+					statusProgress.max = total;
+				} else {
+					statusProgress.removeAttribute('value');
+					statusProgress.removeAttribute('max');
+				}
+			},
+		});
+	}).then(function () {
+		// The game calls window.tatoReady() once its first screen is drawn;
+		// keep the loading picture up until then (or 12 s at most).
+		statusTitle.textContent = 'Almost ready...';
+		setTimeout(hideStatus, 12000);
+	}, displayFailureNotice);
+}());
+		</script>
+	</body>
+</html>
+
