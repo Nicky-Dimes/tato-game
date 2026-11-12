@@ -293,7 +293,7 @@ const engine = new Engine(Object.assign({}, GODOT_CONFIG, {
 		initializing = false;
 	}
 
-	function displayFailureNotice(err) {
+	function displayFailureNotice(err, title) {
 		console.error(err);
 		let text = 'Something went wrong while loading.';
 		if (err instanceof Error) {
@@ -302,10 +302,22 @@ const engine = new Engine(Object.assign({}, GODOT_CONFIG, {
 			text = err;
 		}
 		statusProgress.style.display = 'none';
-		statusTitle.textContent = 'Oh no!';
-		statusNotice.textContent = text + ' Try reloading the page.';
+		statusTitle.textContent = title || 'Oh no!';
+		statusNotice.textContent = title ? text : text + ' Try reloading the page.';
 		statusNotice.style.display = 'block';
 		initializing = false;
+	}
+
+	// The engine is built with WebAssembly SIMD. Safari gained it in iOS / iPadOS 16.4;
+	// an older system cannot read the engine file at all (it fails with "WebAssembly.Module
+	// doesn't parse"). Check first and say what to do, instead of downloading 100 MB to fail.
+	function hasWasmSimd() {
+		try {
+			return WebAssembly.validate(new Uint8Array([0, 97, 115, 109, 1, 0, 0, 0, 1, 5, 1, 96, 0, 1, 123,
+				3, 2, 1, 0, 10, 10, 1, 8, 0, 65, 0, 253, 15, 253, 98, 11]));
+		} catch (e) {
+			return false;
+		}
 	}
 
 	// Stop the page itself from scrolling, zooming or showing menus on long presses.
@@ -316,6 +328,17 @@ const engine = new Engine(Object.assign({}, GODOT_CONFIG, {
 	const missing = Engine.getMissingFeatures({ threads: GODOT_THREADS_ENABLED });
 	if (missing.length !== 0) {
 		displayFailureNotice('This browser is missing: ' + missing.join(', ') + '.');
+		return;
+	}
+	// ?nosimd=1 shows this message on any device, to check how it looks
+	if (!hasWasmSimd() || /[?&]nosimd=1/.test(window.location.search)) {
+		const apple = /iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent || '');
+		displayFailureNotice(apple
+			? 'This device needs a software update before it can run TATO! The game needs iPadOS or iOS 16.4 or newer. On the device open Settings, then General, then Software Update, install the update, and come back to this page.'
+			: 'This browser is too old to run TATO! Please update the browser, or try a current version of Safari, Chrome, Edge or Firefox.',
+		'Update needed');
+		showDetail();
+		clearInterval(watchdog);
 		return;
 	}
 	// The game is kept on the device so it opens quickly and works offline.
