@@ -123,3 +123,13 @@ python3 tools/serve_https.py        # prints https://<this computer's address>:8
 The certificate is made locally, so the browser warns once ("This Connection Is Not
 Private"); choose Show Details and visit the website. Plain `http://<address>` from
 another device shows "This browser is missing: Secure Context".
+
+## Which devices can run the web build
+
+Godot's 4.7 web export is built with WebAssembly SIMD. Safari supports that from
+**iOS / iPadOS 16.4**; older systems cannot read the engine file (the error is
+"WebAssembly.Module doesn't parse ... can't get Function local's type"). Found on a
+10.2-inch iPad running iPadOS 15.5 on 2026-11-11. The loading page checks for SIMD
+first and shows "Update needed" (`?nosimd=1` shows that page on any device).
+Supporting older systems would need custom export templates built with
+`wasm_simd=no`; that has not been done.

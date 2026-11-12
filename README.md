@@ -8,7 +8,7 @@ brings home the six Flavor Pages of the Great Recipe Book.
 Plays in a browser (including iPad and iPhone), and on Windows, macOS and Linux.
 
 **Play in your browser:** https://nicky-dimes.github.io/tato-game/
-(works on iPad and iPhone in Safari; hold the device sideways; the first load is about 100 MB).
+(iPad and iPhone need **iOS / iPadOS 16.4 or newer**; hold the device sideways; the first load is about 100 MB).
 
 > **Status: version 0.4.0, a playable work in progress.** All six worlds, 30 stages and
 > six bosses can be played from start to finish. Art, animation and stage pacing are
